@@ -28,7 +28,7 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     maven {
-        url  "http://dl.bintray.com/thb/UniversityEvaluationDTOs"
+        url  "http://dl.bintray.com/thb/maven"
     }
 }
 
