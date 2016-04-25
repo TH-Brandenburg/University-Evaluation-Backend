@@ -20,7 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import de.fhb.ca.dto.util.Department;
+import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.util.Degree;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

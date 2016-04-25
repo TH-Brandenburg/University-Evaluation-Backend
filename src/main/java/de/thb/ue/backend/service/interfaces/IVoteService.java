@@ -16,7 +16,7 @@
 
 package de.thb.ue.backend.service.interfaces;
 
-import de.fhb.ca.dto.AnswersDTO;
+import de.thb.ue.dto.AnswersDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ValidationExeption;

@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.fhb.ca.dto.util.Department;
+import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.model.StudyPath;
 import de.thb.ue.backend.util.Degree;
 

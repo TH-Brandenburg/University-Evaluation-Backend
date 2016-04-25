@@ -19,7 +19,7 @@ package de.thb.ue.backend.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fhb.ca.dto.util.Department;
+import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.model.Choice;
 import de.thb.ue.backend.model.MCQuestion;
 import de.thb.ue.backend.model.Question;

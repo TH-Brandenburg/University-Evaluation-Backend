@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.fhb.ca.dto.AnswersDTO;
-import de.fhb.ca.dto.util.ChoiceDTO;
-import de.fhb.ca.dto.util.MultipleChoiceAnswerDTO;
+import de.thb.ue.dto.AnswersDTO;
+import de.thb.ue.dto.util.ChoiceDTO;
+import de.thb.ue.dto.util.MultipleChoiceAnswerDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ValidationExeption;

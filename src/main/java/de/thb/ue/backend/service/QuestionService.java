@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.fhb.ca.dto.QuestionsDTO;
+import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.model.MCQuestion;
 import de.thb.ue.backend.model.Question;

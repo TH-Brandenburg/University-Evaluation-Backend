@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.fhb.ca.dto.util.Department;
+import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;

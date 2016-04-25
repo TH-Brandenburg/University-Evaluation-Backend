@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import de.fhb.ca.dto.util.ErrorType;
+import de.thb.ue.dto.util.ErrorType;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;

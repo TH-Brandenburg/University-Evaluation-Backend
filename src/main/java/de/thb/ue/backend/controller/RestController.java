@@ -32,11 +32,11 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import de.fhb.ca.dto.AnswersDTO;
-import de.fhb.ca.dto.QuestionsDTO;
-import de.fhb.ca.dto.RequestDTO;
-import de.fhb.ca.dto.ResponseDTO;
-import de.fhb.ca.dto.util.ErrorType;
+import de.thb.ue.dto.AnswersDTO;
+import de.thb.ue.dto.QuestionsDTO;
+import de.thb.ue.dto.RequestDTO;
+import de.thb.ue.dto.ResponseDTO;
+import de.thb.ue.dto.util.ErrorType;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;

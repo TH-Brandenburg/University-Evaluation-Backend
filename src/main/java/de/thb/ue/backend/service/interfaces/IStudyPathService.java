@@ -18,7 +18,7 @@ package de.thb.ue.backend.service.interfaces;
 
 import java.util.List;
 
-import de.fhb.ca.dto.util.Department;
+import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.model.StudyPath;

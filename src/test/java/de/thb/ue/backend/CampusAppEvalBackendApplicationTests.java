@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import de.fhb.ca.dto.AnswersDTO;
-import de.fhb.ca.dto.RequestDTO;
-import de.fhb.ca.dto.util.ChoiceDTO;
-import de.fhb.ca.dto.util.MultipleChoiceAnswerDTO;
-import de.fhb.ca.dto.util.TextAnswerDTO;
+import de.thb.ue.dto.AnswersDTO;
+import de.thb.ue.dto.RequestDTO;
+import de.thb.ue.dto.util.ChoiceDTO;
+import de.thb.ue.dto.util.MultipleChoiceAnswerDTO;
+import de.thb.ue.dto.util.TextAnswerDTO;
 import de.thb.ue.backend.controller.RestController;
 import de.thb.ue.backend.model.Choice;
 import de.thb.ue.backend.model.Evaluation;

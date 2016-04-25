@@ -4,7 +4,7 @@ package de.thb.ue.backend.service.interfaces;
 
 import java.util.List;
 
-import de.fhb.ca.dto.QuestionsDTO;
+import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.model.MCQuestion;
 import de.thb.ue.backend.model.Question;

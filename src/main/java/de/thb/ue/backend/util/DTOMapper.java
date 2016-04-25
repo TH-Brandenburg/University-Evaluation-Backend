@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.fhb.ca.dto.AnswersDTO;
-import de.fhb.ca.dto.MultipleChoiceQuestionDTO;
-import de.fhb.ca.dto.QuestionsDTO;
-import de.fhb.ca.dto.util.ChoiceDTO;
-import de.fhb.ca.dto.util.TextQuestionDTO;
+import de.thb.ue.dto.AnswersDTO;
+import de.thb.ue.dto.MultipleChoiceQuestionDTO;
+import de.thb.ue.dto.QuestionsDTO;
+import de.thb.ue.dto.util.ChoiceDTO;
+import de.thb.ue.dto.util.TextQuestionDTO;
 import de.thb.ue.backend.model.Choice;
 import de.thb.ue.backend.model.MCQuestion;
 import de.thb.ue.backend.model.Question;
