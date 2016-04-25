@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="stdTemplate :: #head"></head>
+<body>
+<!-- Banner -->
+<div th:replace="stdTemplate :: #banner"></div>
+<div id="flow">
+    <!-- Primary Contents -->
+    <div role="main" id="main">
+        <div id="evaluation">
+            <!-- QR PDF Link -->
+            <form action="#" th:action="@{/qrcfile}" method="get">
+                <fieldset>
+                    <legend>Tickets</legend>
+                    <input type="hidden" name="uid" th:value="${evaluation.uid}"/>
+                    <input type="submit" value="Download QR-Codes"/>
+                </fieldset>
+            </form>
+
+            <form id="time" action="#" method="get">
+                <fieldset>
+                    <legend>Zeitlimit</legend>
+                    <div id="control-labels">
+                        <label for="minutes">minuten</label>
+                        <label for="seconds">sekunden</label>
+                    </div>
+                    <div id="controls">
+                        <input type="number" min="0" max="59" name="minutes" value="0"
+                               id="minutes"/> :
+                        <input type="number" min="0" max="59" name="seconds" value="0"
+                               id="seconds"/>
+                    </div>
+                    <div>
+                        <input type="button" value="stop" id="stop"/>
+                        <input type="button" value="start" id="start"/>
+                    </div>
+                </fieldset>
+            </form>
+            <p id="status">
+                <span id="votes" th:text="${evaluation.studentsVoted}">0</span>
+                <span th:text="' von ' + ${evaluation.studentsAll}">X</span>
+            </p>
+            Studenten haben abgestimmt.
+            <form action="#" th:action="@{/evaluation/close}" method="get">
+                <fieldset>
+                    <legend>Evaluation</legend>
+                    <input type="hidden" name="uid" th:value="${evaluation.uid}"/>
+                    <input type="submit" value="Evaluation beenden"/>
+                </fieldset>
+            </form>
+        </div>
+        <div id="overtime"></div>
+    </div>
+    <!-- Aside -->
+    <div role="complementary">
+        <ul>
+            <li><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
+            <li><a href="#" th:href="@{/}">Dashboard</a></li>
+            <li><a href="#" th:href="@{/archive}">Archiv</a></li>
+            <li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
+        </ul>
+    </div>
+</div>
+<!-- Footer -->
+<div th:replace="stdTemplate :: #footer"></div>
+</body>
+</html>

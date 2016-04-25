@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="stdTemplate :: #head"></head>
+<body>
+<!-- Banner -->
+<div th:replace="stdTemplate :: #banner"></div>
+<div id="flow">
+    <!-- Primary Contents -->
+    <div role="main" id="main">
+        <div id="error">
+            <h3>Ein Fehler ist aufgetreten.</h3>
+
+            <p th:if="${message} == null">Die angeforderte Seite kann nicht angezeigt werden.</p>
+
+            <p th:else="${message} != null" th:text="${message}">Die angeforderte Seite kann nicht angezeigt werden.</p>
+
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<div th:replace="stdTemplate :: #footer"></div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="stdTemplate :: #head"></head>
+<body>
+<!-- Banner -->
+<div th:replace="stdTemplate :: #banner"></div>
+<div id="flow">
+    <!-- Primary Contents -->
+    <div role="main" id="main">
+        <table th:unless="${#lists.isEmpty(evaluations)}">
+            <thead>
+            <tr>
+                <th>Aktive Evaluation</th>
+                <th>Gestartet</th>
+                <th>Abgestimmt</th>
+                <th>Studentenanzahl</th>
+                <th>Tickets</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="evaluation : ${evaluations}">
+                <td><a th:href="@{/evaluation/__${evaluation.uid}__}"
+                       th:text="${evaluation.subject.name}">Vorlesungsname</a></td>
+                <td th:datetime-local="${evaluation.dateOfEvaluation}">Datum der Evaluation</td>
+                <td th:text="${evaluation.studentsVoted}"></td>
+                <td th:text="${evaluation.studentsAll}"></td>
+                <td><a th:href="@{/qrcfile(uid=${evaluation.uid})}" class="pdf">QR-Codes</a></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(evaluations)}" class="info">Es wurden noch keine Evaluationen erstellt</p>
+    </div>
+    <!-- Aside -->
+    <div role="complementary">
+        <ul>
+            <li><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
+            <li><a href="#" th:href="@{/}" class="active">Dashboard</a></li>
+            <li><a href="#" th:href="@{/archive}">Archiv</a></li>
+            <li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
+        </ul>
+    </div>
+</div>
+<!-- Footer -->
+<div th:replace="stdTemplate :: #footer"></div>
+</body>
+</html>

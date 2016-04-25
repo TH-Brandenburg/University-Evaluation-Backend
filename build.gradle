@@ -1,0 +1,103 @@
+buildscript {
+    ext {
+        springBootVersion = '1.3.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+
+war {
+    baseName = 'ROOT'
+//    version = '0.0.1'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url  "http://dl.bintray.com/thb/UniversityEvaluationDTOs"
+    }
+}
+
+configurations {
+    providedRuntime
+}
+
+dependencies {
+
+// Testing
+//    testCompile "junit:junit:4.12"
+
+//    Spring stuff
+    testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    providedRuntime "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+
+// LDAP + Security
+    compile "org.springframework.ldap:spring-ldap-core:2.0.3.RELEASE"
+    compile("org.springframework.security:spring-security-ldap")
+    compile 'org.springframework.ldap:spring-ldap-test:2.0.3.RELEASE'
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework:spring-tx")
+
+// Templating engine
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf:${springBootVersion}"
+
+//    DB stuff
+    compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+    runtime "mysql:mysql-connector-java"
+//    Connection pool for DB connection
+    compile 'com.zaxxer:HikariCP:2.3.8'
+
+// For fancy annotations e.g. in the model classes
+    providedRuntime "org.projectlombok:lombok:1.16.6"
+
+//    For QRCode Stuff
+    compile "com.google.zxing:core:3.2.1"
+    compile "com.google.zxing:javase:3.2.1"
+
+//    DTOs
+    compile "de.thb.ue.dto:UE-DTOs:1.14"
+
+//  For Excel write stuff
+    compile 'org.apache.poi:poi:3.13'
+
+//    Time
+    compile 'org.jadira.usertype:usertype.core:4.0.0.GA'
+    compile 'joda-time:joda-time:2.9.1'
+    compile 'uk.co.gcwilliams:jodatime-thymeleaf-dialect:1.3'
+
+//    PDF stuff
+    compile 'org.apache.pdfbox:pdfbox:1.8.9'
+//    FileUpload stuff
+    compile 'commons-io:commons-io:2.4'
+    compile 'commons-fileupload:commons-fileupload:1.3.1'
+}
+
+
+eclipse {
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
+}
+
+bootRun {
+    addResources = false
+    environment 'spring.profiles.active', 'https'
+//    systemProperty 'spring.profiles.active', 'production'
+}

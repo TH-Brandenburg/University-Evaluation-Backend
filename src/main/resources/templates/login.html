@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="stdTemplate :: #head"></head>
+<body>
+<!-- Banner -->
+<div th:replace="stdTemplate :: #banner"></div>
+<div id="flow">
+    <!-- Primary Contents -->
+    <div role="main" id="main">
+        <form name="f" th:action="@{/login}" method="post">
+            <fieldset>
+                <legend>Login</legend>
+                <div th:if="${param.error}" class="alert alert-error">
+                    Der Benutzername und, oder das Passwort waren falsch.
+                </div>
+                <div th:if="${param.logout}" class="alert alert-success">
+                    Du wurdes ausgeloggt.
+                </div>
+                <div>
+                    <label>Benutzer:</label>
+                    <input type="text" name="username"
+                           pattern=".{2,}" title="at least 2 characters"
+                           aria-required="true" required="required" />
+                </div>
+                <div>
+                    <label>Passwort:</label>
+                    <input type="password" name="password"
+                           pattern=".{6,}" title="at least 6 characters"
+                           aria-required="true" required="required" />
+                </div>
+                <input type="submit" name="login" value="Log In" />
+            </fieldset>
+        </form>
+    </div>
+</div>
+<!-- Footer -->
+<div th:replace="stdTemplate :: #footer"></div>
+</body>
+</html>
