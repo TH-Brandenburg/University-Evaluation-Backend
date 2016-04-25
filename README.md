@@ -1,6 +1,6 @@
 # University Evaluation Backend 
 
-[![Build Status](https://travis-ci.org/TH-Brandenburg/University-Evaluation-Backend.svg?branch=master)](https://travis-ci.org/TH-Brandenburg/University-Evaluation-Backend)
+[![Build Status](https://travis-ci.org/TH-Brandenburg/University-Evaluation-Backend.svg?branch=develop)](https://travis-ci.org/TH-Brandenburg/University-Evaluation-Backend)
 
 This project presents a software solution of the evaluation
 problem faced by universities. The software consists of a REST-server (Github: CampusAppEvalBackend) application and to date this Android client project. The software
