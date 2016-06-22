@@ -194,7 +194,10 @@ public class EvaluationExcelFileGenerator {
 
                 //add average formula
                 cell = row.createCell(2, Cell.CELL_TYPE_FORMULA);
-                cell.setCellFormula("AVERAGE(F" + (i + yOffset + 1) + ":" + endCellName + (i + yOffset + 1) + ")");
+                //formlua works with blanks, empty strings and negative values
+                String formula = "SUMPRODUCT(ABS(N(+F" + (i + yOffset + 1) + ":" + endCellName + (i + yOffset + 1) + ")))/COUNT(F" + (i + yOffset + 1) + ":" + endCellName + (i + yOffset + 1) + ")";
+                //String averageFormula = "AVERAGE(IF(F" + (i + yOffset + 1) + ":" + endCellName + (i + yOffset + 1) + "<>\"\", ABS(F" + (i + yOffset + 1) + ":" + endCellName + (i + yOffset + 1) + ")))";
+                cell.setCellFormula(formula);
                 cell.setCellStyle(commonStyle);
 
                 //fill blank cells
@@ -219,7 +222,7 @@ public class EvaluationExcelFileGenerator {
                         // the correct question for this cell
                         if (answer.getQuestion().getText().equals(mcQuestionTexts.get(k))) {
                             Choice choice = answer.getChoice();
-                            if (choice != null && choice.getGrade() > 0) {
+                            if (choice != null && choice.getGrade() != 0) {
                                 cell = colorizeCell(cell, wb, choice.getGrade());
                                 cell.setCellValue(answer.getChoice().getGrade());
                             } else {
@@ -549,11 +552,11 @@ public class EvaluationExcelFileGenerator {
             style.setFillForegroundColor(HSSFColor.LIGHT_GREEN.index);
             style.setFillPattern(CellStyle.SOLID_FOREGROUND);
             cell.setCellStyle(style);
-        } else if (grade > 3.0 && grade <= 4.0) {
+        } else if ((grade >= 3.0 && grade <= 4.0) || (grade <= -3.0 && grade >= -4.0)) {
             style.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);
             style.setFillPattern(CellStyle.SOLID_FOREGROUND);
             cell.setCellStyle(style);
-        } else if (grade > 4.0) {
+        } else if (grade > 4.0 || grade < -4.0) {
             style.setFillForegroundColor(HSSFColor.MAROON.index);
             style.setFillPattern(CellStyle.SOLID_FOREGROUND);
             cell.setCellStyle(style);

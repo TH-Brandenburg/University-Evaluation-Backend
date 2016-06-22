@@ -74,10 +74,10 @@ public class InitializationService implements IInitializationService {
         tutorRepo.save(DBInit.getAllTutors());
         subjectRepo.save(DBInit.getAllSubjects());
         studyPathRepo.save(DBInit.getAllStudyPaths());
-        addQuestions(DBInit.getComputerScienceMCQuestionsV2(), DBInit.getComputerScienceQuestionsV2(), "Computer Science and Media v2.1 (2016-05-16)", DBInit.TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V2);
         addQuestions(DBInit.getBusinessAdministrationMCQuestions(), DBInit.getBusinessAdministrationQuestions(), "Business Administration", DBInit.TEXT_QUESTIONS_FIRST_BUSINESS_ADMINISTRATION);
         addQuestions(DBInit.getComputerScienceMCQuestions(), DBInit.getComputerScienceQuestions(), "Computer Science and Media", DBInit.TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V1);
         addQuestions(DBInit.getDemoMCQuestions(), DBInit.getDemoQuestions(), "Demo Evaluation", DBInit.TEXT_QUESTIONS_FIRST_DEMO);
+        addQuestions(DBInit.getComputerScienceMCQuestionsV2(), DBInit.getComputerScienceQuestionsV2(), "Computer Science and Media v2.1 (2016-05-16)", DBInit.TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V2);
     }
 
     private void addQuestions(List<MCQuestion> MCQuestions, List<Question> questions, String revisionName, boolean textQuestionsFirst) {
@@ -112,7 +112,7 @@ public class InitializationService implements IInitializationService {
         for(Question question : questions){
             List<Question> savedQuestion = questionRepo.findByText(question.getText());
             if(savedQuestion.size() == 0){
-                questionRepo.save(question);
+                questionsForRevision.add(questionRepo.save(question));
             } else {
                 questionsForRevision.add(savedQuestion.get(0));
             }
