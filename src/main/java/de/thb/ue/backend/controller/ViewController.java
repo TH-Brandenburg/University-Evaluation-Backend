@@ -231,7 +231,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
                            @RequestParam String semesterType,
                            @RequestParam String revision) throws ParticipantException, EvaluationException {
 
-        if (semester > 0 && semester <= 8 && students > 0 && students < 100) {
+        if (semester > 0 && semester <= 8 && students > 1 && students < 1000) {
             String generatedUid;
             generatedUid = evaluationService.add(semester, students, tutors, subject,
                     semesterType.equalsIgnoreCase("Sommer") ? SemesterType.SUMMER : SemesterType.WINTER, revision);
