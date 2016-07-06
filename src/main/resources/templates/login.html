@@ -1,39 +1,60 @@
 <!DOCTYPE html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="stdTemplate :: #head"></head>
+<head th:include="stdTemplate :: #head"></head>
+
 <body>
-<!-- Banner -->
-<div th:replace="stdTemplate :: #banner"></div>
-<div id="flow">
-    <!-- Primary Contents -->
-    <div role="main" id="main">
-        <form name="f" th:action="@{/login}" method="post">
-            <fieldset>
-                <legend>Login</legend>
-                <div th:if="${param.error}" class="alert alert-error">
-                    Der Benutzername und, oder das Passwort waren falsch.
-                </div>
-                <div th:if="${param.logout}" class="alert alert-success">
-                    Du wurdes ausgeloggt.
-                </div>
-                <div>
-                    <label>Benutzer:</label>
-                    <input type="text" name="username"
-                           pattern=".{2,}" title="at least 2 characters"
-                           aria-required="true" required="required" />
-                </div>
-                <div>
-                    <label>Passwort:</label>
-                    <input type="password" name="password"
-                           pattern=".{6,}" title="at least 6 characters"
-                           aria-required="true" required="required" />
-                </div>
-                <input type="submit" name="login" value="Log In" />
-            </fieldset>
-        </form>
-    </div>
-</div>
-<!-- Footer -->
-<div th:replace="stdTemplate :: #footer"></div>
+	<!-- Navigation bar -->
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href=""> <img th:src="..." alt="THB Evaluation" />
+				</a>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Content -->
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div th:if="${param.error}" class="alert alert-danger" role="alert">Der Benutzername und/oder das
+					Passwort waren falsch.</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-xs-4"></div>
+
+			<div class="col-xs-3">
+				<form th:action="@{/login}" method="post">
+					<fieldset>
+						<legend>Login</legend>
+						<div class="form-group">
+							<label>Benutzer</label>
+							<input type="text" class="form-control" name="username" pattern=".{2,}" title="at least 2 characters"
+								aria-required="true" required="required" />
+						</div>
+						<div class="form-group">
+							<label>Passwort</label>
+							<input type="password" class="form-control" name="password" pattern=".{6,}"
+								title="at least 6 characters" aria-required="true" required="required" />
+						</div>
+						<button type="submit" class="btn btn-danger" name="login">Einloggen</button>
+					</fieldset>
+				</form>
+			</div>
+
+			<div class="col-xs-4"></div>
+		</div>
+	</div>
 </body>
+
 </html>

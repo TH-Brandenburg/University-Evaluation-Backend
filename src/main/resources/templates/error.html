@@ -1,23 +1,44 @@
 <!DOCTYPE html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="stdTemplate :: #head"></head>
+
 <body>
-<!-- Banner -->
-<div th:replace="stdTemplate :: #banner"></div>
-<div id="flow">
-    <!-- Primary Contents -->
-    <div role="main" id="main">
-        <div id="error">
-            <h3>Ein Fehler ist aufgetreten.</h3>
+	<!-- Banner -->
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"> <img th:src="@{/img/logo.jpg}" alt="THB Evaluation" />
+				</a>
+			</div>
+		</div>
+	</nav>
 
-            <p th:if="${message} == null">Die angeforderte Seite kann nicht angezeigt werden.</p>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="panel panel-danger">
+					<div class="panel-heading">
+						<h3>Ein Fehler ist aufgetreten.</h3>
+					</div>
+					<div class="panel-body" th:if="${message} == null">Die angeforderte Seite kann nicht angezeigt
+						werden.</div>
 
-            <p th:else="${message} != null" th:text="${message}">Die angeforderte Seite kann nicht angezeigt werden.</p>
+					<div class="panel-body" th:else="${message} != null" th:text="${message}">Die angeforderte Seite
+						kann nicht angezeigt werden.</div>
+				</div>
 
-        </div>
-    </div>
-</div>
-<!-- Footer -->
-<div th:replace="stdTemplate :: #footer"></div>
+
+			</div>
+		</div>
+	</div>
+
 </body>
+
+
 </html>
