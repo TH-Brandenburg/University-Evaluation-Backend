@@ -33,7 +33,55 @@
 	<!-- Content -->
 	<div class="container">
 		<div class="row">
-			<div class="col-xs-12"></div>
+			<div class="col-sm-4">
+				<!-- QR PDF Link -->
+				<div id="pdf-link" class="text-center">
+					<form action="#" th:action="@{/qrcfile}" method="get">
+						<input type="hidden" name="uid" th:value="${evaluation.uid}" />
+						<button type="submit" class="btn btn-danger">Download QR-Codes</button>
+					</form>
+				</div>
+
+				<!-- Countdown Clock Inputs -->
+				<div class="text-center margin-top-bottom">
+					<form id="time" action="#" method="get">
+						<span style="display: inline-block">
+							<label for="minutes" style="display: block">Minuten</label>
+							<input type="number" min="0" max="59" name="minutes" value="0" id="minutes" />
+						</span>
+						<span style="display: inline-block">
+							<label for="seconds" style="display: block">Sekunden</label>
+							<input type="number" min="0" max="59" name="seconds" value="0" id="seconds" />
+						</span>
+						<div class="text-center margin-top-bottom">
+							<button type="submit" class="btn btn-danger" id="stop">Stop</button>
+							<button type="submit" class="btn btn-danger" id="start">Start</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="text-center">
+					<p id="status">
+						<span id="votes" th:text="${evaluation.studentsVoted}">0</span>
+						<span th:text="' von ' + ${evaluation.studentsAll}">X</span>
+					</p>
+					<p>Studenten haben abgestimmt.</p>
+				</div>
+
+				<div class="text-center margin-top-bottom">
+					<form action="#" th:action="@{/evaluation/close}" method="get">
+						<input type="hidden" name="uid" th:value="${evaluation.uid}" />
+						<button type="submit" class="btn btn-danger">Evaluation beenden</button>
+					</form>
+				</div>
+			</div>
+
+			<div class="col-sm-2"></div>
+
+			<div class="col-sm-6">
+				<!-- Countdown Clock -->
+				<div id="overtime"></div>
+			</div>
 		</div>
 	</div>
 </body>
