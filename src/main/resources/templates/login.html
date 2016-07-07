@@ -23,35 +23,39 @@
 	<!-- Content -->
 	<div class="container">
 		<div class="row">
-			<div class="col-xs-12">
-				<div th:if="${param.error}" class="alert alert-danger" role="alert">Der Benutzername und/oder das
-					Passwort waren falsch.</div>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-xs-4"></div>
-
-			<div class="col-xs-3">
-				<form th:action="@{/login}" method="post">
-					<fieldset>
-						<legend>Login</legend>
-						<div class="form-group">
-							<label>Benutzer</label>
-							<input type="text" class="form-control" name="username" pattern=".{2,}" title="at least 2 characters"
-								aria-required="true" required="required" />
+			<div class="col-sm-4"></div>
+			
+			<div class="col-sm-4">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Login</h3>
+					</div>
+					<div class="panel-body">
+						<div th:if="${param.error}" class="alert alert-danger alert-dismissable alert-link" role="alert">
+							<button class="close" type="button" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<p>Der Benutzername und/oder das Passwort waren falsch.</p>
 						</div>
-						<div class="form-group">
-							<label>Passwort</label>
-							<input type="password" class="form-control" name="password" pattern=".{6,}"
-								title="at least 6 characters" aria-required="true" required="required" />
-						</div>
-						<button type="submit" class="btn btn-danger" name="login">Einloggen</button>
-					</fieldset>
-				</form>
+						<form th:action="@{/login}" method="post" class="form">
+							<fieldset>
+								<div class="form-group">
+									<label>Benutzer</label> <input type="text" class="form-control"
+										name="username" pattern=".{2,}" title="at least 2 characters"
+										aria-required="true" required="required" />
+								</div>
+								<div class="form-group">
+									<label>Passwort</label> <input type="password"
+										class="form-control" name="password" pattern=".{6,}"
+										title="at least 6 characters" aria-required="true"
+										required="required" />
+								</div>
+								<button type="submit" class="btn btn-danger" name="login">Einloggen</button>
+							</fieldset>
+						</form>
+					</div>
+				</div>
 			</div>
 
-			<div class="col-xs-4"></div>
+			<div class="col-sm-4"></div>
 		</div>
 	</div>
 </body>
