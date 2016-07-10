@@ -46,6 +46,14 @@
 							th:value="${questionnaire.id}" />
 					</form>
 				</th:block>
+				<th:block th:each="question: ${questionnaire.questions}">
+					<form th:id="'delete-question-' + ${question.id}"
+						th:action="@{'/deleteQuestion/' + ${question.id}}"
+						th:method="POST">
+						<input type="hidden" name="questionnaireid"
+							th:value="${questionnaire.id}" />
+					</form>
+				</th:block>
 				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}"
 					th:method="POST" class="form-horizontal">
 					<input type="hidden" name="question-count"
@@ -70,8 +78,9 @@
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									Textfrage
-									<th:block th:text="${rowStat.count}"></th:block>
-
+									<th:block th:text="${rowStat.count}">1</th:block>
+									<span th:onClick="'deleteQuestion(' + ${question.id} + ')'" class="glyphicon glyphicon-remove"
+										aria-hidden="true" style="float: right;cursor: pointer;" title="Frage l&ouml;schen"></span>
 								</h3>
 							</div>
 							<div class="panel-body">
@@ -92,7 +101,7 @@
 									Ratingfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
 									<span th:onClick="'deleteMcQuestion(' + ${mcQuestion.id} + ')'" class="glyphicon glyphicon-remove"
-										aria-hidden="true" style="float: right;"></span>
+										aria-hidden="true" style="float: right;cursor: pointer;" title="Frage l&ouml;schen"></span>
 								</h3>
 							</div>
 							<div class="panel-body">
@@ -119,6 +128,9 @@
 <script>
 	function deleteMcQuestion(id){
 		document.getElementById("delete-mc-question-" + id).submit();
+	}
+	function deleteQuestion(id){
+		document.getElementById("delete-question-" + id).submit();
 	}
 </script>
 </html>

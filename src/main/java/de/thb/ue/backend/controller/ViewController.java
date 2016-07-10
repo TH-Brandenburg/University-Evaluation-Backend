@@ -52,6 +52,7 @@ import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.Evaluation;
 import de.thb.ue.backend.model.MCQuestion;
+import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.Tutor;
 import de.thb.ue.backend.service.interfaces.IEvaluationService;
@@ -176,6 +177,15 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	MCQuestion mcQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
     	questionnaire.getMcQuestions().remove(mcQuestion);
+    	questionsService.updateQuestionRevision(questionnaire);
+    	return "redirect:/questionnaire/" + questionnaireid;
+    }
+    
+    @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.POST)
+    String deleteQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
+    	Question question = questionsService.getQuestionById(Integer.parseInt(id));
+    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
+    	questionnaire.getQuestions().remove(question);
     	questionsService.updateQuestionRevision(questionnaire);
     	return "redirect:/questionnaire/" + questionnaireid;
     }

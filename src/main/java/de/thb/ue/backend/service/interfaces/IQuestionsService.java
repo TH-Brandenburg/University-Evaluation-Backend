@@ -31,4 +31,6 @@ public interface IQuestionsService {
     List<QuestionRevision> findAllQuestionRevisions();
     
     public MCQuestion getMCQuestionById(int id);
+    
+    public Question getQuestionById(int id);
 }

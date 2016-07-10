@@ -117,4 +117,9 @@ public class QuestionService implements IQuestionsService {
     public MCQuestion getMCQuestionById(int id) {
     	return mcQuestionRepo.findOne(id);
     }
+    
+    @Override
+    public Question getQuestionById(int id) {
+    	return questionRepo.findOne(id);
+    }
 }
