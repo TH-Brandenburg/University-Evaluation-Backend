@@ -42,6 +42,7 @@
 							<h3 class="panel-title">Allgemeine Angaben</h3>
 						</div>
 						<div class="panel-body">
+							<!-- Form Main -->
 							<fieldset>
 								<div class="form-group">
 									<label for="tutors" class="col-sm-4 control-label">Tutor</label>
@@ -96,21 +97,53 @@
 						</div>
 					</div>
 
-					<div class="panel panel-danger">
+					<!-- Additional Questions -->
+					<div class="panel panel-danger" th:each="i : ${#numbers.sequence(1, 2)}" th:id="'question-panel-' + ${i}">
 						<div class="panel-heading">
-							<h3 class="panel-title">Zusatzfrage 1</h3>
+							<h3 class="panel-title" style="display: inline-block" th:text="'Zusatzfrage ' + ${i}"></h3>
+							<div class="checkbox pull-right" style="padding-top: 0px;">
+								<label> <input type="checkbox" class="omit-question" />Frage auslassen
+								</label>
+							</div>
 						</div>
-						<div class="panel-body"></div>
-					</div>
-					<div class="panel panel-danger">
-						<div class="panel-heading">
-							<h3 class="panel-title">Zusatzfrage 2</h3>
+						<div class="panel-body" th:id="'question-panel-body-' + ${i}">
+							<div class="form-group">
+								<label th:for="'question-type-' + ${i}" class="col-sm-3 control-label">Fragetyp</label>
+								<div class="col-sm-9">
+									<select th:id="'question-type-' + ${i}" th:name="'question-type-' + ${i}" class="form-control"
+										required="required">
+										<option selected="selected">Textfrage</option>
+										<option>Best First</option>
+										<option>Best In The Middle</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label th:for="'question-' + ${i}" class="col-sm-3 control-label">Frage</label>
+								<div class="col-sm-9">
+									<textarea class="form-control" rows="3" th:id="'question-' + ${i}" th:name="'question-' + ${i}"
+										required="required"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label th:for="'max-chars-' + ${i}" class="col-sm-3 control-label">Max Zeichen</label>
+								<div class="col-sm-9">
+									<input type="number" class="form-control" th:id="'max-chars-' + ${i}" th:name="'max-chars-' + ${i}"
+										required="required" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label th:for="'numbers-only-' + ${i}" class="col-sm-3 control-label">Nur Zahlen</label>
+								<div class="col-sm-9">
+									<input type="checkbox" value="" th:id="'numbers-only-' + ${i}" th:name="'numbers-only-' + ${i}" />
+								</div>
+							</div>
 						</div>
-						<div class="panel-body"></div>
 					</div>
 
 					<div class="text-center">
 						<button type="submit" class="btn btn-danger btn-lg" name="create">Evaluation erstellen</button>
+						<p>&nbsp;</p>
 					</div>
 				</form>
 			</div>
