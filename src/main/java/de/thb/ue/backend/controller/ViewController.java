@@ -158,18 +158,29 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
     	questionnaire.setName(allRequestParams.get("name"));
     	
+    	boolean textQuestionsFirst = false;
+    	String textQuestionsFirstString = allRequestParams.get("text-questions-first");
+    	if( textQuestionsFirstString != null ) {
+    		textQuestionsFirst = true;
+    	}
+    	questionnaire.setTextQuestionsFirst(textQuestionsFirst);
+    	
     	int mcQuestionCount = Integer.parseInt(allRequestParams.get("mc-question-count"));
     	List<MCQuestion>allMcQuestions = questionnaire.getMcQuestions();
     	for(int i=1; i <= mcQuestionCount; i++){
     		allMcQuestions.get(i-1).setText(allRequestParams.get("mc-question-text-" + i));;
     	}
     	
-    	
+    	int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
+    	List<Question>allQuestions = questionnaire.getQuestions();
+    	for(int i=1; i <= questionCount; i++){
+    		allQuestions.get(i-1).setText(allRequestParams.get("question-text-" + i));;
+    	}
     	
     	model.addAttribute("questionaire", questionnaire);
  
     	questionsService.updateQuestionRevision(questionnaire);
-    	return "redirect:/questionnaire/" + id;
+    	return "redirect:/questionnaire/" + id + "?success";
     }
     
     @RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)
@@ -178,7 +189,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
     	questionnaire.getMcQuestions().remove(mcQuestion);
     	questionsService.updateQuestionRevision(questionnaire);
-    	return "redirect:/questionnaire/" + questionnaireid;
+    	return "redirect:/questionnaire/" + questionnaireid + "?success";
     }
     
     @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.POST)
@@ -187,7 +198,13 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
     	questionnaire.getQuestions().remove(question);
     	questionsService.updateQuestionRevision(questionnaire);
-    	return "redirect:/questionnaire/" + questionnaireid;
+    	return "redirect:/questionnaire/" + questionnaireid + "?success";
+    }
+    
+    @RequestMapping(value = "/deleteQuestionnaire/{id}", method = RequestMethod.POST)
+    String deleteQuestionRevision(@PathVariable String id) {
+    	questionsService.deleteQuestionRevisionById(Integer.parseInt(id));
+    	return "questionnaires";
     }
 
     @RequestMapping(value = "/evaluation/vote-count", method = RequestMethod.GET)

@@ -122,4 +122,9 @@ public class QuestionService implements IQuestionsService {
     public Question getQuestionById(int id) {
     	return questionRepo.findOne(id);
     }
+    
+    @Override
+    public void deleteQuestionRevisionById(int id) {
+    	questionRevisionRepo.delete(id);
+    }
 }
