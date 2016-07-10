@@ -107,7 +107,7 @@ function drawTextQuestion(panelBody) {
 		<label for="max-chars-%i" class="col-sm-3 control-label">Max Zeichen</label> \
 		<div class="col-sm-9"> \
 			<input type="number" class="form-control" id="max-chars-%i" name="max-chars-%i" \
-				required="required" /> \
+				min="2" max="1000" value="1000" required="required" /> \
 		</div> \
 	</div> \
 	<div class="form-group"> \
