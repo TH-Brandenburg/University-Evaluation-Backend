@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +51,9 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.Evaluation;
+import de.thb.ue.backend.model.MCQuestion;
+import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.Tutor;
 import de.thb.ue.backend.service.interfaces.IEvaluationService;
 import de.thb.ue.backend.service.interfaces.IQuestionsService;
@@ -131,6 +135,59 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
         model.addAttribute("evaluation", evaluationService.getByUID(uid));
         return "evaluation";
+    }
+    
+    @RequestMapping(value= "/questionnaires", method = RequestMethod.GET)
+    String getAllQuestionRevisions(Model model) {
+    	model.addAttribute("questionnaires", questionsService.findAllQuestionRevisions());
+    	return "questionnaires";
+    }
+    
+    
+    @RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
+    String getQuestionRevision(@PathVariable String id, Model model) {
+    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
+    	model.addAttribute("questionnaire", questionnaire);
+    	model.addAttribute("questionCount", questionnaire.getQuestions().size());
+    	model.addAttribute("mcQuestionCount", questionnaire.getMcQuestions().size());
+    	return "questionnaire";
+    }
+    
+    @RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.POST)
+    String updateQuestionRevision(@PathVariable String id, @RequestParam Map<String,String> allRequestParams, Model model) {
+    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
+    	questionnaire.setName(allRequestParams.get("name"));
+    	
+    	int mcQuestionCount = Integer.parseInt(allRequestParams.get("mc-question-count"));
+    	List<MCQuestion>allMcQuestions = questionnaire.getMcQuestions();
+    	for(int i=1; i <= mcQuestionCount; i++){
+    		allMcQuestions.get(i-1).setText(allRequestParams.get("mc-question-text-" + i));;
+    	}
+    	
+    	
+    	
+    	model.addAttribute("questionaire", questionnaire);
+ 
+    	questionsService.updateQuestionRevision(questionnaire);
+    	return "redirect:/questionnaire/" + id;
+    }
+    
+    @RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)
+    String deleteMcQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
+    	MCQuestion mcQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
+    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
+    	questionnaire.getMcQuestions().remove(mcQuestion);
+    	questionsService.updateQuestionRevision(questionnaire);
+    	return "redirect:/questionnaire/" + questionnaireid;
+    }
+    
+    @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.POST)
+    String deleteQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
+    	Question question = questionsService.getQuestionById(Integer.parseInt(id));
+    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
+    	questionnaire.getQuestions().remove(question);
+    	questionsService.updateQuestionRevision(questionnaire);
+    	return "redirect:/questionnaire/" + questionnaireid;
     }
 
     @RequestMapping(value = "/evaluation/vote-count", method = RequestMethod.GET)
