@@ -8,22 +8,20 @@
 		<div class="container-fluid">
 			<!-- Brand and toggle get grouped for better mobile display -->
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed"
-					data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-					aria-expanded="false">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" href="/">THB Evaluation</a>
 			</div>
 
 			<!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse"
-				id="bs-example-navbar-collapse-1">
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
-					<li><a href="#" th:href="@{/new-evaluation}">Neue
-							Evaluation</a></li>
+					<li><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
 					<li><a href="#" th:href="@{/}">Dashboard</a></li>
 					<li class="active"><a href="#" th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
 					<li><a href="#" th:href="@{/archive}">Archiv</a></li>
@@ -37,28 +35,24 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-3"></div>
+
 			<div class="col-sm-6">
 				<th:block th:each="mcQuestion: ${questionnaire.mcQuestions}">
 					<form th:id="'delete-mc-question-' + ${mcQuestion.id}"
-						th:action="@{'/deleteMcQuestion/' + ${mcQuestion.id}}"
-						th:method="POST">
-						<input type="hidden" name="questionnaireid"
-							th:value="${questionnaire.id}" />
+						th:action="@{'/deleteMcQuestion/' + ${mcQuestion.id}}" th:method="POST">
+						<input type="hidden" name="questionnaireid" th:value="${questionnaire.id}" />
 					</form>
 				</th:block>
 				<th:block th:each="question: ${questionnaire.questions}">
-					<form th:id="'delete-question-' + ${question.id}"
-						th:action="@{'/deleteQuestion/' + ${question.id}}"
+					<form th:id="'delete-question-' + ${question.id}" th:action="@{'/deleteQuestion/' + ${question.id}}"
 						th:method="POST">
-						<input type="hidden" name="questionnaireid"
-							th:value="${questionnaire.id}" />
+						<input type="hidden" name="questionnaireid" th:value="${questionnaire.id}" />
 					</form>
 				</th:block>
-				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}"
-					th:method="POST" class="form-horizontal">
-					<input type="hidden" name="question-count"
-						th:value="${questionCount}" /> <input type="hidden"
-						name="mc-question-count" th:value="${mcQuestionCount}" />
+
+				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
+					<input type="hidden" name="question-count" th:value="${questionCount}" />
+					<input type="hidden" name="mc-question-count" th:value="${mcQuestionCount}" />
 					<div class="panel panel-danger">
 						<div class="panel-heading">
 							<h3 class="panel-title">Allgemeine Angaben</h3>
@@ -67,8 +61,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Name</label>
 								<div class="col-sm-9">
-									<input type="text" name="name" th:value="${questionnaire.name}"
-										class="form-control" />
+									<input type="text" name="name" th:value="${questionnaire.name}" class="form-control" />
 								</div>
 							</div>
 						</div>
@@ -80,44 +73,41 @@
 									Textfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
 									<span th:onClick="'deleteQuestion(' + ${question.id} + ')'" class="glyphicon glyphicon-remove"
-										aria-hidden="true" style="float: right;cursor: pointer;" title="Frage l&ouml;schen"></span>
+										aria-hidden="true" style="float: right; cursor: pointer;" title="Frage l&ouml;schen"></span>
 								</h3>
 							</div>
 							<div class="panel-body">
 								<label class="col-sm-3 control-label">Fragetext</label>
 								<div class="col-sm-9">
-									<textarea th:name="'question-text-' + ${rowStat.count}"
-										class="form-control" rows="4"><th:block
+									<textarea th:name="'question-text-' + ${rowStat.count}" class="form-control" rows="4"><th:block
 											th:text="${question.text}">Fragetext</th:block></textarea>
 								</div>
 							</div>
 						</div>
 					</th:block>
-					<th:block
-						th:each="mcQuestion, rowStat : ${questionnaire.mcQuestions}">
+					<th:block th:each="mcQuestion, rowStat : ${questionnaire.mcQuestions}">
 						<div class="panel panel-danger">
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									Ratingfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
 									<span th:onClick="'deleteMcQuestion(' + ${mcQuestion.id} + ')'" class="glyphicon glyphicon-remove"
-										aria-hidden="true" style="float: right;cursor: pointer;" title="Frage l&ouml;schen"></span>
+										aria-hidden="true" style="float: right; cursor: pointer;" title="Frage l&ouml;schen"></span>
 								</h3>
 							</div>
 							<div class="panel-body">
 								<label class="col-sm-3 control-label">Fragetext</label>
 								<div class="col-sm-9">
-									<textarea th:name="'mc-question-text-' + ${rowStat.count}"
-										class="form-control" rows="4"><th:block
+									<textarea th:name="'mc-question-text-' + ${rowStat.count}" class="form-control" rows="4"><th:block
 											th:text="${mcQuestion.text}">Fragetext</th:block></textarea>
 								</div>
-								<!-- <th:block th:each="choice : ${mcQuestion.choices}"> -->
-								<!-- <p th:text="${choice.text}">Text</p> -->
-								<!-- </th:block> -->
 							</div>
 						</div>
 					</th:block>
-					<button class="btn btn-danger" type="submit">Update</button>
+					<div class="text-center">
+						<button class="btn btn-danger btn-lg" type="submit">Aktualisieren</button>
+						<p>&nbsp;</p>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -126,10 +116,10 @@
 	<div class="col-sm-3"></div>
 </body>
 <script>
-	function deleteMcQuestion(id){
+	function deleteMcQuestion(id) {
 		document.getElementById("delete-mc-question-" + id).submit();
 	}
-	function deleteQuestion(id){
+	function deleteQuestion(id) {
 		document.getElementById("delete-question-" + id).submit();
 	}
 </script>
