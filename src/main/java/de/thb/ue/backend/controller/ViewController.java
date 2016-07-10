@@ -204,7 +204,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     @RequestMapping(value = "/deleteQuestionnaire/{id}", method = RequestMethod.POST)
     String deleteQuestionRevision(@PathVariable String id) {
     	questionsService.deleteQuestionRevisionById(Integer.parseInt(id));
-    	return "questionnaires";
+    	return "redirect:/questionnaires/";
     }
 
     @RequestMapping(value = "/evaluation/vote-count", method = RequestMethod.GET)
