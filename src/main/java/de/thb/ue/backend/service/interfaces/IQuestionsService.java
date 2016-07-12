@@ -8,6 +8,7 @@ import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.model.MCQuestion;
 import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.QuestionRevision;
 
 public interface IQuestionsService {
 
@@ -22,4 +23,17 @@ public interface IQuestionsService {
     List<MCQuestion> getMCQuestions(String revisionName);
 
     List<String> getRevisionNames();
+    
+    QuestionRevision getRevisionById(int id);
+    
+    void updateQuestionRevision(QuestionRevision questionaire);
+    
+    List<QuestionRevision> findAllQuestionRevisions();
+    
+    MCQuestion getMCQuestionById(int id);
+    
+    Question getQuestionById(int id);
+    
+    void deleteQuestionRevisionById(int id);
+    
 }

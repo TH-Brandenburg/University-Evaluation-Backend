@@ -97,4 +97,34 @@ public class QuestionService implements IQuestionsService {
         out.addAll(revisions.stream().map(QuestionRevision::getName).collect(Collectors.toList()));
         return out;
     }
+    
+    @Override
+    public QuestionRevision getRevisionById(int id) {
+    	return questionRevisionRepo.findOne(id);
+    }
+    
+    @Override
+    public void updateQuestionRevision(QuestionRevision questionnaire) {
+    	questionRevisionRepo.save(questionnaire);
+    }
+    
+    @Override
+    public List<QuestionRevision> findAllQuestionRevisions() {
+    	return questionRevisionRepo.findAll();
+    }
+    
+    @Override
+    public MCQuestion getMCQuestionById(int id) {
+    	return mcQuestionRepo.findOne(id);
+    }
+    
+    @Override
+    public Question getQuestionById(int id) {
+    	return questionRepo.findOne(id);
+    }
+    
+    @Override
+    public void deleteQuestionRevisionById(int id) {
+    	questionRevisionRepo.delete(id);
+    }
 }

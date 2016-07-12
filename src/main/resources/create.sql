@@ -161,7 +161,7 @@ INSERT INTO `mc_question` (`id`, `text`) VALUES
 (37, 'Interface for question with 5 + 1 possible answers.'),
 (38, 'Interface for question with 5 + 1 possible answers. The best answer placed in the middle.'),
 (39, 'Interface for question with 6 + 1 possible answers.'),
-(41, 'Interface for question with 6 + 1 possible answers. The best answer placed in the middle.'),
+(41, 'Interface for question with 7 + 1 possible answers. The best answer placed in the middle.'),
 (40, 'Interface for question with 7 + 1 possible answers.'),
 (22, 'Kann er/sie schwierige Sachverhalte verständlich erklären?'),
 (4, 'Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.'),

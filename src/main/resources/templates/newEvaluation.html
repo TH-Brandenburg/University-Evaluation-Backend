@@ -1,77 +1,157 @@
 <!DOCTYPE html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="stdTemplate :: #head"></head>
+
 <body>
-<!-- Banner -->
-<div th:replace="stdTemplate :: #banner"></div>
-<div id="flow">
-    <!-- Primary Contents -->
-    <div role="main" id="main">
-        <form action="#" th:action="@{/evaluation}" method="post">
-            <fieldset>
-                <legend>Neue Evaluation</legend>
-                <div>
-                    <label for="tutors">Tutor:</label>
-                    <select name="tutors" aria-required="true" required="required" id="tutors">
-                        <option th:each="tutor : ${tutors}"
-                                th:value="${tutor.familyName}"
-                                th:text="${tutor.name} + ' ' + ${tutor.familyName}">
-                        </option>
-                    </select>
-                </div>
-                <div>
-                    <label for="subject">Lehrveranstaltung:</label>
-                    <select name="subject" aria-required="true" required="required" id="subject">
-                        <option th:each="subject : ${subjects}"
-                                th:value="${subject.id}"
-                                th:text="${subject.name} + ' ' + ${subject.degree}">
-                        </option>
-                    </select>
-                </div>
-                <div>
-                    <label for="semesterType">Semesterart:</label>
-                    <select name="semesterType" aria-required="true" required="required"
-                            id="semesterType">
-                        <option th:each="type : ${semesterTypes}"
-                                th:value="${type}"
-                                th:text="${type}">
-                        </option>
-                    </select>
-                </div>
-                <div>
-                    <label for="semester">Semester:</label>
-                    <input name="semester" type="number" min="1" max="8" value="1" aria-required="true"
-                           required="required" id="semester"/>
-                </div>
-                <div>
-                    <label for="revision">Fragebogen:</label>
-                    <select name="revision" aria-required="true" required="required" id="revision">
-                        <option th:each="revision : ${revisions}"
-                                th:value="${revision}"
-                                th:text="${revision}">
-                        </option>
-                    </select>
-                </div>
-                <div>
-                    <label for="students">Anzahl der Studenten:</label>
-                    <input name="students" type="number" min="2" max="999" value="10" aria-required="true"
-                           required="required" id="students" />
-                </div>
-                <input type="submit" name="create" value="Evaluation Erstellen"/>
-            </fieldset>
-        </form>
-    </div>
-    <!-- Aside -->
-    <div role="complementary">
-        <ul>
-            <li><a href="#" th:href="@{/new-evaluation}" class="active">Neue Evaluation</a></li>
-            <li><a href="#" th:href="@{/}">Dashboard</a></li>
-            <li><a href="#" th:href="@{/archive}">Archiv</a></li>
-            <li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
-        </ul>
-    </div>
-</div>
-<!-- Footer -->
-<div th:replace="stdTemplate :: #footer"></div>
+	<!-- Navigation bar -->
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">THB Evaluation</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
+					<li><a href="#" th:href="@{/}"><span class="sr-only">(current)</span>Dashboard</a></li>
+					<li><a href="#" th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
+					<li><a href="#" th:href="@{/archive}">Archiv</a></li>
+					<li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Content -->
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-3"></div>
+
+			<div class="col-sm-6">
+				<form action="#" th:action="@{/evaluation}" method="post" class="form-horizontal">
+					<div class="panel panel-danger">
+						<div class="panel-heading">
+							<h3 class="panel-title">Allgemeine Angaben</h3>
+						</div>
+						<div class="panel-body">
+							<!-- Form Main -->
+							<fieldset>
+								<div class="form-group">
+									<label for="tutors" class="col-sm-4 control-label">Tutor</label>
+									<div class="col-sm-8">
+										<select name="tutors" aria-required="true" required="required" id="tutors" class="form-control">
+											<option th:each="tutor : ${tutors}" th:value="${tutor.familyName}"
+												th:text="${tutor.name} + ' ' + ${tutor.familyName}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="subject" class="col-sm-4 control-label">Lehrveranstaltung</label>
+									<div class="col-sm-8">
+										<select name="subject" aria-required="true" required="required" id="subject" class="form-control">
+											<option th:each="subject : ${subjects}" th:value="${subject.id}"
+												th:text="${subject.name} + ' ' + ${subject.degree}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="semesterType" class="col-sm-4 control-label">Semesterart</label>
+									<div class="col-sm-8">
+										<select name="semesterType" aria-required="true" required="required" id="semesterType"
+											class="form-control">
+											<option th:each="type : ${semesterTypes}" th:value="${type}" th:text="${type}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="semester" class="col-sm-4 control-label">Semester</label>
+									<div class="col-sm-8">
+										<input name="semester" type="number" min="1" max="8" value="1" aria-required="true"
+											required="required" id="semester" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="revision" class="col-sm-4 control-label">Fragebogen</label>
+									<div class="col-sm-8">
+										<select name="revision" aria-required="true" required="required" id="revision" class="form-control">
+											<option th:each="revision : ${revisions}" th:value="${revision}" th:text="${revision}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="students" class="col-sm-4 control-label">Anzahl der Studenten</label>
+									<div class="col-sm-8">
+										<input name="students" type="number" min="2" max="999" value="10" aria-required="true"
+											required="required" id="students" class="form-control" />
+									</div>
+								</div>
+							</fieldset>
+						</div>
+					</div>
+
+					<!-- Additional Questions -->
+					<div class="panel panel-danger" th:each="i : ${#numbers.sequence(1, 2)}" th:id="'question-panel-' + ${i}">
+						<div class="panel-heading">
+							<h3 class="panel-title" style="display: inline-block" th:text="'Zusatzfrage ' + ${i}"></h3>
+							<div class="checkbox pull-right" style="padding-top: 0px;">
+								<label> <input type="checkbox" class="omit-question" />Frage auslassen
+								</label>
+							</div>
+						</div>
+						<div class="panel-body" th:id="'question-panel-body-' + ${i}">
+							<div class="form-group">
+								<label th:for="'question-type-' + ${i}" class="col-sm-3 control-label">Fragetyp</label>
+								<div class="col-sm-9">
+									<select th:id="'question-type-' + ${i}" th:name="'question-type-' + ${i}" class="form-control"
+										required="required">
+										<option selected="selected">Textfrage</option>
+										<option>Best First</option>
+										<option>Best In The Middle</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label th:for="'question-' + ${i}" class="col-sm-3 control-label">Frage</label>
+								<div class="col-sm-9">
+									<textarea class="form-control" rows="3" th:id="'question-' + ${i}" th:name="'question-' + ${i}"
+										required="required"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label th:for="'max-chars-' + ${i}" class="col-sm-3 control-label">Max Zeichen</label>
+								<div class="col-sm-9">
+									<input type="number" class="form-control" th:id="'max-chars-' + ${i}" th:name="'max-chars-' + ${i}"
+										min="2" max="1000" value="1000" required="required" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label th:for="'numbers-only-' + ${i}" class="col-sm-3 control-label">Nur Zahlen</label>
+								<div class="col-sm-9">
+									<input type="checkbox" value="" th:id="'numbers-only-' + ${i}" th:name="'numbers-only-' + ${i}" />
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="text-center">
+						<button type="submit" class="btn btn-danger btn-lg" name="create">Evaluation erstellen</button>
+						<p>&nbsp;</p>
+					</div>
+				</form>
+			</div>
+
+			<div class="col-sm-3"></div>
+		</div>
+	</div>
 </body>
+
 </html>
