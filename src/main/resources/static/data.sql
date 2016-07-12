@@ -636,6 +636,9 @@ UPDATE `tutor` SET `id` = 23,`department` = 0,`family_name` = 'Schafföner',`nam
 UPDATE `tutor` SET `id` = 24,`department` = 0,`family_name` = 'Beck',`name` = 'Eberhard' WHERE `tutor`.`id` = 24;
 UPDATE `tutor` SET `id` = 25,`department` = 0,`family_name` = 'Schrader',`name` = 'Thomas' WHERE `tutor`.`id` = 25;
 UPDATE `tutor` SET `id` = 26,`department` = 0,`family_name` = 'Jänicke',`name` = 'Karl-Heinz' WHERE `tutor`.`id` = 26;
+UPDATE `tutor` SET `id` = 27,`department` = 0,`username` = 'bartz',`family_name` = 'Bartz',`name` = 'Tobias' WHERE `tutor`.`id` = 27;
+UPDATE `tutor` SET `id` = 28,`department` = 0,`username` = 'anderst', `family_name` = 'Anders',`name` = 'Toni' WHERE `tutor`.`id` = 28;
+UPDATE `tutor` SET `id` = 28,`department` = 0,`username` = 'muellerb', `family_name` = 'Müller',`name` = 'Ben' WHERE `tutor`.`id` = 29;
 
 INSERT INTO `tutor` (`id`, `department`, `family_name`, `name`) VALUES
   (27, 2, 'Hausmann', 'Dietmar') ON DUPLICATE KEY UPDATE `id` = 27,`department` = 2, `family_name` = 'Hausmann', `name` = 'Dietmar';

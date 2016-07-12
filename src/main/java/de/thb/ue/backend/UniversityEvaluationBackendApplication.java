@@ -24,12 +24,14 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 @SpringBootApplication
 public class UniversityEvaluationBackendApplication extends SpringBootServletInitializer {
 
+    public static void main(String[] args) {
+        System.setProperty("javax.net.ssl.trustStore", "C:\\Users\\Tobi\\Development\\workspace\\java\\University-Evaluation-Backend\\src\\main\\resources\\cacerts");
+        System.setProperty("javax.net.ssl.trustStorePassword", "test123");
+        SpringApplication.run(UniversityEvaluationBackendApplication.class, args);
+    }
+
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(UniversityEvaluationBackendApplication.class);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(UniversityEvaluationBackendApplication.class, args);
     }
 }

@@ -16,15 +16,14 @@
 
 package de.thb.ue.backend.service;
 
+import de.thb.ue.backend.model.Tutor;
+import de.thb.ue.backend.repository.ITutor;
+import de.thb.ue.backend.service.interfaces.ITutorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import de.thb.ue.backend.model.Tutor;
-import de.thb.ue.backend.repository.ITutor;
-import de.thb.ue.backend.service.interfaces.ITutorService;
 
 @Component
 @Service
@@ -33,6 +32,11 @@ public class TutorService implements ITutorService {
     @Autowired
     private ITutor tutorRepo;
 
+
+    @Override
+    public List<Tutor> getByUsername(String username) {
+        return tutorRepo.findByUsername(username);
+    }
 
     @Override
     public List<Tutor> getByFamilyName(String name) {

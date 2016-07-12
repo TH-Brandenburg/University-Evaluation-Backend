@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.repository;
 
+import de.thb.ue.backend.model.Tutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -24,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.List;
-
-import de.thb.ue.backend.model.Tutor;
 
 @RepositoryDefinition(domainClass = Tutor.class, idClass = Integer.class)
 @Transactional(readOnly = true)
@@ -38,5 +37,8 @@ public interface ITutor extends CrudRepository<Tutor, Serializable> {
 
     @Query("SELECT t FROM Tutor t WHERE LOWER(t.familyName) = LOWER(:familyName)")
     List<Tutor> findByFamilyName(@Param("familyName") String familyName);
+
+    @Query("SELECT t FROM Tutor t WHERE LOWER(t.username) = LOWER(:username)")
+    List<Tutor> findByUsername(@Param("username") String username);
 
 }

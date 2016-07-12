@@ -16,20 +16,15 @@
 
 package de.thb.ue.backend.model;
 
-import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import de.thb.ue.dto.util.Department;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,6 +33,9 @@ import lombok.Setter;
 @Getter
 @Table(name = "tutor")
 public class Tutor extends BaseModel {
+
+    @NotNull
+    private String username;
 
     @NotNull
     private String name;

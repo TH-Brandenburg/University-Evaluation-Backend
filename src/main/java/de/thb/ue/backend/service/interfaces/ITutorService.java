@@ -16,11 +16,14 @@
 
 package de.thb.ue.backend.service.interfaces;
 
-import java.util.List;
-
 import de.thb.ue.backend.model.Tutor;
 
+import java.util.List;
+
 public interface ITutorService {
+
+    List<Tutor> getByUsername(String username);
+
     List<Tutor> getByFamilyName(String name);
 
     List<Tutor> getAll();

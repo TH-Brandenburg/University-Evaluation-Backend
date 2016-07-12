@@ -16,35 +16,6 @@
 
 package de.thb.ue.backend.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.ldap.userdetails.LdapUserDetails;
-import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
@@ -56,7 +27,30 @@ import de.thb.ue.backend.service.interfaces.IQuestionsService;
 import de.thb.ue.backend.service.interfaces.ISubjectService;
 import de.thb.ue.backend.service.interfaces.ITutorService;
 import de.thb.ue.backend.util.SemesterType;
+import de.thb.ue.dto.util.Department;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.ldap.userdetails.LdapUserDetails;
+import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @org.springframework.stereotype.Controller
@@ -86,7 +80,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     String index(Model model) {
         //TODO
         LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Tutor> tutors = tutorService.getByFamilyName(user.getUsername());
+        List<Tutor> tutors = tutorService.getByUsername(user.getUsername());
         List<Evaluation> evaluations;
 
         if (tutors != null && !tutors.isEmpty()) {
@@ -107,7 +101,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     String archive(Model model) {
         //TODO
         LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Evaluation> evaluations = tutorService.getByFamilyName(user.getUsername()).
+        List<Evaluation> evaluations = tutorService.getByUsername(user.getUsername()).
                 get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
         model.addAttribute("evaluations", evaluations);
         return "archive";
@@ -118,7 +112,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //TODo
         model.addAttribute("tutors", new ArrayList<Tutor>() {{
-            add(new Tutor("", user.getUsername(), Department.COMPUTER_SCIENCE_MEDIA, null));
+            add(new Tutor("", "", user.getUsername(), Department.COMPUTER_SCIENCE_MEDIA, null));
         }});
         model.addAttribute("subjects", subjectService.getAll());
         model.addAttribute("semesterTypes", new String[]{"Sommer", "Winter"});

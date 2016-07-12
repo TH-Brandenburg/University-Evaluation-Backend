@@ -18,7 +18,19 @@ package de.thb.ue.backend.service;
 
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-
+import de.thb.ue.backend.exception.AggregatedAnswerException;
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.exception.EvaluationException;
+import de.thb.ue.backend.exception.ParticipantException;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.IEvaluation;
+import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.service.interfaces.*;
+import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
+import de.thb.ue.backend.util.QRCGeneration;
+import de.thb.ue.backend.util.SemesterType;
+import de.thb.ue.backend.util.ZipHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.joda.time.LocalDateTime;
@@ -34,32 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.exception.EvaluationException;
-import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Participant;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.Subject;
-import de.thb.ue.backend.model.Tutor;
-import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.repository.IEvaluation;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IParticipantService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
-import de.thb.ue.backend.util.QRCGeneration;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.backend.util.ZipHelper;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -95,7 +81,7 @@ public class EvaluationService implements IEvaluationService {
 
         Subject subjectToEvaluate = subjectService.getByID(subject);
 
-        List<Tutor> tutorsForEvaluation = tutorService.getByFamilyName(tutor);
+        List<Tutor> tutorsForEvaluation = tutorService.getByUsername(tutor);
         if (tutorsForEvaluation == null || tutorsForEvaluation.isEmpty()) {
             log.error("Tutor was unknown!");
         }
@@ -163,7 +149,7 @@ public class EvaluationService implements IEvaluationService {
             if (votes != null && !votes.isEmpty()) {
                 aggregatedMCAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
 
-                List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getFamilyName()).collect(Collectors.toList());
+                List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getUsername()).collect(Collectors.toList());
                 List<String> mcQuestions = evaluation.getQuestionRevision().getMcQuestions().stream().map(MCQuestion::getText).collect(Collectors.toList());
                 List<String> textualQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
                 new EvaluationExcelFileGenerator(evaluationUID, aggregatedMCAnswers, tutors, mcQuestions,

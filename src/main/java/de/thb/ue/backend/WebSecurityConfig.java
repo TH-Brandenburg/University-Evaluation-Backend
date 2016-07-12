@@ -16,8 +16,10 @@
 
 package de.thb.ue.backend;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -57,14 +59,16 @@ public class WebSecurityConfig {
     protected static class AuthenticationConfiguration extends
             GlobalAuthenticationConfigurerAdapter {
 
+
+        @Autowired
+        Environment env;
+
         @Override
         public void init(AuthenticationManagerBuilder auth) throws Exception {
-            auth
-                    .ldapAuthentication()
-                    .userDnPatterns("uid={0},ou=informatik")
-                    .groupSearchBase("ou=informatik")
-                    .contextSource()
-                    .ldif("classpath:test-server.ldif");
+            auth.ldapAuthentication()
+                    .userSearchFilter("(uid={0})")
+                    .userDnPatterns("uid={0}")
+                    .contextSource().url(env.getProperty("ldap.url") + "/" + env.getProperty("ldap.base")).managerDn(env.getProperty("ldap.user")).managerPassword(env.getProperty("ldap.password"));
         }
     }
 
