@@ -51,6 +51,10 @@ public class TutorService implements ITutorService {
         if (tutor == null) {
             tutor = getLdapUser(username);
             tutorRepo.save(tutor);
+        } else {
+            if (isDisabled(username)) {
+                tutor = null;
+            }
         }
         return tutor;
     }
@@ -80,6 +84,15 @@ public class TutorService implements ITutorService {
 
         return (Tutor) ldapTemplate.search(
                 "", filter.encode(), new PersonAttributesMapper()).get(0);
+    }
+
+    private boolean isDisabled(String uid) {
+        AndFilter filter = new AndFilter();
+        filter.and(new NotFilter(new EqualsFilter("loginDisabled", "TRUE")));
+        filter.and(new EqualsFilter("uid", uid));
+
+        return ldapTemplate.search(
+                "", filter.encode(), new PersonAttributesMapper()).get(0) == null;
     }
 
     private class PersonAttributesMapper implements AttributesMapper {
