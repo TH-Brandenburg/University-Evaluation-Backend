@@ -72,10 +72,12 @@ function replaceChoices(choicesNumberSelectBox, panelBody) {
 		var lowestRank = 1;
 		choicesPanel.remove();
 		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
+		setNoAnswerOnChange();
 	} else if (questionType == "Best In The Middle") {
 		var lowestRank = (parseInt(numberOfChoices) + 1) / -2;
 		choicesPanel.remove();
 		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
+		setNoAnswerOnChange();
 	}
 }
 
@@ -171,6 +173,7 @@ function drawBestFirst(panelBody) {
 	panelBody.append(formGroups);
 
 	setSelectOnChange();
+	setNoAnswerOnChange();
 }
 
 /**
@@ -215,6 +218,7 @@ function drawBestInTheMiddle(panelBody) {
 	panelBody.append(formGroups);
 
 	setSelectOnChange();
+	setNoAnswerOnChange();
 }
 
 /**
@@ -244,7 +248,7 @@ function createChoicesPanel(lowestRank, numberOfChoices) {
 	}
 
 	choices = choices.replace("%formGroups", formGroups);
-
+	
 	return choices;
 }
 
@@ -257,7 +261,8 @@ function createChoicesPanel(lowestRank, numberOfChoices) {
  */
 function createChoicesBestFist(lowestRank, numberOfChoices) {
 	var formGroups = '';
-
+	
+	// create choices except n/a choice
 	for (choiceNumber = lowestRank; choiceNumber <= numberOfChoices; choiceNumber++) {
 		var formGroup = '<div class="form-group"> \
 			<label for="choice-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
@@ -270,6 +275,9 @@ function createChoicesBestFist(lowestRank, numberOfChoices) {
 		formGroup = formGroup.replace(/%choiceNumber/g, choiceNumber);
 		formGroups = formGroups.concat(formGroup);
 	}
+	
+	// add n/a choice
+	formGroups = formGroups.concat(createNoAnswerOption());
 
 	return formGroups;
 }
@@ -283,7 +291,8 @@ function createChoicesBestFist(lowestRank, numberOfChoices) {
  */
 function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 	var formGroups = '';
-
+	
+	// create choices except n/a choice
 	var highestRank = lowestRank * -1;
 	for (choiceNumber = highestRank; choiceNumber >= lowestRank; choiceNumber--) {
 		// always skip grade -1 and 0
@@ -302,6 +311,55 @@ function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 		formGroup = formGroup.replace(/%choiceNumber/g, choiceNumber);
 		formGroups = formGroups.concat(formGroup);
 	}
+	
+	// add n/a choice
+	formGroups = formGroups.concat(createNoAnswerOption());
 
 	return formGroups;
+}
+
+/**
+ * Creates the checkbox for toggling the n/a option with the accompanying text field
+ * 
+ * @returns {String}
+ */
+function createNoAnswerOption(){
+	return '<div class="form-group">\
+		<label class="col-sm-1 control-label"></label> \
+	    <div class="col-sm-11">\
+		    <div class="checkbox">\
+		      <label>\
+		        <input type="checkbox" class="allow-no-choice-checkbox">"keine Angabe" erlauben\
+		      </label>\
+		    </div>\
+	  </div>\
+	</div>\
+	<div class="form-group hidden allow-no-choice-div"> \
+		<label for="choice-%i-0" class="col-sm-1 control-label"></label> \
+		<div class="col-sm-11"> \
+			<input type="text" class="form-control" id="choice-%i-0" name="choice-%i-0" placeholder="Text"/>\
+		</div> \
+	</div>';
+}
+
+/**
+ * Enables the toggling of the text field of the n/a checkbox
+ */
+function setNoAnswerOnChange() {
+	$(".allow-no-choice-checkbox").change(function() {
+		var checkBox = $(this);
+		var panelBody = checkBox.closest(".panel-body");
+		var allowNoChoiceDiv = panelBody.find(".allow-no-choice-div");
+		var textBox = allowNoChoiceDiv.find(".form-control");
+		
+		if (checkBox.is(":checked")){
+			allowNoChoiceDiv.removeClass('hidden');
+			textBox.attr('required', 'required');
+		}
+		else {
+			allowNoChoiceDiv.addClass('hidden');
+			textBox.removeAttr('required');
+			textBox.val("");
+		}
+	});
 }
