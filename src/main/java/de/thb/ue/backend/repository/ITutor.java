@@ -39,6 +39,6 @@ public interface ITutor extends CrudRepository<Tutor, Serializable> {
     List<Tutor> findByFamilyName(@Param("familyName") String familyName);
 
     @Query("SELECT t FROM Tutor t WHERE LOWER(t.username) = LOWER(:username)")
-    List<Tutor> findByUsername(@Param("username") String username);
+    Tutor findByUsername(@Param("username") String username);
 
 }

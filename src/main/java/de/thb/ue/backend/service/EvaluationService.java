@@ -43,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -81,15 +82,15 @@ public class EvaluationService implements IEvaluationService {
 
         Subject subjectToEvaluate = subjectService.getByID(subject);
 
-        List<Tutor> tutorsForEvaluation = tutorService.getByUsername(tutor);
-        if (tutorsForEvaluation == null || tutorsForEvaluation.isEmpty()) {
+        Tutor tutorsForEvaluation = tutorService.getByUsername(tutor);
+        if (tutorsForEvaluation == null) {
             log.error("Tutor was unknown!");
         }
 
         String uid = UUID.randomUUID().toString();
 
         QuestionRevision questionRevision = questionRevisionRepo.findByName(revisionName).get(0);
-        Evaluation evaluation = evaluationRepo.save(new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
+        Evaluation evaluation = evaluationRepo.save(new Evaluation(uid, LocalDateTime.now(), semester, Collections.singletonList(tutorsForEvaluation), subjectToEvaluate, type, false,
                 questionRevision, null, students, 0));
         participantService.add(students, evaluation);
         return uid;

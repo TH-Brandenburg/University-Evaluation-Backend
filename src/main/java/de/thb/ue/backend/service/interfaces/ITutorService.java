@@ -22,7 +22,7 @@ import java.util.List;
 
 public interface ITutorService {
 
-    List<Tutor> getByUsername(String username);
+    Tutor getByUsername(String username);
 
     List<Tutor> getByFamilyName(String name);
 

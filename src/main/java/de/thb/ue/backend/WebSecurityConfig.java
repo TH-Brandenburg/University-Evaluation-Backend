@@ -68,7 +68,10 @@ public class WebSecurityConfig {
             auth.ldapAuthentication()
                     .userSearchFilter("(uid={0})")
                     .userDnPatterns("uid={0}")
-                    .contextSource().url(env.getProperty("ldap.url") + "/" + env.getProperty("ldap.base")).managerDn(env.getProperty("ldap.user")).managerPassword(env.getProperty("ldap.password"));
+                    .contextSource().url(env.getProperty("ldap.url")
+                    + "/" + env.getProperty("ldap.base"))
+                    .managerDn(env.getProperty("ldap.user"))
+                    .managerPassword(env.getProperty("ldap.password"));
         }
     }
 

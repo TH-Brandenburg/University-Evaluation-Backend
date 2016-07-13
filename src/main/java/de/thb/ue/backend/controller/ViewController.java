@@ -16,6 +16,18 @@
 
 package de.thb.ue.backend.controller;
 
+import de.thb.ue.backend.exception.AggregatedAnswerException;
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.exception.EvaluationException;
+import de.thb.ue.backend.exception.ParticipantException;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.service.interfaces.IEvaluationService;
+import de.thb.ue.backend.service.interfaces.IQuestionsService;
+import de.thb.ue.backend.service.interfaces.ISubjectService;
+import de.thb.ue.backend.service.interfaces.ITutorService;
+import de.thb.ue.backend.util.SemesterType;
+import de.thb.ue.dto.util.Department;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,26 +51,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import de.thb.ue.dto.util.Department;
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.exception.EvaluationException;
-import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.Tutor;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.SemesterType;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @org.springframework.stereotype.Controller
@@ -88,13 +80,12 @@ public class ViewController extends WebMvcConfigurerAdapter {
     String index(Model model) {
         //TODO
         LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Tutor> tutors = tutorService.getByUsername(user.getUsername());
+        Tutor tutor = tutorService.getByUsername(user.getUsername());
         List<Evaluation> evaluations;
 
-        if (tutors != null && !tutors.isEmpty()) {
+        if (tutor != null) {
 
-            evaluations = tutors.
-                    get(0).getEvaluations().stream().filter(evaluation -> !evaluation.getClosed()).collect(Collectors.toList());
+            evaluations = tutor.getEvaluations().stream().filter(evaluation -> !evaluation.getClosed()).collect(Collectors.toList());
 
         } else {
             //TODO delete workaround
@@ -110,7 +101,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         //TODO
         LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Evaluation> evaluations = tutorService.getByUsername(user.getUsername()).
-                get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+                getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
         model.addAttribute("evaluations", evaluations);
         return "archive";
     }
