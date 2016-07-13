@@ -73,7 +73,7 @@ function replaceChoices(choicesNumberSelectBox, panelBody) {
 		choicesPanel.remove();
 		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
 	} else if (questionType == "Best In The Middle") {
-		var lowestRank = Math.floor(numberOfChoices / 2) * -1;
+		var lowestRank = (parseInt(numberOfChoices) + 1) / -2;
 		choicesPanel.remove();
 		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
 	}
@@ -206,7 +206,7 @@ function drawBestInTheMiddle(panelBody) {
 		</div> \
 	</div>';
 
-	formGroups = formGroups.concat(createChoicesPanel(-2, 5));
+	formGroups = formGroups.concat(createChoicesPanel(-3, 5));
 
 	var questionNumber = panelBody.attr('id').split("-").pop();
 	formGroups = formGroups.replace(/%i/g, questionNumber);
@@ -286,6 +286,11 @@ function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 
 	var highestRank = lowestRank * -1;
 	for (choiceNumber = highestRank; choiceNumber >= lowestRank; choiceNumber--) {
+		// always skip grade -1 and 0
+		if (choiceNumber == -1 || choiceNumber == 0){
+			continue;
+		}
+		
 		var formGroup = '<div class="form-group"> \
 			<label for="choice-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
 			<div class="col-sm-11"> \
