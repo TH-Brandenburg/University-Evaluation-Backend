@@ -74,15 +74,16 @@ public class InitializationService implements IInitializationService {
         tutorRepo.save(DBInit.getAllTutors());
         subjectRepo.save(DBInit.getAllSubjects());
         studyPathRepo.save(DBInit.getAllStudyPaths());
+        addQuestions(DBInit.getComputerScienceMCQuestionsV2(), DBInit.getComputerScienceQuestionsV2(), "Computer Science and Media v2.1 (2016-05-16)", DBInit.TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V2);
         addQuestions(DBInit.getBusinessAdministrationMCQuestions(), DBInit.getBusinessAdministrationQuestions(), "Business Administration", DBInit.TEXT_QUESTIONS_FIRST_BUSINESS_ADMINISTRATION);
-        addQuestions(DBInit.getComputerScienceMCQuestions(), DBInit.getComputerScienceQuestios(), "Computer Science and Media", DBInit.TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE);
+        addQuestions(DBInit.getComputerScienceMCQuestions(), DBInit.getComputerScienceQuestions(), "Computer Science and Media", DBInit.TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V1);
         addQuestions(DBInit.getDemoMCQuestions(), DBInit.getDemoQuestions(), "Demo Evaluation", DBInit.TEXT_QUESTIONS_FIRST_DEMO);
     }
 
     private void addQuestions(List<MCQuestion> MCQuestions, List<Question> questions, String revisionName, boolean textQuestionsFirst) {
         List<Choice> choicesForRevision = new ArrayList<>();
         List<MCQuestion> mcQuestionsForRevision = new ArrayList<>();
-        List<Question> questionsForRevision = new ArrayList<>();
+        ArrayList<Question> questionsForRevision = new ArrayList<>();
 
         for (MCQuestion mcQuestion : MCQuestions) {
             List<Choice> actualQuestionChoiceList = new ArrayList<>();
@@ -99,11 +100,24 @@ public class InitializationService implements IInitializationService {
                 choicesForRevision.add(tempChoice);
             }
             mcQuestion.setChoices(actualQuestionChoiceList);
-            mcQuestionsForRevision.add(mcQuestionRepo.save(mcQuestion));
+
+            MCQuestion savedQuestion = mcQuestionRepo.findByText(mcQuestion.getText());
+            if(savedQuestion != null){
+                mcQuestionsForRevision.add(savedQuestion);
+            } else {
+                mcQuestionsForRevision.add(mcQuestionRepo.save(mcQuestion));
+            }
         }
 
-        questionsForRevision = (List<Question>) questionRepo.save(questions);
-
+        for(Question question : questions){
+            List<Question> savedQuestion = questionRepo.findByText(question.getText());
+            if(savedQuestion.size() == 0){
+                questionRepo.save(question);
+            } else {
+                questionsForRevision.add(savedQuestion.get(0));
+            }
+        }
+//        questionsForRevision = (List<Question>) questionRepo.save(questions);
         questionRevisionRepo.save(new QuestionRevision(revisionName,
                 questionsForRevision, mcQuestionsForRevision, choicesForRevision, textQuestionsFirst));
     }
