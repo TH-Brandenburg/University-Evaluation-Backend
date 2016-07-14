@@ -48,9 +48,9 @@
 									<a th:href="@{'/questionnaire/' + ${questionnaire.id}}"><th:block th:text="${questionnaire.name}"></th:block></a>
 								</div>
 								<div class="col-sm-3">
-									<form th:action="@{'/deleteQuestionnaire/' + ${questionnaire.id}}" th:method="POST">
-										<button type="submit" class="btn btn-danger btn-xs pull-right">L&ouml;schen</button>
-									</form>
+									<button type="submit" class="btn btn-danger btn-xs pull-right"
+										th:attr="data-url=@{'/deleteQuestionnaire/' + ${questionnaire.id}}" data-toggle="modal"
+										data-target="#delete-dialog">L&ouml;schen</button>
 								</div>
 							</div>
 						</th:block>
@@ -78,6 +78,35 @@
 			<div class="col-sm-3"></div>
 		</div>
 	</div>
+
+	<!-- Delete Dialog-->
+	<div class="modal fade" id="delete-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="delete-dialog-label">Fragebogen wirklich löschen?</h4>
+				</div>
+				<div class="modal-footer">
+					<form th:action="@{/deleteQuestionnaire/}" id="delete-form" th:method="POST">
+						<button class="btn btn-danger" type="submit">Ja</button>
+						<button class="btn btn-default" data-dismiss="modal">Nein</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
+
+<script>
+	$('#delete-dialog').on('show.bs.modal', function(event) {
+		var button = $(event.relatedTarget);
+		var url = button.data('url');
+		var modal = $(this);
+		modal.find('#delete-form').attr("action", url);
+	});
+</script>
 
 </html>
