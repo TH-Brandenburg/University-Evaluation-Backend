@@ -22,7 +22,6 @@ import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.exception.ValidationExeption;
 import de.thb.ue.backend.model.Evaluation;
 import de.thb.ue.backend.model.Subject;
-import de.thb.ue.backend.model.Tutor;
 import de.thb.ue.backend.model.Vote;
 import de.thb.ue.backend.service.TutorService;
 import de.thb.ue.backend.service.interfaces.*;
@@ -106,7 +105,7 @@ public class RestController {
             throw new EvaluationException(EvaluationException.ALREADY_CLOSED, "Evaluation already closed or the participant already voted");
         }
     }
-
+/* ONLY FOR TESTING!!!
     @RequestMapping(value = API_VERSION + "/superuser/{id}", method = RequestMethod.GET)
     @ResponseBody
     ResponseEntity<?> getSuperuser(@PathVariable String id) {
@@ -117,7 +116,7 @@ public class RestController {
             }
         }
         return new ResponseEntity<>(false, HttpStatus.OK);
-    }
+    }*/
 
     @RequestMapping(value = API_VERSION + "/answers", method = RequestMethod.POST)
     @ResponseBody
