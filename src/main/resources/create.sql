@@ -899,8 +899,10 @@ INSERT INTO `tutor` (`id`, `username`, `department`, `family_name`, `name`) VALU
   -- (27, 0, 'Schrader', 'Thomas'),
   -- (28, 0, 'Jänicke', 'Karl-Heinz'),
   -- (29, 0, 'Developer', 'Account'),
-  (30, 'bartz', 0, 'Bartz', 'Tobias'),
+  -- (30, 'bartz', 0, 'Bartz', 'Tobias'),
   (31, 'anderst', 0, 'Anders', 'Toni'),
   (32, 'muellerb', 0, 'Müller', 'Ben');
 
+INSERT INTO `tutor` (`id`, `username`, `department`, `family_name`, `name`, `is_superuser`) VALUES
+  (30, 'bartz', 0, 'Bartz', 'Tobias', TRUE);
 -- --------------------------------------------------------

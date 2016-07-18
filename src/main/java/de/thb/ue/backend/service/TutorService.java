@@ -60,6 +60,12 @@ public class TutorService implements ITutorService {
     }
 
     @Override
+    public Boolean isSuperuser(String username) {
+        Tutor tutor = getByUsername(username);
+        return tutor != null && tutor.getIsSuperuser();
+    }
+
+    @Override
     public List<Tutor> getByFamilyName(String name) {
         return tutorRepo.findByFamilyName(name);
     }

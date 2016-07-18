@@ -24,6 +24,8 @@ public interface ITutorService {
 
     Tutor getByUsername(String username);
 
+    Boolean isSuperuser(String username);
+
     List<Tutor> getByFamilyName(String name);
 
     List<Tutor> getAll();

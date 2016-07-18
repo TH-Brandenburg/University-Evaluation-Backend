@@ -17,7 +17,6 @@
 package de.thb.ue.backend.model;
 
 import de.thb.ue.dto.util.Department;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +26,6 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Setter
 @Getter
@@ -46,10 +44,20 @@ public class Tutor extends BaseModel {
     @NotNull
     private Department department;
 
+    private Boolean isSuperuser;
+
     @ManyToMany
     @JoinTable(name = "evaluation_tutor", joinColumns = {@JoinColumn(name = "tutor_id")}, inverseJoinColumns = {@JoinColumn(name = "evaluation_id")})
     private List<Evaluation> evaluations;
 
+
+    public Tutor(String username, String name, String familyName, Department department, List<Evaluation> evaluations) {
+        this.username = username;
+        this.name = name;
+        this.familyName = familyName;
+        this.department = department;
+        this.evaluations = evaluations;
+    }
 
     @Override
     public boolean equals(Object o) {

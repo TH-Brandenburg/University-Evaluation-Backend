@@ -16,42 +16,32 @@
 
 package de.thb.ue.backend.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-
-import de.thb.ue.dto.AnswersDTO;
-import de.thb.ue.dto.QuestionsDTO;
-import de.thb.ue.dto.RequestDTO;
-import de.thb.ue.dto.ResponseDTO;
-import de.thb.ue.dto.util.ErrorType;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.exception.ValidationExeption;
 import de.thb.ue.backend.model.Evaluation;
 import de.thb.ue.backend.model.Subject;
+import de.thb.ue.backend.model.Tutor;
 import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.service.interfaces.IAnswerImageService;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IParticipantService;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.service.interfaces.IStudyPathService;
-import de.thb.ue.backend.service.interfaces.IVoteService;
+import de.thb.ue.backend.service.TutorService;
+import de.thb.ue.backend.service.interfaces.*;
 import de.thb.ue.backend.util.DTOMapper;
+import de.thb.ue.dto.AnswersDTO;
+import de.thb.ue.dto.QuestionsDTO;
+import de.thb.ue.dto.RequestDTO;
+import de.thb.ue.dto.ResponseDTO;
+import de.thb.ue.dto.util.ErrorType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 @Slf4j
 @org.springframework.web.bind.annotation.RestController
@@ -79,6 +69,9 @@ public class RestController {
 
     @Autowired
     private IAnswerImageService answerImageService;
+
+    @Autowired
+    private TutorService tutorService;
 
 
 //    @RequestMapping(value = API_VERSION + "/init", method = RequestMethod.GET)
@@ -112,6 +105,18 @@ public class RestController {
         } else {
             throw new EvaluationException(EvaluationException.ALREADY_CLOSED, "Evaluation already closed or the participant already voted");
         }
+    }
+
+    @RequestMapping(value = API_VERSION + "/superuser/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    ResponseEntity<?> getSuperuser(@PathVariable String id) {
+        Tutor tutor = tutorService.getByUsername(id);
+        if (tutor != null) {
+            if (tutor.getIsSuperuser() != null) {
+                return new ResponseEntity<>(tutor.getIsSuperuser(), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(false, HttpStatus.OK);
     }
 
     @RequestMapping(value = API_VERSION + "/answers", method = RequestMethod.POST)
