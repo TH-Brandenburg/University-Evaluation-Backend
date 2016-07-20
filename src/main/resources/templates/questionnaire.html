@@ -77,8 +77,7 @@
 							<div class="form-group">
 								<div class="col-sm-offset-3 col-sm-9">
 									<div class="checkbox">
-										<label> 
-											<th:block th:if="${questionnaire.textQuestionsFirst}">
+										<label> <th:block th:if="${questionnaire.textQuestionsFirst}">
 												<input type="checkbox" name="text-questions-first" checked="checked" value="true" />Textfragen zuerst
 											</th:block> <th:block th:unless="${questionnaire.textQuestionsFirst}">
 												<input type="checkbox" name="text-questions-first" value="true" />Textfragen zuerst
@@ -96,7 +95,7 @@
 								<h3 class="panel-title">
 									Textfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
-									<span class="glyphicon glyphicon-remove" aria-hidden="true" style="float: right; cursor: pointer;"
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;"
 										title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
 										th:attr="data-delete-method=@{'deleteQuestion(' + ${question.id} + ')'}"></span>
 								</h3>
@@ -117,7 +116,7 @@
 								<h3 class="panel-title">
 									Ratingfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
-									<span class="glyphicon glyphicon-remove" aria-hidden="true" style="float: right; cursor: pointer;"
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;"
 										title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
 										th:attr="data-delete-method=@{'deleteMcQuestion(' + ${mcQuestion.id} + ')'}"></span>
 								</h3>
