@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.service;
 
+import de.thb.ue.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
+import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.backend.repository.IChoice;
-import de.thb.ue.backend.repository.IMCQuestion;
-import de.thb.ue.backend.repository.IQuestion;
+import de.thb.ue.backend.repository.ISCQuestion;
+import de.thb.ue.backend.repository.ITextQuestion;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.IStudyPath;
 import de.thb.ue.backend.repository.ISubject;
@@ -48,10 +47,10 @@ public class InitializationService implements IInitializationService {
     private IChoice choiceRepo;
 
     @Autowired
-    private IQuestion questionRepo;
+    private ITextQuestion questionRepo;
 
     @Autowired
-    private IMCQuestion mcQuestionRepo;
+    private ISCQuestion mcQuestionRepo;
 
     @Autowired
     private ITutor tutorRepo;
@@ -80,15 +79,15 @@ public class InitializationService implements IInitializationService {
         addQuestions(DBInit.getDemoMCQuestions(), DBInit.getDemoQuestions(), "Demo Evaluation", DBInit.TEXT_QUESTIONS_FIRST_DEMO);
     }
 
-    private void addQuestions(List<MCQuestion> MCQuestions, List<Question> questions, String revisionName, boolean textQuestionsFirst) {
+    private void addQuestions(List<SingleChoiceQuestion> SingleChoiceQuestions, List<TextQuestion> textQuestions, String revisionName, boolean textQuestionsFirst) {
         List<Choice> choicesForRevision = new ArrayList<>();
-        List<MCQuestion> mcQuestionsForRevision = new ArrayList<>();
-        ArrayList<Question> questionsForRevision = new ArrayList<>();
+        List<SingleChoiceQuestion> singleChoiceQuestionsForRevision = new ArrayList<>();
+        ArrayList<TextQuestion> questionsForRevision = new ArrayList<>();
 
-        for (MCQuestion mcQuestion : MCQuestions) {
+        for (SingleChoiceQuestion singleChoiceQuestion : SingleChoiceQuestions) {
             List<Choice> actualQuestionChoiceList = new ArrayList<>();
-            for (int i = 0; i < mcQuestion.getChoices().size(); i++) {
-                Choice actualChoice = mcQuestion.getChoices().get(i);
+            for (int i = 0; i < singleChoiceQuestion.getChoices().size(); i++) {
+                Choice actualChoice = singleChoiceQuestion.getChoices().get(i);
                 List<Choice> tempChoices = choiceRepo.findByTextGrade(actualChoice.getText(), actualChoice.getGrade());
                 Choice tempChoice;
                 if (tempChoices == null || tempChoices.isEmpty()) {
@@ -99,26 +98,26 @@ public class InitializationService implements IInitializationService {
                 actualQuestionChoiceList.add(tempChoice);
                 choicesForRevision.add(tempChoice);
             }
-            mcQuestion.setChoices(actualQuestionChoiceList);
+            singleChoiceQuestion.setChoices(actualQuestionChoiceList);
 
-            MCQuestion savedQuestion = mcQuestionRepo.findByText(mcQuestion.getText());
+            SingleChoiceQuestion savedQuestion = mcQuestionRepo.findByText(singleChoiceQuestion.getText());
             if(savedQuestion != null){
-                mcQuestionsForRevision.add(savedQuestion);
+                singleChoiceQuestionsForRevision.add(savedQuestion);
             } else {
-                mcQuestionsForRevision.add(mcQuestionRepo.save(mcQuestion));
+                singleChoiceQuestionsForRevision.add(mcQuestionRepo.save(singleChoiceQuestion));
             }
         }
 
-        for(Question question : questions){
-            List<Question> savedQuestion = questionRepo.findByText(question.getText());
-            if(savedQuestion.size() == 0){
-                questionRepo.save(question);
+        for(TextQuestion textQuestion : textQuestions){
+            List<TextQuestion> savedTextQuestion = questionRepo.findByText(textQuestion.getText());
+            if(savedTextQuestion.size() == 0){
+                questionRepo.save(textQuestion);
             } else {
-                questionsForRevision.add(savedQuestion.get(0));
+                questionsForRevision.add(savedTextQuestion.get(0));
             }
         }
 //        questionsForRevision = (List<Question>) questionRepo.save(questions);
         questionRevisionRepo.save(new QuestionRevision(revisionName,
-                questionsForRevision, mcQuestionsForRevision, choicesForRevision, textQuestionsFirst));
+                questionsForRevision, singleChoiceQuestionsForRevision, choicesForRevision));
     }
 }

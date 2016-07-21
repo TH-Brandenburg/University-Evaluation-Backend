@@ -80,6 +80,8 @@ public class Evaluation extends BaseModel {
     @NotNull
     private Integer studentsVoted;
 
+    private Question adhocQuestion;
+
     @Override
     public boolean equals(Object o) {
         return super.equals(o);

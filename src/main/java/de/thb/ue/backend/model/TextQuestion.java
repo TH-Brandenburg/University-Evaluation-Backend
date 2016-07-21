@@ -16,30 +16,39 @@
 
 package de.thb.ue.backend.model;
 
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import de.thb.ue.backend.util.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Entity
 @Setter
 @Getter
-@Table(name = "mc_answer")
-public class MCAnswer extends BaseModel {
+@Table(name = "text_question")
+@PrimaryKeyJoinColumn(name = "QUESTION_ID")
+public class TextQuestion extends Question {
+
+
+    public TextQuestion(QuestionType type, String text,boolean onlyNumbers, int maxLength) {
+        super(type, text);
+        this.onlyNumbers = onlyNumbers;
+        this.maxLength = maxLength;
+    }
 
     @NotNull
-    @ManyToOne
-    private MCQuestion question;
+    private Boolean onlyNumbers;
 
-    @ManyToOne
-    private Choice choice;
+    @NotNull
+    private Integer maxLength;
 
     @Override
     public boolean equals(Object o) {

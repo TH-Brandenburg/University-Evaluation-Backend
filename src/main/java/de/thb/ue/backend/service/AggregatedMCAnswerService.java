@@ -25,11 +25,11 @@ import java.util.List;
 
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
-import de.thb.ue.backend.model.MCAnswer;
+import de.thb.ue.backend.model.AggregatedSCAnswer;
+import de.thb.ue.backend.model.SingleChoiceAnswer;
 import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.repository.IAggregatedMCAnswer;
+import de.thb.ue.backend.repository.IAggregatedSCAnswer;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,41 +40,41 @@ import lombok.extern.slf4j.Slf4j;
 public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
 
     @Autowired
-    private IAggregatedMCAnswer aggregatedMCAnswerRepo;
+    private IAggregatedSCAnswer aggregatedMCAnswerRepo;
 
     @Autowired
     private IQuestionRevision questionRevisionRepo;
 
     /**
-     * This Method aggregates a list of votes (mcAnswers). For aggregation the mean value is calculated for all
+     * This Method aggregates a list of votes (singleChoiceAnswers). For aggregation the mean value is calculated for all
      * choices with grades grater then 0.
      *
      * @return a list with aggregatedMCAnswers
      */
     @Override
-    public List<AggregatedMCAnswer> aggregate(List<Vote> votes, String questionRevisionName) throws AggregatedAnswerException, DBEntryDoesNotExistException {
+    public List<AggregatedSCAnswer> aggregate(List<Vote> votes, String questionRevisionName) throws AggregatedAnswerException, DBEntryDoesNotExistException {
         List<QuestionRevision> questionRevisions = questionRevisionRepo.findByName(questionRevisionName);
         int mcQuestionCount;
         if (questionRevisions != null && !questionRevisions.isEmpty()) {
-            mcQuestionCount = questionRevisions.get(0).getMcQuestions().size();
+            mcQuestionCount = questionRevisions.get(0).getSingleChoiceQuestions().size();
         } else {
             throw new DBEntryDoesNotExistException("There ist no db entry for: " + questionRevisionName);
         }
         if (votes != null && votes.size() > 0) {
-            List<AggregatedMCAnswer> aggregatedMCAnswers = new ArrayList<>(mcQuestionCount);
+            List<AggregatedSCAnswer> aggregatedSCAnswers = new ArrayList<>(mcQuestionCount);
             for (int i = 0; i < mcQuestionCount; i++) {
-                AggregatedMCAnswer aggregatedMCAnswer = new AggregatedMCAnswer();
+                AggregatedSCAnswer aggregatedSCAnswer = new AggregatedSCAnswer();
                 int summedGrades = 0;
                 int voteCount = 0;
                 for (int j = 0; j < votes.size(); j++) {
-                    List<MCAnswer> mcAnswers = votes.get(j).getMcAnswers();
-                    if (mcAnswers != null && mcAnswers.size() > 0) {
-                        MCAnswer mcAnswer = mcAnswers.get(i);
+                    List<SingleChoiceAnswer> singleChoiceAnswers = votes.get(j).getSingleChoiceAnswers();
+                    if (singleChoiceAnswers != null && singleChoiceAnswers.size() > 0) {
+                        SingleChoiceAnswer singleChoiceAnswer = singleChoiceAnswers.get(i);
                         if (j == 0) {
-                            aggregatedMCAnswer.setQuestion(mcAnswer.getQuestion());
+                            aggregatedSCAnswer.setQuestion(singleChoiceAnswer.getQuestion());
                         }
-                        if (mcAnswer.getChoice() != null && mcAnswer.getChoice().getGrade() > 0) {
-                            summedGrades += mcAnswer.getChoice().getGrade();
+                        if (singleChoiceAnswer.getChoice() != null && singleChoiceAnswer.getChoice().getGrade() > 0) {
+                            summedGrades += singleChoiceAnswer.getChoice().getGrade();
                             voteCount += 1;
                         }
 
@@ -83,14 +83,14 @@ public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
                     }
                 }
                 if (voteCount > 0) {
-                    aggregatedMCAnswer.setMeanGrade((double) summedGrades / voteCount);
+                    aggregatedSCAnswer.setMeanGrade((double) summedGrades / voteCount);
                 } else {
-                    aggregatedMCAnswer.setMeanGrade(0);
+                    aggregatedSCAnswer.setMeanGrade(0);
                 }
-                aggregatedMCAnswers.add(aggregatedMCAnswer);
+                aggregatedSCAnswers.add(aggregatedSCAnswer);
             }
-            aggregatedMCAnswerRepo.save(aggregatedMCAnswers);
-            return aggregatedMCAnswers;
+            aggregatedMCAnswerRepo.save(aggregatedSCAnswers);
+            return aggregatedSCAnswers;
         } else {
             throw new AggregatedAnswerException("There are no votes/answers to aggregate");
         }

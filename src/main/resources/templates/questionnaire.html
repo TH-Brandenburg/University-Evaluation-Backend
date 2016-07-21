@@ -47,9 +47,9 @@
 		<div class="row">
 			<div class="col-sm-3"></div>
 			<div class="col-sm-6">
-				<th:block th:each="mcQuestion: ${questionnaire.mcQuestions}">
-					<form th:id="'delete-mc-question-' + ${mcQuestion.id}"
-						th:action="@{'/deleteMcQuestion/' + ${mcQuestion.id}}" th:method="POST">
+				<th:block th:each="singleChoiceQuestion: ${questionnaire.singleChoiceQuestions}">
+					<form th:id="'delete-mc-question-' + ${singleChoiceQuestion.id}"
+						th:action="@{'/deleteMcQuestion/' + ${singleChoiceQuestion.id}}" th:method="POST">
 						<input type="hidden" name="questionnaireid" th:value="${questionnaire.id}" />
 					</form>
 				</th:block>
@@ -107,13 +107,13 @@
 							</div>
 						</div>
 					</th:block>
-					<th:block th:each="mcQuestion, rowStat : ${questionnaire.mcQuestions}">
+					<th:block th:each="singleChoiceQuestion, rowStat : ${questionnaire.singleChoiceQuestions}">
 						<div class="panel panel-danger">
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									Ratingfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
-									<span th:onClick="'deleteMcQuestion(' + ${mcQuestion.id} + ')'" class="glyphicon glyphicon-remove"
+									<span th:onClick="'deleteMcQuestion(' + ${singleChoiceQuestion.id} + ')'" class="glyphicon glyphicon-remove"
 										aria-hidden="true" style="float: right; cursor: pointer;" title="Frage l&ouml;schen"></span>
 								</h3>
 							</div>
@@ -121,7 +121,7 @@
 								<label class="col-sm-3 control-label">Fragetext</label>
 								<div class="col-sm-9">
 									<textarea th:name="'mc-question-text-' + ${rowStat.count}" class="form-control" rows="4"><th:block
-											th:text="${mcQuestion.text}">Fragetext</th:block></textarea>
+											th:text="${singleChoiceQuestion.text}">Fragetext</th:block></textarea>
 								</div>
 							</div>
 						</div>

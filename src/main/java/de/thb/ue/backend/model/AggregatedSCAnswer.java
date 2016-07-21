@@ -31,12 +31,12 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@Table(name = "aggregated_mc_answer")
-public class AggregatedMCAnswer extends BaseModel {
+@Table(name = "aggregated_sc_answer")
+public class AggregatedSCAnswer extends BaseModel {
 
     @NotNull
     @ManyToOne
-    private MCQuestion question;
+    private SingleChoiceQuestion question;
 
     @NotNull
     private double meanGrade;

@@ -1,57 +1,48 @@
-/*
- * Copyright 2016 Max Gregor
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package de.thb.ue.backend.model;
 
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import lombok.AllArgsConstructor;
+import de.thb.ue.backend.util.QuestionType;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Setter
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
+/**
+ * Created by Toni Anders on 13.07.2016.
+ */
 @Getter
-@Table(name = "question")
-public class Question extends BaseModel {
+@Setter
+@Entity
+@Table(name = "QUESTION")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Question extends BaseModel {
 
-    @NotNull
-    @Column(unique = true)
-    private String text;
-
-    @NotNull
-    private Boolean onlyNumbers;
-
-    @NotNull
-    private Integer maxLength;
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
+    public Question(){}
+    public Question(QuestionType type, String text) {
+        this.text = text;
+        this.type = type;
     }
 
+    @Column(table = "QUESTION")
+    @NotNull
+    private QuestionType type;
+
+    @NotNull
+    private String text;
+
+
+    private boolean adhocQuestion;
+
+
+    private int questionPosition;
+
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public boolean equals(Object obj) {
+        if ((obj instanceof Question)) {
+            if (this.getId() == ((Question) obj).getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

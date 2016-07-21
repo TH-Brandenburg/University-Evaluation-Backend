@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.controller;
 
+import de.thb.ue.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,11 +51,7 @@ import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.Tutor;
+import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.backend.service.interfaces.IEvaluationService;
 import de.thb.ue.backend.service.interfaces.IQuestionsService;
 import de.thb.ue.backend.service.interfaces.ISubjectService;
@@ -149,7 +146,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
     	model.addAttribute("questionnaire", questionnaire);
     	model.addAttribute("questionCount", questionnaire.getQuestions().size());
-    	model.addAttribute("mcQuestionCount", questionnaire.getMcQuestions().size());
+    	model.addAttribute("mcQuestionCount", questionnaire.getSingleChoiceQuestions().size());
     	return "questionnaire";
     }
     
@@ -163,18 +160,18 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	if( textQuestionsFirstString != null ) {
     		textQuestionsFirst = true;
     	}
-    	questionnaire.setTextQuestionsFirst(textQuestionsFirst);
+    	//questionnaire.setTextQuestionsFirst(textQuestionsFirst);
     	
     	int mcQuestionCount = Integer.parseInt(allRequestParams.get("mc-question-count"));
-    	List<MCQuestion>allMcQuestions = questionnaire.getMcQuestions();
+    	List<SingleChoiceQuestion> allSingleChoiceQuestions = questionnaire.getSingleChoiceQuestions();
     	for(int i=1; i <= mcQuestionCount; i++){
-    		allMcQuestions.get(i-1).setText(allRequestParams.get("mc-question-text-" + i));;
+    		allSingleChoiceQuestions.get(i-1).setText(allRequestParams.get("mc-question-text-" + i));;
     	}
     	
     	int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
-    	List<Question>allQuestions = questionnaire.getQuestions();
+    	List<TextQuestion> allTextQuestions = questionnaire.getQuestions();
     	for(int i=1; i <= questionCount; i++){
-    		allQuestions.get(i-1).setText(allRequestParams.get("question-text-" + i));;
+    		allTextQuestions.get(i-1).setText(allRequestParams.get("question-text-" + i));;
     	}
     	
     	model.addAttribute("questionaire", questionnaire);
@@ -185,18 +182,18 @@ public class ViewController extends WebMvcConfigurerAdapter {
     
     @RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)
     String deleteMcQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
-    	MCQuestion mcQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
+    	SingleChoiceQuestion singleChoiceQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
-    	questionnaire.getMcQuestions().remove(mcQuestion);
+    	questionnaire.getSingleChoiceQuestions().remove(singleChoiceQuestion);
     	questionsService.updateQuestionRevision(questionnaire);
     	return "redirect:/questionnaire/" + questionnaireid + "?success";
     }
     
     @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.POST)
     String deleteQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
-    	Question question = questionsService.getQuestionById(Integer.parseInt(id));
+    	TextQuestion textQuestion = questionsService.getQuestionById(Integer.parseInt(id));
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
-    	questionnaire.getQuestions().remove(question);
+    	questionnaire.getQuestions().remove(textQuestion);
     	questionsService.updateQuestionRevision(questionnaire);
     	return "redirect:/questionnaire/" + questionnaireid + "?success";
     }

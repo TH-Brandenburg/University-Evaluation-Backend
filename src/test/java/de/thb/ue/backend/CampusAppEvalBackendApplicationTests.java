@@ -1,5 +1,6 @@
 package de.thb.ue.backend;
 
+import de.thb.ue.backend.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,11 +35,7 @@ import de.thb.ue.dto.util.ChoiceDTO;
 import de.thb.ue.dto.util.MultipleChoiceAnswerDTO;
 import de.thb.ue.dto.util.TextAnswerDTO;
 import de.thb.ue.backend.controller.RestController;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Participant;
-import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.backend.service.interfaces.IEvaluationService;
 import de.thb.ue.backend.service.interfaces.IParticipantService;
 import de.thb.ue.backend.util.DBInit;
@@ -152,12 +149,12 @@ public class CampusAppEvalBackendApplicationTests {
     private AnswersDTO getRandomAnsweredQuestions(String voteToken, String studyPath) {
         List<TextAnswerDTO> answers = new ArrayList<>();
         List<MultipleChoiceAnswerDTO> mcAnswers = new ArrayList<>();
-        for (Question question : DBInit.getDemoQuestions()) {
-            answers.add(new TextAnswerDTO(question.getId(), question.getText(), "Lorem ipsum dolor sit amet, consetetur sadipscing elitr aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. \n" +
+        for (TextQuestion textQuestion : DBInit.getDemoQuestions()) {
+            answers.add(new TextAnswerDTO(textQuestion.getId(), textQuestion.getText(), "Lorem ipsum dolor sit amet, consetetur sadipscing elitr aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. \n" +
                     "\n" +
                     " hendrerit in vulputate velit esse molestie consequat, vel "));
         }
-        for (MCQuestion multipleChoiceQuestion : DBInit.getDemoMCQuestions()) {
+        for (SingleChoiceQuestion multipleChoiceQuestion : DBInit.getDemoMCQuestions()) {
             Choice randomChoice = multipleChoiceQuestion.getChoices().get(new Random().nextInt(multipleChoiceQuestion.getChoices().size()));
             mcAnswers.add(new MultipleChoiceAnswerDTO(multipleChoiceQuestion.getText(), new ChoiceDTO(randomChoice.getText(), randomChoice.getGrade())));
         }

@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.service;
 
+import de.thb.ue.backend.model.SingleChoiceAnswer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -31,13 +32,12 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ValidationExeption;
 import de.thb.ue.backend.model.Answer;
-import de.thb.ue.backend.model.MCAnswer;
 import de.thb.ue.backend.model.StudyPath;
 import de.thb.ue.backend.model.Vote;
 import de.thb.ue.backend.repository.IAnswer;
-import de.thb.ue.backend.repository.IMCAnswer;
-import de.thb.ue.backend.repository.IMCQuestion;
-import de.thb.ue.backend.repository.IQuestion;
+import de.thb.ue.backend.repository.ISCAnswer;
+import de.thb.ue.backend.repository.ISCQuestion;
+import de.thb.ue.backend.repository.ITextQuestion;
 import de.thb.ue.backend.repository.IVote;
 import de.thb.ue.backend.service.interfaces.IChoiceService;
 import de.thb.ue.backend.service.interfaces.IVoteService;
@@ -50,10 +50,10 @@ public class VoteService implements IVoteService {
     private IChoiceService choiceService;
 
     @Autowired
-    private IQuestion questionRepo;
+    private ITextQuestion questionRepo;
 
     @Autowired
-    private IMCQuestion mcQuestionRepo;
+    private ISCQuestion mcQuestionRepo;
 
     @Autowired
     private IVote voteRepo;
@@ -62,7 +62,7 @@ public class VoteService implements IVoteService {
     private IAnswer answerRepo;
 
     @Autowired
-    private IMCAnswer mcAnswerRepo;
+    private ISCAnswer mcAnswerRepo;
 
     @Autowired
     private StudyPathService studyPathService;
@@ -71,10 +71,12 @@ public class VoteService implements IVoteService {
     @Override
     public Vote addAnswers(AnswersDTO answersDTO, String evaluationUID) throws EvaluationException, DBEntryDoesNotExistException, ValidationExeption {
         List<Answer> answers = new ArrayList<>();
-        List<MCAnswer> mcAnswers = new ArrayList<>();
+        List<SingleChoiceAnswer> singleChoiceAnswers = new ArrayList<>();
         List<StudyPath> studyPaths = studyPathService.getStudyPathByEvaluationUID(evaluationUID);
         StudyPath studyPath = null;
         //Add answers
+
+
         answers.addAll(answersDTO.getTextAnswers().stream().map(answerDTO ->
                 new Answer(questionRepo.findByText(answerDTO.getQuestionText()).get(0),
                         answerDTO.getAnswerText())).collect(Collectors.toList()));
@@ -89,23 +91,23 @@ public class VoteService implements IVoteService {
             throw new DBEntryDoesNotExistException("No study path with name: " + answersDTO.getStudyPath());
         }
 
-        //Add mcAnswers
+        //Add singleChoiceAnswers
         for (MultipleChoiceAnswerDTO multipleChoiceAnswerDTO : answersDTO.getMcAnswers()) {
             ChoiceDTO choiceDTO = multipleChoiceAnswerDTO.getChoice();
-            MCAnswer mcAnswer;
+            SingleChoiceAnswer singleChoiceAnswer;
 
             if (choiceDTO != null && multipleChoiceAnswerDTO.getQuestionText() != null && !multipleChoiceAnswerDTO.getQuestionText().isEmpty()) {
-                mcAnswer = new MCAnswer(mcQuestionRepo.findByText(multipleChoiceAnswerDTO.getQuestionText()), choiceService.get(choiceDTO.getChoiceText(), choiceDTO.getGrade()));
+                singleChoiceAnswer = new SingleChoiceAnswer(mcQuestionRepo.findByText(multipleChoiceAnswerDTO.getQuestionText()), choiceService.get(choiceDTO.getChoiceText(), choiceDTO.getGrade()));
             } else {
                 throw new ValidationExeption(ValidationExeption.OBJECT_INVALID,
                         "Given MultipleChoiceAnswerDTO was invalid.");
             }
 
-            mcAnswers.add(mcAnswer);
-            mcAnswerRepo.save(mcAnswer);
+            singleChoiceAnswers.add(singleChoiceAnswer);
+            mcAnswerRepo.save(singleChoiceAnswer);
         }
         answerRepo.save(answers);
-        return voteRepo.save(new Vote(studyPath, answers, mcAnswers));
+        return voteRepo.save(new Vote(studyPath, answers, singleChoiceAnswers));
     }
 
 

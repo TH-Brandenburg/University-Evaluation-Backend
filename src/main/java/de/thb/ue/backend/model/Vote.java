@@ -47,7 +47,7 @@ public class Vote extends BaseModel {
 
     @NotNull
     @OneToMany
-    private List<MCAnswer> mcAnswers;
+    private List<SingleChoiceAnswer> singleChoiceAnswers;
 
     @Override
     public boolean equals(Object o) {

@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.util;
 
+import de.thb.ue.backend.model.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -35,11 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import de.thb.ue.backend.model.AggregatedMCAnswer;
-import de.thb.ue.backend.model.Answer;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.MCAnswer;
-import de.thb.ue.backend.model.Vote;
+import de.thb.ue.backend.model.SingleChoiceAnswer;
 import lombok.NonNull;
 
 public class EvaluationExcelFileGenerator {
@@ -61,7 +58,7 @@ public class EvaluationExcelFileGenerator {
     private CellStyle furtherHeaderStyle = null;
 
     private final String evaluationUID;
-    private final List<AggregatedMCAnswer> aggregatedMCAnswers;
+    private final List<AggregatedSCAnswer> aggregatedSCAnswers;
     private final List<String> tutors;
     private final List<String> mcQuestionTexts;
     private final List<String> textualQuestionTexts;
@@ -72,12 +69,12 @@ public class EvaluationExcelFileGenerator {
     private final int numberStudentsAll;
     private final int numberStudentsVoted;
 
-    public EvaluationExcelFileGenerator(String evaluationUID, List<AggregatedMCAnswer> aggregatedMCAnswers,
+    public EvaluationExcelFileGenerator(String evaluationUID, List<AggregatedSCAnswer> aggregatedSCAnswers,
                                         List<String> tutors, List<String> mcQuestionTexts, List<String> textualQuestionTexts,
                                         List<Vote> studentVotes, String subject, SemesterType semesterType,
                                         LocalDateTime dateOfEvaluation, int numberStudentsAll, int numberStudentsVoted) {
         this.evaluationUID = evaluationUID;
-        this.aggregatedMCAnswers = aggregatedMCAnswers;
+        this.aggregatedSCAnswers = aggregatedSCAnswers;
         this.tutors = tutors;
         this.mcQuestionTexts = mcQuestionTexts;
         this.textualQuestionTexts = textualQuestionTexts;
@@ -214,7 +211,7 @@ public class EvaluationExcelFileGenerator {
                 for (int k = 0; k < mcQuestionTexts.size(); k++) {
                     row = sheet.getRow(headRow.getRowNum() + 1 + k);
                     cell = row.createCell(5 + i);
-                    for (MCAnswer answer : vote.getMcAnswers()) {
+                    for (SingleChoiceAnswer answer : vote.getSingleChoiceAnswers()) {
                         //if question of inner loop equals question of outer loop we found
                         // the correct question for this cell
                         if (answer.getQuestion().getText().equals(mcQuestionTexts.get(k))) {
@@ -436,7 +433,7 @@ public class EvaluationExcelFileGenerator {
         ArrayList<String> aggregation = new ArrayList<>();
         for (Vote vote : votes) {
             for (Answer answer : vote.getAnswers()) {
-                if (answer.getQuestion().getText().equals(key) && !answer.getText().isEmpty()) {
+                if (answer.getTextQuestion().getText().equals(key) && !answer.getText().isEmpty()) {
                     aggregation.add(answer.getText());
                 }
             }

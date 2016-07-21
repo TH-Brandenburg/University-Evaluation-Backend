@@ -20,11 +20,11 @@ import java.util.List;
 
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
+import de.thb.ue.backend.model.AggregatedSCAnswer;
 import de.thb.ue.backend.model.Vote;
 
 public interface IAggregatedMCAnswerService {
-    List<AggregatedMCAnswer> aggregate(List<Vote> votes, String questionRevisionName) throws AggregatedAnswerException, DBEntryDoesNotExistException;
+    List<AggregatedSCAnswer> aggregate(List<Vote> votes, String questionRevisionName) throws AggregatedAnswerException, DBEntryDoesNotExistException;
 
 
 }

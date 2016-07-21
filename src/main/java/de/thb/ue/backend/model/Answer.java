@@ -37,7 +37,7 @@ public class Answer extends BaseModel {
 
     @NotNull
     @ManyToOne
-    private Question question;
+    private TextQuestion textQuestion;
 
     @NotNull
     @Column(length = 1000)

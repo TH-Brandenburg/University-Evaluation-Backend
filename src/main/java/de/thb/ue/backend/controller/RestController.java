@@ -106,7 +106,7 @@ public class RestController {
         if (!evaluation.getClosed() && !participantService.hasVoted(requestDTO.getVoteToken())) {
             QuestionsDTO out = questionsService.getAllQuestionsAsDTO(evaluation.getQuestionRevision().getName());
             Subject subject = evaluation.getSubject();
-            out.setTextQuestionsFirst(evaluation.getQuestionRevision().getTextQuestionsFirst());
+            //out.setTextQuestionsFirst(evaluation.getQuestionRevision().getTextQuestionsFirst());
             out.setStudyPaths(studyPathService.getByDegreeAndSection(subject.getDegree(), subject.getDepartment()));
             return new ResponseEntity<>(out, HttpStatus.OK);
         } else {

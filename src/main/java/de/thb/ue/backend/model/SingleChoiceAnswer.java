@@ -16,9 +16,9 @@
 
 package de.thb.ue.backend.model;
 
-import java.util.List;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -31,20 +31,15 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@Table(name = "question_revision")
-public class QuestionRevision extends BaseModel {
+@Table(name = "sc_answer")
+public class SingleChoiceAnswer extends BaseModel {
 
     @NotNull
-    @Column(unique = true)
-    private String name;
+    @ManyToOne
+    private SingleChoiceQuestion question;
 
-    @NotNull
-    @OneToMany
-    private List<Question> questions;
-
-    @NotNull
-    @ManyToMany
-    private List<Choice> choices;
+    @ManyToOne
+    private Choice choice;
 
     @Override
     public boolean equals(Object o) {

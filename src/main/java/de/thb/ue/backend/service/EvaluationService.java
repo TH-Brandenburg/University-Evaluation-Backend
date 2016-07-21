@@ -39,11 +39,11 @@ import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
+import de.thb.ue.backend.model.AggregatedSCAnswer;
 import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
+import de.thb.ue.backend.model.SingleChoiceQuestion;
 import de.thb.ue.backend.model.Participant;
-import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.Subject;
 import de.thb.ue.backend.model.Tutor;
@@ -104,7 +104,7 @@ public class EvaluationService implements IEvaluationService {
 
         QuestionRevision questionRevision = questionRevisionRepo.findByName(revisionName).get(0);
         Evaluation evaluation = evaluationRepo.save(new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
-                questionRevision, null, students, 0));
+                questionRevision, null, students, 0, null));
         participantService.add(students, evaluation);
         return uid;
     }
@@ -155,18 +155,18 @@ public class EvaluationService implements IEvaluationService {
     @Override
     public void close(String evaluationUID) throws AggregatedAnswerException {
         Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
-        List<AggregatedMCAnswer> aggregatedMCAnswers;
+        List<AggregatedSCAnswer> aggregatedSCAnswers;
         try {
             File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
             File qrCodesFile = new File(workingDirectory, "qrcodes.pdf");
             List<Vote> votes = evaluation.getVotes();
             if (votes != null && !votes.isEmpty()) {
-                aggregatedMCAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
+                aggregatedSCAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
 
                 List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getFamilyName()).collect(Collectors.toList());
-                List<String> mcQuestions = evaluation.getQuestionRevision().getMcQuestions().stream().map(MCQuestion::getText).collect(Collectors.toList());
-                List<String> textualQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
-                new EvaluationExcelFileGenerator(evaluationUID, aggregatedMCAnswers, tutors, mcQuestions,
+                List<String> mcQuestions = evaluation.getQuestionRevision().getSingleChoiceQuestions().stream().map(SingleChoiceQuestion::getText).collect(Collectors.toList());
+                List<String> textualQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(TextQuestion::getText).collect(Collectors.toList());
+                new EvaluationExcelFileGenerator(evaluationUID, aggregatedSCAnswers, tutors, mcQuestions,
                         textualQuestions, evaluation.getVotes(), evaluation.getSubject().getName(),
                         evaluation.getSemesterType(), evaluation.getDateOfEvaluation(), evaluation.getStudentsAll(),
                         evaluation.getStudentsVoted()).generateExcelFile();
