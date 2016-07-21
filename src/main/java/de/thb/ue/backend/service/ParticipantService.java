@@ -69,7 +69,7 @@ public class ParticipantService implements IParticipantService {
             try {
                 qrcs.add(QRCGeneration.generateQRC(
                         "{\"voteToken\":\"" + voteToken + "\",\"host\":\"" + hostadress + "\"}",
-                        QRCGeneration.SIZE_SMALL, ErrorCorrectionLevel.Q, QRCGeneration.ENCODING_UTF_8));
+                        QRCGeneration.SIZE_SMALL, ErrorCorrectionLevel.L, QRCGeneration.ENCODING_UTF_8));
             } catch (WriterException | IOException e) {
                 throw new ParticipantException(ParticipantException.ERROR_CREATING_QRC_PDF, e.getMessage());
             }
