@@ -17,24 +17,15 @@
 package de.thb.ue.backend.service;
 
 import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.*;
+import de.thb.ue.backend.service.interfaces.IInitializationService;
+import de.thb.ue.backend.util.DBInit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.thb.ue.backend.model.SingleChoiceQuestion;
-import de.thb.ue.backend.model.TextQuestion;
-import de.thb.ue.backend.repository.IChoice;
-import de.thb.ue.backend.repository.ISCQuestion;
-import de.thb.ue.backend.repository.ITextQuestion;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.repository.IStudyPath;
-import de.thb.ue.backend.repository.ISubject;
-import de.thb.ue.backend.repository.ITutor;
-import de.thb.ue.backend.service.interfaces.IInitializationService;
-import de.thb.ue.backend.util.DBInit;
 
 @Component
 @Service
@@ -100,24 +91,28 @@ public class InitializationService implements IInitializationService {
             }
             singleChoiceQuestion.setChoices(actualQuestionChoiceList);
 
-            SingleChoiceQuestion savedQuestion = mcQuestionRepo.findByText(singleChoiceQuestion.getText());
-            if(savedQuestion != null){
-                singleChoiceQuestionsForRevision.add(savedQuestion);
+            Question savedQuestion = mcQuestionRepo.findByText(singleChoiceQuestion.getText());
+            if (savedQuestion != null && savedQuestion instanceof SingleChoiceQuestion) {
+                singleChoiceQuestionsForRevision.add((SingleChoiceQuestion) savedQuestion);
             } else {
                 singleChoiceQuestionsForRevision.add(mcQuestionRepo.save(singleChoiceQuestion));
             }
         }
 
         for(TextQuestion textQuestion : textQuestions){
-            List<TextQuestion> savedTextQuestion = questionRepo.findByText(textQuestion.getText());
+            List<Question> savedTextQuestion = questionRepo.findByText(textQuestion.getText());
             if(savedTextQuestion.size() == 0){
                 questionRepo.save(textQuestion);
             } else {
-                questionsForRevision.add(savedTextQuestion.get(0));
+                questionsForRevision.add((TextQuestion) savedTextQuestion.get(0));
             }
         }
 //        questionsForRevision = (List<Question>) questionRepo.save(questions);
+        List<Question> questions = new ArrayList<>();
+        questions.addAll(questionsForRevision);
+        questions.addAll(singleChoiceQuestionsForRevision);
+
         questionRevisionRepo.save(new QuestionRevision(revisionName,
-                questionsForRevision, singleChoiceQuestionsForRevision, choicesForRevision));
+                questions, choicesForRevision));
     }
 }

@@ -18,21 +18,17 @@ package de.thb.ue.backend.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.model.*;
 import de.thb.ue.dto.AnswersDTO;
 import de.thb.ue.dto.MultipleChoiceQuestionDTO;
 import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.dto.util.ChoiceDTO;
 import de.thb.ue.dto.util.TextQuestionDTO;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.TextQuestion;
-import de.thb.ue.backend.model.StudyPath;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DTOMapper {
 
@@ -67,13 +63,16 @@ public class DTOMapper {
         return out;
     }
 
-    public static QuestionsDTO questionModelsToDTO(List<Question> textQuestions, List<Question> singleChoiceQuestions) {
+    public static QuestionsDTO questionModelsToDTO(List<Question> textQuestions, List<SingleChoiceQuestion> singleChoiceQuestions) {
         QuestionsDTO out = new QuestionsDTO();
         List<TextQuestionDTO> textQuestionDTOs = new ArrayList<>(textQuestions.size());
         int questionNumber = singleChoiceQuestions.size() + 1;
-        for (TextQuestion textQuestion : textQuestions) {
-            textQuestionDTOs.add(new TextQuestionDTO(questionNumber, textQuestion.getText(), textQuestion.getOnlyNumbers(), textQuestion.getMaxLength()));
-            questionNumber++;
+        for (Question question : textQuestions) {
+            if (question instanceof TextQuestion) {
+                TextQuestion textQuestion = (TextQuestion) question;
+                textQuestionDTOs.add(new TextQuestionDTO(questionNumber, textQuestion.getText(), textQuestion.getOnlyNumbers(), textQuestion.getMaxLength()));
+                questionNumber++;
+            }
         }
         out.setTextQuestions(textQuestionDTOs);
         out.setMultipleChoiceQuestionDTOs(mcQuestionsToMultipleChoiceQuestionDTOs(singleChoiceQuestions));

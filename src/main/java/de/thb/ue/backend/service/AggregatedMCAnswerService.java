@@ -16,23 +16,19 @@
 
 package de.thb.ue.backend.service;
 
+import de.thb.ue.backend.exception.AggregatedAnswerException;
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.IAggregatedSCAnswer;
+import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.AggregatedSCAnswer;
-import de.thb.ue.backend.model.SingleChoiceAnswer;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.repository.IAggregatedSCAnswer;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -56,7 +52,13 @@ public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
         List<QuestionRevision> questionRevisions = questionRevisionRepo.findByName(questionRevisionName);
         int mcQuestionCount;
         if (questionRevisions != null && !questionRevisions.isEmpty()) {
-            mcQuestionCount = questionRevisions.get(0).getSingleChoiceQuestions().size();
+            int i = 0;
+            for (Question question : questionRevisions.get(0).getQuestions()) {
+                if (question instanceof SingleChoiceQuestion) {
+                    i++;
+                }
+            }
+            mcQuestionCount = i;
         } else {
             throw new DBEntryDoesNotExistException("There ist no db entry for: " + questionRevisionName);
         }

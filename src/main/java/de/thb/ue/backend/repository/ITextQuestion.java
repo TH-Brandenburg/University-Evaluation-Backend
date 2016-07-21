@@ -17,7 +17,6 @@
 package de.thb.ue.backend.repository;
 
 import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.TextQuestion;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -27,22 +26,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.thb.ue.backend.model.TextQuestion;
-
 @RepositoryDefinition(domainClass = Question.class, idClass = Integer.class)
 @Transactional(readOnly = true)
 public interface ITextQuestion extends CrudRepository<Question, Serializable> {
-
     /**
      * @return all questions from DB
      */
-    @Query("SELECT q FROM Question q WHERE q.type = QuestionType.TextQuestion")
+    @Query("SELECT q FROM Question q WHERE q.type = de.thb.ue.backend.util.QuestionType.TextQuestion")
     List<Question> findAll();
 
-    @Query("SELECT COUNT(q) FROM Question q WHERE q.text = :text and q.type = QuestionType.TextQuestion")
+    @Query("SELECT COUNT(q) FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.TextQuestion")
     long count(@Param("text") String text);
 
-    @Query("SELECT q FROM Question q WHERE q.text = :text and q.type = QuestionType.TextQuestion")
+    @Query("SELECT q FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.TextQuestion")
     List<Question> findByText(@Param("text") String text);
 
 }

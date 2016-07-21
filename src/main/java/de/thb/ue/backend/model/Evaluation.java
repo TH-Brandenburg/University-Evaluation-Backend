@@ -16,25 +16,16 @@
 
 package de.thb.ue.backend.model;
 
-import org.joda.time.LocalDateTime;
-
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import de.thb.ue.backend.util.SemesterType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.joda.time.LocalDateTime;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -80,7 +71,8 @@ public class Evaluation extends BaseModel {
     @NotNull
     private Integer studentsVoted;
 
-    private Question adhocQuestion;
+    @OneToMany
+    private List<Question> adhocQuestions;
 
     @Override
     public boolean equals(Object o) {

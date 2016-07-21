@@ -17,19 +17,17 @@
 package de.thb.ue.backend.model;
 
 
-import javax.persistence.Column;
+import de.thb.ue.backend.util.QuestionType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import de.thb.ue.backend.util.QuestionType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
+@NoArgsConstructor
 @Entity
 @Setter
 @Getter
@@ -38,17 +36,16 @@ import lombok.Setter;
 public class TextQuestion extends Question {
 
 
+    @NotNull
+    private Boolean onlyNumbers;
+    @NotNull
+    private Integer maxLength;
+
     public TextQuestion(QuestionType type, String text,boolean onlyNumbers, int maxLength) {
         super(type, text);
         this.onlyNumbers = onlyNumbers;
         this.maxLength = maxLength;
     }
-
-    @NotNull
-    private Boolean onlyNumbers;
-
-    @NotNull
-    private Integer maxLength;
 
     @Override
     public boolean equals(Object o) {

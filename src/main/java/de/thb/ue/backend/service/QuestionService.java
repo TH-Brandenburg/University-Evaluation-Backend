@@ -16,8 +16,17 @@
 
 package de.thb.ue.backend.service;
 
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.QuestionRevision;
+import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.repository.ISCQuestion;
+import de.thb.ue.backend.repository.ITextQuestion;
+import de.thb.ue.backend.service.interfaces.IQuestionsService;
+import de.thb.ue.backend.util.DTOMapper;
 import de.thb.ue.backend.util.QuestionType;
+import de.thb.ue.dto.QuestionsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -25,15 +34,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import de.thb.ue.dto.QuestionsDTO;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.repository.ISCQuestion;
-import de.thb.ue.backend.repository.ITextQuestion;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.util.DTOMapper;
 
 @Component
 @Service
@@ -54,7 +54,7 @@ public class QuestionService implements IQuestionsService {
         QuestionsDTO out;
         if (questionRevisions != null && questionRevisions.size() == 1) {
             List<Question> textQuestions = new ArrayList<Question>();
-            List<Question> scQuestions = new ArrayList<Question>();
+            List<SingleChoiceQuestion> scQuestions = new ArrayList<>();
             for (Question element:questionRevisions.get(0).getQuestions()){
                 if (element.getType()==QuestionType.TextQuestion){
                     textQuestions.add(element);
@@ -62,7 +62,7 @@ public class QuestionService implements IQuestionsService {
             }
             for (Question element:questionRevisions.get(0).getQuestions()){
                 if (element.getType()==QuestionType.SingleChoiceQuestion){
-                    scQuestions.add(element);
+                    scQuestions.add((SingleChoiceQuestion) element);
                 }
             }
             out = DTOMapper.questionModelsToDTO(textQuestions, scQuestions);

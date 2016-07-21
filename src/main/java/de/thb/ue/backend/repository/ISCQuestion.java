@@ -17,7 +17,6 @@
 package de.thb.ue.backend.repository;
 
 import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.SingleChoiceQuestion;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -34,13 +33,13 @@ public interface ISCQuestion extends CrudRepository<Question, Serializable> {
     /**
      * @return all multiple choice questions from DB
      */
-    @Query("SELECT q FROM Question q WHERE q.type = QuestionType.SingleChoiceQuestion")
+    @Query("SELECT q FROM Question q WHERE q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
     List<Question> findAll();
 
-    @Query("SELECT q FROM Question q WHERE q.text = :text and q.type = QuestionType.SingleChoiceQuestion")
+    @Query("SELECT q FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
     Question findByText(@Param("text") String text);
 
-    @Query("SELECT COUNT(q) FROM Question q WHERE q.text = :text and q.type = QuestionType.SingleChoiceQuestion")
+    @Query("SELECT COUNT(q) FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
     long count(@Param("text") String text);
 
 }
