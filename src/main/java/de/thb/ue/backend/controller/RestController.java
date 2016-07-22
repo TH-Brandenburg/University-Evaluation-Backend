@@ -114,9 +114,9 @@ public class RestController {
         }
     }
 
-    @RequestMapping(value = API_VERSION + "/answers", method = RequestMethod.POST)
+    @RequestMapping(value = API_VERSION + "/textAnswers", method = RequestMethod.POST)
     @ResponseBody
-    ResponseEntity<ResponseDTO> addAnswers(@RequestParam("answers-dto") String answerDTOString, @RequestParam("images") MultipartFile images) throws DBEntryDoesNotExistException, EvaluationException, ParticipantException, IOException, ValidationExeption {
+    ResponseEntity<ResponseDTO> addAnswers(@RequestParam("textAnswers-dto") String answerDTOString, @RequestParam("images") MultipartFile images) throws DBEntryDoesNotExistException, EvaluationException, ParticipantException, IOException, ValidationExeption {
         AnswersDTO answersDTO = DTOMapper.stringToAnswersDTO(answerDTOString);
         participantService.setVoted(answersDTO.getVoteToken(), answersDTO.getDeviceID());
         Evaluation evaluation = participantService.getEvaluation(answersDTO.getVoteToken());

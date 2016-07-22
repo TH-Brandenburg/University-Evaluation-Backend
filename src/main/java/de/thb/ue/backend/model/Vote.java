@@ -43,7 +43,7 @@ public class Vote extends BaseModel {
 
     @NotNull
     @OneToMany
-    private List<Answer> answers;
+    private List<TextAnswer> textAnswers;
 
     @NotNull
     @OneToMany

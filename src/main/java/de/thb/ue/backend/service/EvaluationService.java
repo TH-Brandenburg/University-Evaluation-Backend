@@ -141,19 +141,19 @@ public class EvaluationService implements IEvaluationService {
     @Override
     public void close(String evaluationUID) throws AggregatedAnswerException {
         Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
-        List<AggregatedSCAnswer> aggregatedSCAnswers;
+        List<AggregatedSingleChoiceAnswer> aggregatedSingleChoiceAnswers;
         try {
             File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
             File qrCodesFile = new File(workingDirectory, "qrcodes.pdf");
             List<Vote> votes = evaluation.getVotes();
             if (votes != null && !votes.isEmpty()) {
-                aggregatedSCAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
+                aggregatedSingleChoiceAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
 
                 List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getFamilyName()).collect(Collectors.toList());
                 //TODO: Buggy?
                 List<String> mcQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
                 List<String> textualQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
-                new EvaluationExcelFileGenerator(evaluationUID, aggregatedSCAnswers, tutors, mcQuestions,
+                new EvaluationExcelFileGenerator(evaluationUID, aggregatedSingleChoiceAnswers, tutors, mcQuestions,
                         textualQuestions, evaluation.getVotes(), evaluation.getSubject().getName(),
                         evaluation.getSemesterType(), evaluation.getDateOfEvaluation(), evaluation.getStudentsAll(),
                         evaluation.getStudentsVoted()).generateExcelFile();

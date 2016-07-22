@@ -165,8 +165,8 @@ public class CampusAppEvalBackendApplicationTests {
         AnswersDTO answersDTO = getRandomAnsweredQuestions(voteToken, "Informatik");
         MockMultipartFile multipartFile = new MockMultipartFile("images", new FileInputStream("README.md"));
 
-        mockMvc.perform(MockMvcRequestBuilders.fileUpload(RestController.API_VERSION + "/answers")
-                .file(multipartFile).param("answers-dto", DTOMapper.answersDTOToString(answersDTO))
+        mockMvc.perform(MockMvcRequestBuilders.fileUpload(RestController.API_VERSION + "/textAnswers")
+                .file(multipartFile).param("textAnswers-dto", DTOMapper.answersDTOToString(answersDTO))
         ).andExpect(result);
         return answersDTO;
     }

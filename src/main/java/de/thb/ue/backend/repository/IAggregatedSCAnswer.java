@@ -7,12 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.thb.ue.backend.model.AggregatedSCAnswer;
+import de.thb.ue.backend.model.AggregatedSingleChoiceAnswer;
 
-@RepositoryDefinition(domainClass = AggregatedSCAnswer.class, idClass = Integer.class)
+@RepositoryDefinition(domainClass = AggregatedSingleChoiceAnswer.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface IAggregatedSCAnswer extends CrudRepository<AggregatedSCAnswer, Serializable> {
+public interface IAggregatedSCAnswer extends CrudRepository<AggregatedSingleChoiceAnswer, Serializable> {
 
-    List<AggregatedSCAnswer> findAll();
+    List<AggregatedSingleChoiceAnswer> findAll();
 
 }

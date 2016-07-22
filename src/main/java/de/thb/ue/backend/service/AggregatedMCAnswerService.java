@@ -48,7 +48,7 @@ public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
      * @return a list with aggregatedMCAnswers
      */
     @Override
-    public List<AggregatedSCAnswer> aggregate(List<Vote> votes, String questionRevisionName) throws AggregatedAnswerException, DBEntryDoesNotExistException {
+    public List<AggregatedSingleChoiceAnswer> aggregate(List<Vote> votes, String questionRevisionName) throws AggregatedAnswerException, DBEntryDoesNotExistException {
         List<QuestionRevision> questionRevisions = questionRevisionRepo.findByName(questionRevisionName);
         int mcQuestionCount;
         if (questionRevisions != null && !questionRevisions.isEmpty()) {
@@ -63,9 +63,9 @@ public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
             throw new DBEntryDoesNotExistException("There ist no db entry for: " + questionRevisionName);
         }
         if (votes != null && votes.size() > 0) {
-            List<AggregatedSCAnswer> aggregatedSCAnswers = new ArrayList<>(mcQuestionCount);
+            List<AggregatedSingleChoiceAnswer> aggregatedSingleChoiceAnswers = new ArrayList<>(mcQuestionCount);
             for (int i = 0; i < mcQuestionCount; i++) {
-                AggregatedSCAnswer aggregatedSCAnswer = new AggregatedSCAnswer();
+                AggregatedSingleChoiceAnswer aggregatedSingleChoiceAnswer = new AggregatedSingleChoiceAnswer();
                 int summedGrades = 0;
                 int voteCount = 0;
                 for (int j = 0; j < votes.size(); j++) {
@@ -73,7 +73,7 @@ public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
                     if (singleChoiceAnswers != null && singleChoiceAnswers.size() > 0) {
                         SingleChoiceAnswer singleChoiceAnswer = singleChoiceAnswers.get(i);
                         if (j == 0) {
-                            aggregatedSCAnswer.setQuestion(singleChoiceAnswer.getQuestion());
+                            aggregatedSingleChoiceAnswer.setQuestion(singleChoiceAnswer.getQuestion());
                         }
                         if (singleChoiceAnswer.getChoice() != null && singleChoiceAnswer.getChoice().getGrade() > 0) {
                             summedGrades += singleChoiceAnswer.getChoice().getGrade();
@@ -81,20 +81,20 @@ public class AggregatedMCAnswerService implements IAggregatedMCAnswerService {
                         }
 
                     } else {
-                        log.error("Aggregation of answers without answers");
+                        log.error("Aggregation of textAnswers without textAnswers");
                     }
                 }
                 if (voteCount > 0) {
-                    aggregatedSCAnswer.setMeanGrade((double) summedGrades / voteCount);
+                    aggregatedSingleChoiceAnswer.setMeanGrade((double) summedGrades / voteCount);
                 } else {
-                    aggregatedSCAnswer.setMeanGrade(0);
+                    aggregatedSingleChoiceAnswer.setMeanGrade(0);
                 }
-                aggregatedSCAnswers.add(aggregatedSCAnswer);
+                aggregatedSingleChoiceAnswers.add(aggregatedSingleChoiceAnswer);
             }
-            aggregatedMCAnswerRepo.save(aggregatedSCAnswers);
-            return aggregatedSCAnswers;
+            aggregatedMCAnswerRepo.save(aggregatedSingleChoiceAnswers);
+            return aggregatedSingleChoiceAnswers;
         } else {
-            throw new AggregatedAnswerException("There are no votes/answers to aggregate");
+            throw new AggregatedAnswerException("There are no votes/textAnswers to aggregate");
         }
     }
 }

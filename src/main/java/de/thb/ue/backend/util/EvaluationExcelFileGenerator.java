@@ -58,7 +58,7 @@ public class EvaluationExcelFileGenerator {
     private CellStyle furtherHeaderStyle = null;
 
     private final String evaluationUID;
-    private final List<AggregatedSCAnswer> aggregatedSCAnswers;
+    private final List<AggregatedSingleChoiceAnswer> aggregatedSingleChoiceAnswers;
     private final List<String> tutors;
     private final List<String> mcQuestionTexts;
     private final List<String> textualQuestionTexts;
@@ -69,12 +69,12 @@ public class EvaluationExcelFileGenerator {
     private final int numberStudentsAll;
     private final int numberStudentsVoted;
 
-    public EvaluationExcelFileGenerator(String evaluationUID, List<AggregatedSCAnswer> aggregatedSCAnswers,
+    public EvaluationExcelFileGenerator(String evaluationUID, List<AggregatedSingleChoiceAnswer> aggregatedSingleChoiceAnswers,
                                         List<String> tutors, List<String> mcQuestionTexts, List<String> textualQuestionTexts,
                                         List<Vote> studentVotes, String subject, SemesterType semesterType,
                                         LocalDateTime dateOfEvaluation, int numberStudentsAll, int numberStudentsVoted) {
         this.evaluationUID = evaluationUID;
-        this.aggregatedSCAnswers = aggregatedSCAnswers;
+        this.aggregatedSingleChoiceAnswers = aggregatedSingleChoiceAnswers;
         this.tutors = tutors;
         this.mcQuestionTexts = mcQuestionTexts;
         this.textualQuestionTexts = textualQuestionTexts;
@@ -228,7 +228,7 @@ public class EvaluationExcelFileGenerator {
                 }
             }
 
-            // include textual answers
+            // include textual textAnswers
             createTextualAnswers(studentVotes, textualQuestionTexts, sheet, wb);
             wb.write(out);
             out.close();
@@ -395,7 +395,7 @@ public class EvaluationExcelFileGenerator {
     }
 
     /*
-        splits the students text answers into chunks of 20 words.
+        splits the students text textAnswers into chunks of 20 words.
         returns Arraylist of those chunks as Strings
      */
     private ArrayList<String> splitComment(String comment){
@@ -432,9 +432,9 @@ public class EvaluationExcelFileGenerator {
     private ArrayList<String> aggregateTextAnswers(List<Vote> votes, String key) {
         ArrayList<String> aggregation = new ArrayList<>();
         for (Vote vote : votes) {
-            for (Answer answer : vote.getAnswers()) {
-                if (answer.getTextQuestion().getText().equals(key) && !answer.getText().isEmpty()) {
-                    aggregation.add(answer.getText());
+            for (TextAnswer textAnswer : vote.getTextAnswers()) {
+                if (textAnswer.getTextQuestion().getText().equals(key) && !textAnswer.getText().isEmpty()) {
+                    aggregation.add(textAnswer.getText());
                 }
             }
         }
