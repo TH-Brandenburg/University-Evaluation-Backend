@@ -21,11 +21,12 @@
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
-					<li><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
-					<li><a href="#" th:href="@{/}">Dashboard</a></li>
-					<li class="active"><a href="#" th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
-					<li><a href="#" th:href="@{/archive}">Archiv</a></li>
-					<li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
+					<li><a th:href="@{/new-evaluation}">Neue Evaluation</a></li>
+					<li><a th:href="@{/}">Dashboard</a></li>
+					<li class="active"><a th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
+					<li><a th:href="@{/archive}">Archiv</a></li>
+					<li><a href="http://evaluation.th-brandenburg.de/mediawiki">Wiki</a></li>
+					<li><a th:href="@{/logout}" id="logout">Log Out</a></li>
 				</ul>
 			</div>
 		</div>
@@ -47,9 +48,9 @@
 		<div class="row">
 			<div class="col-sm-3"></div>
 			<div class="col-sm-6">
-				<th:block th:each="singleChoiceQuestion: ${questionnaire.singleChoiceQuestions}">
-					<form th:id="'delete-mc-question-' + ${singleChoiceQuestion.id}"
-						th:action="@{'/deleteMcQuestion/' + ${singleChoiceQuestion.id}}" th:method="POST">
+				<th:block th:each="mcQuestion: ${questionnaire.mcQuestions}">
+					<form th:id="'delete-mc-question-' + ${mcQuestion.id}"
+						th:action="@{'/deleteMcQuestion/' + ${mcQuestion.id}}" th:method="POST">
 						<input type="hidden" name="questionnaireid" th:value="${questionnaire.id}" />
 					</form>
 				</th:block>
@@ -88,14 +89,16 @@
 							</div>
 						</div>
 					</div>
+
 					<th:block th:each="question, rowStat : ${questionnaire.questions}">
 						<div class="panel panel-danger">
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									Textfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
-									<span th:onClick="'deleteQuestion(' + ${question.id} + ')'" class="glyphicon glyphicon-remove"
-										aria-hidden="true" style="float: right; cursor: pointer;" title="Frage l&ouml;schen"></span>
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;"
+										title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
+										th:attr="data-delete-method=@{'deleteQuestion(' + ${question.id} + ')'}"></span>
 								</h3>
 							</div>
 							<div class="panel-body">
@@ -107,25 +110,28 @@
 							</div>
 						</div>
 					</th:block>
-					<th:block th:each="singleChoiceQuestion, rowStat : ${questionnaire.singleChoiceQuestions}">
+
+					<th:block th:each="mcQuestion, rowStat : ${questionnaire.mcQuestions}">
 						<div class="panel panel-danger">
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									Ratingfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
-									<span th:onClick="'deleteMcQuestion(' + ${singleChoiceQuestion.id} + ')'" class="glyphicon glyphicon-remove"
-										aria-hidden="true" style="float: right; cursor: pointer;" title="Frage l&ouml;schen"></span>
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;"
+										title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
+										th:attr="data-delete-method=@{'deleteMcQuestion(' + ${mcQuestion.id} + ')'}"></span>
 								</h3>
 							</div>
 							<div class="panel-body">
 								<label class="col-sm-3 control-label">Fragetext</label>
 								<div class="col-sm-9">
 									<textarea th:name="'mc-question-text-' + ${rowStat.count}" class="form-control" rows="4"><th:block
-											th:text="${singleChoiceQuestion.text}">Fragetext</th:block></textarea>
+											th:text="${mcQuestion.text}">Fragetext</th:block></textarea>
 								</div>
 							</div>
 						</div>
 					</th:block>
+
 					<div class="text-center">
 						<button class="btn btn-danger btn-lg" type="submit">Aktualisieren</button>
 						<p>&nbsp;</p>
@@ -136,13 +142,41 @@
 	</div>
 
 	<div class="col-sm-3"></div>
+
+	<!-- Delete Dialog-->
+	<div class="modal fade" id="delete-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="delete-dialog-label">Frage wirklich löschen?</h4>
+				</div>
+				<div class="modal-footer">
+					<button id="delete-button" class="btn btn-danger">Ja</button>
+					<button class="btn btn-default" data-dismiss="modal">Nein</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
+
 <script>
 	function deleteMcQuestion(id) {
 		document.getElementById("delete-mc-question-" + id).submit();
 	}
+
 	function deleteQuestion(id) {
 		document.getElementById("delete-question-" + id).submit();
 	}
+
+	$('#delete-dialog').on('show.bs.modal', function(event) {
+		var button = $(event.relatedTarget);
+		var deleteMethod = button.data('delete-method');
+		var modal = $(this);
+		modal.find('#delete-button').attr("onclick", deleteMethod);
+	});
 </script>
+
 </html>
