@@ -139,6 +139,65 @@ INSERT INTO `choice` (`id`, `grade`, `text`) VALUES
 
 -- --------------------------------------------------------
 
+--
+-- Daten für Tabelle `question`
+--
+--
+INSERT INTO `question` (`id`, `adhoc_question`, `question_position`, `text`, `type`) VALUES
+  (10, b'0',10,'Die Stoffpräsentation der LV war stets klar und gut strukturiert.',0),
+  (12, b'0',12,'Die Übung war nützlich. Sie war sehr gut geeignet, die Vorlesungsinhalte zu verdeutlichen und zu vertiefen.',0),
+  (5, b'0',5,'Er/Sie kann schwierige Sachverhalte verständlich erklären.',0),
+  (24, b'0',24,'Ging der/die Dozent(in) auf Fragen innerhalb der LV ein?',0),
+  (6, b'0',6,'Ging er/sie auf Fragen innerhalb der LV ein?',0),
+  (1, b'0',1,'Haben Sie die LV regelmäßig besucht?',0),
+  (18, b'0',18,'Haben Sie die Veranstaltung regelmässig besucht?',0),
+  (2, b'0',2,'Haben Sie Interesse an dem Fach?',0),
+  (19, b'0',19,'Haben Sie Interesse an diesem Fach?',0),
+  (33, b'0',33, 'Interface for question with 2 + 1 possible answers.',0),
+  (34, b'0',34,'Interface for question with 3 + 1 possible answers.',0),
+  (35, b'0',35,'Interface for question with 3 + 1 possible answers. The best answer placed in the middle.',0),
+  (36, b'0',36,'Interface for question with 4 + 1 possible answers.',0),
+  (37, b'0',37,'Interface for question with 5 + 1 possible answers.',0),
+  (38, b'0',38,'Interface for question with 5 + 1 possible answers. The best answer placed in the middle.',0),
+  (39, b'0',39,'Interface for question with 6 + 1 possible answers.',0),
+  (41, b'0',41,'Interface for question with 7 + 1 possible answers. The best answer placed in the middle.',0),
+  (40, b'0',40,'Interface for question with 7 + 1 possible answers.',0),
+  (22, b'0',22,'Kann er/sie schwierige Sachverhalte verständlich erklären?',0),
+  (4, b'0',4,'Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.',0),
+  (23, b'0',23,'Versuchte der/die Dozent(in) festzustellen, ob die Studenten der LV folgen können?',0),
+  (26, b'0',26,'War der/die Dozent(in) gut vorbereitet?',0),
+  (25, b'0',25,'War er/sie auch ausserhalb der LV zu diesen Themen ansprechbar?',0),
+  (7, b'0',7,'War er/sie stets gut auf die LV vorbereitet?',0),
+  (8, b'0',8,'Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?',0),
+#   (, b'0',,,0),
+#   (, b'0',,,0),
+#   (, b'0',,,0),
+#   (, b'0',,,0),
+#   (, b'0',,,0),
+
+
+
+
+  # (22, 'Kann er/sie schwierige Sachverhalte verständlich erklären?'),
+  # (4, 'Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.'),
+  # (23, 'Versuchte der/die Dozent(in) festzustellen, ob die Studenten der LV folgen können?'),
+  # (26, 'War der/die Dozent(in) gut vorbereitet?'),
+  # (25, 'War er/sie auch ausserhalb der LV zu diesen Themen ansprechbar?'),
+  # (7, 'War er/sie stets gut auf die LV vorbereitet?'),
+  # (8, 'Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?'),
+  # (27, 'Welche Gesamtnote geben Sie dem/der Dozenten(in)?'),
+  # (9, 'Welche Gesamtnote geben Sie den Lehrunterlagen?'),
+  # (32, 'Welche Gesamtnote geben Sie der Lehrveranstaltung?'),
+  # (16, 'Welche Gesamtnote geben Sie der LV?'),
+  # (30, 'Wie beurteilen Sie den Medieneinsatz (Beamer, Tafel, Overhead-Projektor, usw.)?'),
+  # (14, 'Wie beurteilen Sie den Medieneinsatz der LV? (Beamer, Tafel, Overheadprojektor, Mobil-Telefone...)'),
+  # (13, 'Wie beurteilen Sie den Übungsanteil im Vergleich zum Vorlesungsanteil?'),
+  # (29, 'Wie beurteilen Sie die Ausstattung des Übungs- oder Laborraumes?'),
+  # (17, 'Wie beurteilen Sie die Lehrveranstaltung insgesamt? Auf einer Skala von 1 bis 5; 1 = sehr gut, 5 = nicht gut'),
+  # (31, 'Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser Lehrveranstaltung?'),
+  # (15, 'Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser LV?'),
+  # (20, 'Wie empfanden Sie das Niveau der Lehrveranstaltung?'),
+  # (3, 'Wie fanden Sie das Niveau der Lehrveranstaltung?'),
 
 --
 -- Daten für Tabelle `mc_question`
