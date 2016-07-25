@@ -46,6 +46,10 @@ public class QuestionRevision extends BaseModel {
     @ManyToMany
     private List<Choice> choices;
 
+    @NotNull
+    private Boolean textQuestionsFirst;
+
+
     @Override
     public boolean equals(Object o) {
         return super.equals(o);
