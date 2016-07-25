@@ -26,10 +26,7 @@ import de.thb.ue.backend.model.*;
 import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.service.interfaces.*;
-import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
-import de.thb.ue.backend.util.QRCGeneration;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.backend.util.ZipHelper;
+import de.thb.ue.backend.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -94,6 +91,19 @@ public class EvaluationService implements IEvaluationService {
         participantService.add(students, evaluation);
         return uid;
     }
+
+    @Override
+    public String add(int semester, int students, String tutor, int subject, SemesterType type, String revision, List<Question> adhocQuestions) throws ParticipantException, EvaluationException {
+        Evaluation evaluation = evaluationRepo.findByUID(add(semester, students, tutor, subject, type, revision));
+        for (Question element : adhocQuestions){
+            if(!element.isAdhocQuestion()){
+                element.setAdhocQuestion(true);
+            }
+        }
+        evaluation.setAdhocQuestions(adhocQuestions);
+        return evaluation.getUid();
+    }
+
 
     @Override
     public void addVote(Vote vote, String evaluationUID) {
