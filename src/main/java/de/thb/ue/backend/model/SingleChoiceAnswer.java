@@ -31,7 +31,7 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@Table(name = "sc_answer")
+@Table(name = "single_choice_answer")
 public class SingleChoiceAnswer extends BaseModel {
 
     @NotNull

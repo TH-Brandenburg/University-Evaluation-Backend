@@ -62,19 +62,19 @@ public class VoteService implements IVoteService {
 
     @Override
     public Vote addAnswers(AnswersDTO answersDTO, String evaluationUID) throws EvaluationException, DBEntryDoesNotExistException, ValidationExeption {
-        List<Answer> answers = new ArrayList<>();
+        List<TextAnswer> textAnswers = new ArrayList<>();
         List<SingleChoiceAnswer> singleChoiceAnswers = new ArrayList<>();
         List<StudyPath> studyPaths = studyPathService.getStudyPathByEvaluationUID(evaluationUID);
         StudyPath studyPath = null;
-        //Add answers
+        //Add textAnswers
 
 
         for (TextAnswerDTO answer : answersDTO.getTextAnswers()) {
-            answers.add(new Answer((TextQuestion) questionRepo.findByText(answer.getQuestionText()), answer.getAnswerText()));
+            textAnswers.add(new TextAnswer((TextQuestion) questionRepo.findByText(answer.getQuestionText()), answer.getAnswerText()));
         }
         /*
-        answers.addAll(answersDTO.getTextAnswers().stream().map(answerDTO ->
-                new Answer(questionRepo.findByText(answerDTO.getQuestionText()).get(0),
+        textAnswers.addAll(answersDTO.getTextAnswers().stream().map(answerDTO ->
+                new TextAnswer(questionRepo.findByText(answerDTO.getQuestionText()).get(0),
                         answerDTO.getAnswerText())).collect(Collectors.toList()));
 */
         //Add study path
@@ -102,8 +102,8 @@ public class VoteService implements IVoteService {
             singleChoiceAnswers.add(singleChoiceAnswer);
             mcAnswerRepo.save(singleChoiceAnswer);
         }
-        answerRepo.save(answers);
-        return voteRepo.save(new Vote(studyPath, answers, singleChoiceAnswers));
+        answerRepo.save(textAnswers);
+        return voteRepo.save(new Vote(studyPath, textAnswers, singleChoiceAnswers));
     }
 
 

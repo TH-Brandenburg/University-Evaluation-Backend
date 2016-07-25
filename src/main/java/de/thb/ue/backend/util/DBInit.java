@@ -69,27 +69,27 @@ public class DBInit {
 
     public static List<SingleChoiceQuestion> getDemoMCQuestions() {
         List<SingleChoiceQuestion> out = new ArrayList<>();
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 2 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 2 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Negative answer", (short) 2));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 3 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 3 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Neutral answer", (short) 2));
             add(new Choice("Negative answer", (short) 3));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 3 + 1 possible answers. The best answer placed in the middle.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 3 + 1 possible textAnswers. The best answer placed in the middle.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Negative answer", (short) 3));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Negative answer", (short) 3));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 4 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 4 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Slightly positive answer", (short) 2));
@@ -97,7 +97,7 @@ public class DBInit {
             add(new Choice("Negative answer", (short) 4));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 5 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 5 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("positive answer", (short) 1));
             add(new Choice("Slightly positive answer", (short) 2));
@@ -106,7 +106,7 @@ public class DBInit {
             add(new Choice("Negative answer", (short) 5));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 5 + 1 possible answers. The best answer placed in the middle.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 5 + 1 possible textAnswers. The best answer placed in the middle.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Negative answer", (short) 5));
             add(new Choice("Slightly negative answer", (short) 3));
@@ -115,7 +115,7 @@ public class DBInit {
             add(new Choice("Negative answer", (short) 5));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 6 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 6 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Very positive answer", (short) 1));
             add(new Choice("positive answer", (short) 2));
@@ -125,7 +125,7 @@ public class DBInit {
             add(new Choice("Very negative answer", (short) 6));
         }}));
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 7 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 7 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Very positive answer", (short) 1));
             add(new Choice("positive answer", (short) 2));
@@ -137,7 +137,7 @@ public class DBInit {
         }}));
 
 
-        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 6 + 1 possible answers. The best answer placed in the middle.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 6 + 1 possible textAnswers. The best answer placed in the middle.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Very Negative answer", (short) 7));
             add(new Choice("Negative answer", (short) 5));

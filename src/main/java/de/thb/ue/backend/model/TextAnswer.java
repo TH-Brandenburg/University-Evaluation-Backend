@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -31,15 +32,16 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@Table(name = "aggregated_sc_answer")
-public class AggregatedSCAnswer extends BaseModel {
+@Table(name = "text_answer")
+public class TextAnswer extends BaseModel {
 
     @NotNull
     @ManyToOne
-    private SingleChoiceQuestion question;
+    private TextQuestion textQuestion;
 
     @NotNull
-    private double meanGrade;
+    @Column(length = 1000)
+    private String text;
 
     @Override
     public boolean equals(Object o) {
