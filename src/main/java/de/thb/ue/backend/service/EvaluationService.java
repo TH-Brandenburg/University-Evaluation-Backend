@@ -115,7 +115,7 @@ public class EvaluationService implements IEvaluationService {
         for (Participant participant : participantService.getByEvaluation(evaluation)) {
             try {
                 out.add(QRCGeneration.generateQRC("{\"host\":\"" + hostAddress + "\", \"token\":\"" + participant.getVoteToken() + " \"}",
-                        QRCGeneration.SIZE_LARGE, ErrorCorrectionLevel.Q, QRCGeneration.ENCODING_UTF_8));
+                        QRCGeneration.SIZE_LARGE, ErrorCorrectionLevel.L, QRCGeneration.ENCODING_UTF_8));
             } catch (IOException | WriterException e) {
                 log.error("Error while generating Token list for Evaluation: " + evaluationUID);
             }

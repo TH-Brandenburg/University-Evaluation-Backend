@@ -62,7 +62,7 @@ public class PDFGeneration {
             // add QR-Codes
             for (int i = 0; i < tickets.size(); i++) {
 
-                pdImage = new PDJpeg(document, tickets.get(i));
+                pdImage = new PDJpeg(document, tickets.get(i), 1.0f);
                 imageHeight = pdImage.getHeight();
                 imageWidth = pdImage.getWidth();
 
