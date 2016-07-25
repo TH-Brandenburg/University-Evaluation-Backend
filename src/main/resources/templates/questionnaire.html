@@ -64,8 +64,8 @@
 				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
 					<input type="hidden" name="question-count" th:value="${questionCount}" />
 					<input type="hidden" name="mc-question-count" th:value="${mcQuestionCount}" />
-					<div class="panel panel-danger">
-						<div class="panel-heading">
+					<div class="panel panel-thb">
+						<div class="panel-heading panel-heading-thb">
 							<h3 class="panel-title">Allgemeine Angaben</h3>
 						</div>
 						<div class="panel-body">
@@ -91,8 +91,8 @@
 					</div>
 
 					<th:block th:each="question, rowStat : ${questionnaire.questions}">
-						<div class="panel panel-danger">
-							<div class="panel-heading">
+						<div class="panel panel-thb">
+							<div class="panel-heading panel-heading-thb">
 								<h3 class="panel-title">
 									Textfrage
 									<th:block th:text="${rowStat.count}">1</th:block>
@@ -112,8 +112,8 @@
 					</th:block>
 
 					<th:block th:each="mcQuestion, rowStat : ${questionnaire.mcQuestions}">
-						<div class="panel panel-danger">
-							<div class="panel-heading">
+						<div class="panel panel-thb">
+							<div class="panel-heading panel-heading-thb">
 								<h3 class="panel-title">
 									Ratingfrage
 									<th:block th:text="${rowStat.count}">1</th:block>

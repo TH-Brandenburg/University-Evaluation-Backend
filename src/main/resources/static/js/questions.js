@@ -230,8 +230,8 @@ function drawBestInTheMiddle(panelBody) {
  */
 function createChoicesPanel(lowestRank, numberOfChoices) {
 	var choices = '<!-- Choices --> \
-		<div class="panel panel-danger"> \
-			<div class="panel-heading"> \
+		<div class="panel panel-thb"> \
+			<div class="panel-heading panel-heading-thb"> \
 				<h6 class="panel-title">Choices</h6> \
 			</div> \
 			<div class="panel-body"> \
