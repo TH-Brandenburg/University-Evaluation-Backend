@@ -139,6 +139,7 @@ INSERT INTO `choice` (`id`, `grade`, `text`) VALUES
 
 -- --------------------------------------------------------
 
+
 --
 -- Daten für Tabelle `question`
 --
@@ -185,6 +186,55 @@ INSERT INTO `question` (`id`, `adhoc_question`, `question_position`, `text`, `ty
   (11, b'0',11,'Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?',0),
   (28, b'0',28,'Wie war die Vorgehensweise und Stoffpräsentation in der LV?',0),
   (21, b'0',21,'Wie waren Sprache und Ausdrucksweise des Dozenten/der Dozentin?',0);
+
+
+--
+-- Daten für Tabelle `single_choise_question`
+--
+--
+INSERT INTO `single_choise_question` (`question_id`) VALUES
+  (10),
+  (12),
+  (5),
+  (24),
+  (6),
+  (1),
+  (18),
+  (2),
+  (19),
+  (33),
+  (34),
+  (35),
+  (36),
+  (37),
+  (38),
+  (39),
+  (41),
+  (40),
+  (22),
+  (4),
+  (23),
+  (26),
+  (25),
+  (7),
+  (8),
+  (27),
+  (9),
+  (32),
+  (16),
+  (30),
+  (14),
+  (13),
+  (29),
+  (17),
+  (31),
+  (15),
+  (20),
+  (3),
+  (11),
+  (28),
+  (21);
+
 
 --
 -- Daten für Tabelle `mc_question`
