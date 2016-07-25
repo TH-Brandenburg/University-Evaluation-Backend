@@ -139,6 +139,7 @@ INSERT INTO `choice` (`id`, `grade`, `text`) VALUES
 
 -- --------------------------------------------------------
 
+
 --
 -- Daten für Tabelle `question`
 --
@@ -169,35 +170,71 @@ INSERT INTO `question` (`id`, `adhoc_question`, `question_position`, `text`, `ty
   (25, b'0',25,'War er/sie auch ausserhalb der LV zu diesen Themen ansprechbar?',0),
   (7, b'0',7,'War er/sie stets gut auf die LV vorbereitet?',0),
   (8, b'0',8,'Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?',0),
-#   (, b'0',,,0),
-#   (, b'0',,,0),
-#   (, b'0',,,0),
-#   (, b'0',,,0),
-#   (, b'0',,,0),
+  (27, b'0',27,'Welche Gesamtnote geben Sie dem/der Dozenten(in)?',0),
+  (9, b'0',9,'Welche Gesamtnote geben Sie den Lehrunterlagen?',0),
+  (32, b'0',32,'Welche Gesamtnote geben Sie der Lehrveranstaltung?',0),
+  (16, b'0',16,'Welche Gesamtnote geben Sie der LV?',0),
+  (30, b'0',30,'Wie beurteilen Sie den Medieneinsatz (Beamer, Tafel, Overhead-Projektor, usw.)?',0),
+  (14, b'0',14,'Wie beurteilen Sie den Medieneinsatz der LV? (Beamer, Tafel, Overheadprojektor, Mobil-Telefone...)',0),
+  (13, b'0',13,'Wie beurteilen Sie den Übungsanteil im Vergleich zum Vorlesungsanteil?',0),
+  (29, b'0',29,'Wie beurteilen Sie die Ausstattung des Übungs- oder Laborraumes?',0),
+  (17, b'0',17,'Wie beurteilen Sie die Lehrveranstaltung insgesamt? Auf einer Skala von 1 bis 5; 1 = sehr gut, 5 = nicht gut',0),
+  (31, b'0',31,'Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser Lehrveranstaltung?',0),
+  (15, b'0',15,'Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser LV?',0),
+  (20, b'0',20,'Wie empfanden Sie das Niveau der Lehrveranstaltung?',0),
+  (3, b'0',3,'Wie fanden Sie das Niveau der Lehrveranstaltung?',0),
+  (11, b'0',11,'Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?',0),
+  (28, b'0',28,'Wie war die Vorgehensweise und Stoffpräsentation in der LV?',0),
+  (21, b'0',21,'Wie waren Sprache und Ausdrucksweise des Dozenten/der Dozentin?',0);
 
 
+--
+-- Daten für Tabelle `single_choise_question`
+--
+--
+INSERT INTO `single_choise_question` (`question_id`) VALUES
+  (10),
+  (12),
+  (5),
+  (24),
+  (6),
+  (1),
+  (18),
+  (2),
+  (19),
+  (33),
+  (34),
+  (35),
+  (36),
+  (37),
+  (38),
+  (39),
+  (41),
+  (40),
+  (22),
+  (4),
+  (23),
+  (26),
+  (25),
+  (7),
+  (8),
+  (27),
+  (9),
+  (32),
+  (16),
+  (30),
+  (14),
+  (13),
+  (29),
+  (17),
+  (31),
+  (15),
+  (20),
+  (3),
+  (11),
+  (28),
+  (21);
 
-
-  # (22, 'Kann er/sie schwierige Sachverhalte verständlich erklären?'),
-  # (4, 'Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.'),
-  # (23, 'Versuchte der/die Dozent(in) festzustellen, ob die Studenten der LV folgen können?'),
-  # (26, 'War der/die Dozent(in) gut vorbereitet?'),
-  # (25, 'War er/sie auch ausserhalb der LV zu diesen Themen ansprechbar?'),
-  # (7, 'War er/sie stets gut auf die LV vorbereitet?'),
-  # (8, 'Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?'),
-  # (27, 'Welche Gesamtnote geben Sie dem/der Dozenten(in)?'),
-  # (9, 'Welche Gesamtnote geben Sie den Lehrunterlagen?'),
-  # (32, 'Welche Gesamtnote geben Sie der Lehrveranstaltung?'),
-  # (16, 'Welche Gesamtnote geben Sie der LV?'),
-  # (30, 'Wie beurteilen Sie den Medieneinsatz (Beamer, Tafel, Overhead-Projektor, usw.)?'),
-  # (14, 'Wie beurteilen Sie den Medieneinsatz der LV? (Beamer, Tafel, Overheadprojektor, Mobil-Telefone...)'),
-  # (13, 'Wie beurteilen Sie den Übungsanteil im Vergleich zum Vorlesungsanteil?'),
-  # (29, 'Wie beurteilen Sie die Ausstattung des Übungs- oder Laborraumes?'),
-  # (17, 'Wie beurteilen Sie die Lehrveranstaltung insgesamt? Auf einer Skala von 1 bis 5; 1 = sehr gut, 5 = nicht gut'),
-  # (31, 'Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser Lehrveranstaltung?'),
-  # (15, 'Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser LV?'),
-  # (20, 'Wie empfanden Sie das Niveau der Lehrveranstaltung?'),
-  # (3, 'Wie fanden Sie das Niveau der Lehrveranstaltung?'),
 
 --
 -- Daten für Tabelle `mc_question`
