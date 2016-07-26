@@ -16,31 +16,15 @@
 
 package de.thb.ue.backend.util;
 
-import de.thb.ue.backend.model.*;
-import de.thb.ue.dto.util.Department;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import de.thb.ue.backend.model.*;
+import de.thb.ue.dto.util.Department;
+import de.thb.ue.backend.model.TextQuestion;
+
 
 public class DBInit {
-
-    /******************************************************************
-     * Demo Questionnaire - For showing off Client capabilities
-     ******************************************************************/
-
-    public static final boolean TEXT_QUESTIONS_FIRST_DEMO = false;
-    /******************************************************************
-     * Business administration Department related Questions
-     ******************************************************************/
-
-    public static final boolean TEXT_QUESTIONS_FIRST_BUSINESS_ADMINISTRATION = true;
-    /******************************************************************
-     * Computer Science and Media Department related Questions
-     ******************************************************************/
-
-    public static final boolean TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V1 = false;
-    public static final boolean TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V2 = false;
 
     /******************************************************************
      * Merged Lists
@@ -68,36 +52,44 @@ public class DBInit {
         return out;
     }
 
-    public static List<Question> getDemoQuestions() {
-        return new ArrayList<Question>() {{
-            add(new Question("This shows the interface for a question which can be answered by text or with a photo.", false, 1000));
-            add(new Question("This shows how text questions behave when next to each other.", false, 1000));
+
+    /******************************************************************
+     * Demo Questionnaire - For showing off Client capabilities
+     ******************************************************************/
+
+    public static final boolean TEXT_QUESTIONS_FIRST_DEMO = false;
+
+    public static List<TextQuestion> getDemoQuestions() {
+        return new ArrayList<TextQuestion>() {{
+            add(new TextQuestion(QuestionType.TextQuestion,"This shows the interface for a question which can be answered by text or with a photo.",false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"This shows how text questions behave when next to each other.",false, 1000));
+
         }};
     }
 
-    public static List<MCQuestion> getDemoMCQuestions() {
-        List<MCQuestion> out = new ArrayList<>();
-        out.add(new MCQuestion("Interface for question with 2 + 1 possible answers.", new ArrayList<Choice>() {{
+    public static List<SingleChoiceQuestion> getDemoMCQuestions() {
+        List<SingleChoiceQuestion> out = new ArrayList<>();
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 2 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Negative answer", (short) 2));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 3 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 3 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Neutral answer", (short) 2));
             add(new Choice("Negative answer", (short) 3));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 3 + 1 possible answers. The best answer placed in the middle.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 3 + 1 possible textAnswers. The best answer placed in the middle.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Negative answer", (short) 3));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Negative answer", (short) 3));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 4 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 4 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Positive answer", (short) 1));
             add(new Choice("Slightly positive answer", (short) 2));
@@ -105,7 +97,7 @@ public class DBInit {
             add(new Choice("Negative answer", (short) 4));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 5 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 5 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("positive answer", (short) 1));
             add(new Choice("Slightly positive answer", (short) 2));
@@ -114,7 +106,7 @@ public class DBInit {
             add(new Choice("Negative answer", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 5 + 1 possible answers. The best answer placed in the middle.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 5 + 1 possible textAnswers. The best answer placed in the middle.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Negative answer", (short) 5));
             add(new Choice("Slightly negative answer", (short) 3));
@@ -123,7 +115,7 @@ public class DBInit {
             add(new Choice("Negative answer", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 6 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 6 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Very positive answer", (short) 1));
             add(new Choice("positive answer", (short) 2));
@@ -133,7 +125,7 @@ public class DBInit {
             add(new Choice("Very negative answer", (short) 6));
         }}));
 
-        out.add(new MCQuestion("Interface for question with 7 + 1 possible answers.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 7 + 1 possible textAnswers.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Very positive answer", (short) 1));
             add(new Choice("positive answer", (short) 2));
@@ -145,7 +137,7 @@ public class DBInit {
         }}));
 
 
-        out.add(new MCQuestion("Interface for question with 6 + 1 possible answers. The best answer placed in the middle.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Interface for question with 6 + 1 possible textAnswers. The best answer placed in the middle.", new ArrayList<Choice>() {{
             add(new Choice("No comment", (short) 0));
             add(new Choice("Very Negative answer", (short) 7));
             add(new Choice("Negative answer", (short) 5));
@@ -158,18 +150,24 @@ public class DBInit {
         return out;
     }
 
-    public static List<Question> getBusinessAdministrationQuestions() {
-        return new ArrayList<Question>() {{
-            add(new Question("Wie hoch ist Ihr gesamter Arbeitsaufwand für die Lehrveranstaltung(inkl. Vor- und Nachbereitung) in Stunden pro Woche?", true, 2));
-            add(new Question("Was fanden Sie an der Lehrveranstaltung gut?", false, 1000));
-            add(new Question("Was fanden Sie an der Lehrveranstaltung weniger gut?", false, 1000));
-            add(new Question("Welche Verbesserungsvorschläge für die Lehrveranstaltung haben Sie?", false, 1000));
+    /******************************************************************
+     * Business administration Department related Questions
+     ******************************************************************/
+
+    public static final boolean TEXT_QUESTIONS_FIRST_BUSINESS_ADMINISTRATION = true;
+
+    public static List<TextQuestion> getBusinessAdministrationQuestions() {
+        return new ArrayList<TextQuestion>() {{
+            add(new TextQuestion(QuestionType.TextQuestion,"Wie hoch ist Ihr gesamter Arbeitsaufwand für die Lehrveranstaltung(inkl. Vor- und Nachbereitung) in Stunden pro Woche?", true, 2));
+            add(new TextQuestion(QuestionType.TextQuestion,"Was fanden Sie an der Lehrveranstaltung gut?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Was fanden Sie an der Lehrveranstaltung weniger gut?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Welche Verbesserungsvorschläge für die Lehrveranstaltung haben Sie?", false, 1000));
         }};
     }
 
-    public static List<MCQuestion> getBusinessAdministrationMCQuestions() {
-        List<MCQuestion> out = new ArrayList<>();
-        out.add(new MCQuestion("Wie beurteilen Sie die Lehrveranstaltung insgesamt? Auf einer Skala von 1 bis 5; 1 = sehr gut, 5 = nicht gut", new ArrayList<Choice>() {{
+    public static List<SingleChoiceQuestion> getBusinessAdministrationMCQuestions() {
+        List<SingleChoiceQuestion> out = new ArrayList<>();
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie die Lehrveranstaltung insgesamt? Auf einer Skala von 1 bis 5; 1 = sehr gut, 5 = nicht gut", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -183,13 +181,13 @@ public class DBInit {
 
     public static List<Tutor> getBusinessAdministrationTutors() {
         List<Tutor> out = new ArrayList<>();
-        out.add(new Tutor("franz", "Robert", "Franz", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("scheeg", "Jochen", "Scheeg", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("hoeding", "Michael", "Hoeding", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("pfister", "Winfried", "Pfister", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("wikarski", "Dietmar", "Wikarski", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("hausmann", "Dietmar", "Hausmann", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("sens", "Katrin", "Sens", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Robert", "Franz", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Jochen", "Scheeg", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Michael", "Hoeding", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Winfried", "Pfister", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Dietmar", "Wikarski", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Dietmar", "Hausmann", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("Katrin", "Sens", Department.BUSINESS_ADMINISTRATION, null));
 
 
         return out;
@@ -226,20 +224,28 @@ public class DBInit {
         return out;
     }
 
-    public static List<Question> getComputerScienceQuestions() {
-        return new ArrayList<Question>() {{
-            add(new Question("Was fanden Sie positiv?", false, 1000));
-            add(new Question("Was fanden Sie negativ?", false, 1000));
-            add(new Question("Welche Verbesserungsvorschläge würden Sie unterbreiten?", false, 1000));
-            add(new Question("Haben Sie weitere Anmerkungen?", false, 1000));
+    /******************************************************************
+     * Computer Science and Media Department related Questions
+     ******************************************************************/
+
+    public static final boolean TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V1 = false;
+    public static final boolean TEXT_QUESTIONS_FIRST_COMPUTER_SCIENCE_V2 = false;
+
+
+    public static List<TextQuestion> getComputerScienceQuestions() {
+        return new ArrayList<TextQuestion>() {{
+            add(new TextQuestion(QuestionType.TextQuestion,"Was fanden Sie positiv?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Was fanden Sie negativ?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Welche Verbesserungsvorschläge würden Sie unterbreiten?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Haben Sie weitere Anmerkungen?", false, 1000));
         }};
     }
 
-    public static List<MCQuestion> getComputerScienceMCQuestions() {
+    public static List<SingleChoiceQuestion> getComputerScienceMCQuestions() {
 
-        List<MCQuestion> out = new ArrayList<>();
+        List<SingleChoiceQuestion> out = new ArrayList<>();
         //Studentin
-        out.add(new MCQuestion("Haben Sie die Veranstaltung regelmässig besucht?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Haben Sie die Veranstaltung regelmässig besucht?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, immer", (short) 1));
             add(new Choice("sehr häufig", (short) 2));
@@ -247,7 +253,7 @@ public class DBInit {
             add(new Choice("selten", (short) 4));
             add(new Choice("nie", (short) 5));
         }}));
-        out.add(new MCQuestion("Haben Sie Interesse an diesem Fach?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Haben Sie Interesse an diesem Fach?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, sehr", (short) 1));
             add(new Choice("durchaus", (short) 2));
@@ -256,7 +262,7 @@ public class DBInit {
             add(new Choice("überhaupt nicht", (short) 5));
         }}));
         //TODO sort
-        out.add(new MCQuestion("Wie empfanden Sie das Niveau der Lehrveranstaltung?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie empfanden Sie das Niveau der Lehrveranstaltung?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("zu hoch", (short) 3));
             add(new Choice("hoch", (short) 2));
@@ -265,7 +271,7 @@ public class DBInit {
             add(new Choice("zu niedrig", (short) 3));
         }}));
         //Dozentin
-        out.add(new MCQuestion("Wie waren Sprache und Ausdrucksweise des Dozenten/der Dozentin?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie waren Sprache und Ausdrucksweise des Dozenten/der Dozentin?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("sehr laut, sehr deutlich", (short) 1));
             add(new Choice("laut, präzise", (short) 2));
@@ -273,7 +279,7 @@ public class DBInit {
             add(new Choice("leise, eher undeutlich", (short) 4));
             add(new Choice("zu leise, undeutlich", (short) 5));
         }}));
-        out.add(new MCQuestion("Kann er/sie schwierige Sachverhalte verständlich erklären?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Kann er/sie schwierige Sachverhalte verständlich erklären?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, hervorragend", (short) 1));
             add(new Choice("ja, fast immer", (short) 2));
@@ -282,7 +288,7 @@ public class DBInit {
             add(new Choice("nein, nie", (short) 5));
         }}));
         //TODO sort + frage DozentIn
-        out.add(new MCQuestion("Versuchte der/die Dozent(in) festzustellen, ob die Studenten der LV folgen können?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Versuchte der/die Dozent(in) festzustellen, ob die Studenten der LV folgen können?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, immer Dialog mit Studenten", (short) 1));
             add(new Choice("überwiegend Dialog", (short) 2));
@@ -290,7 +296,7 @@ public class DBInit {
             add(new Choice("zu oft Monolog", (short) 4));
             add(new Choice("nein, nur Monolog", (short) 5));
         }}));
-        out.add(new MCQuestion("Ging der/die Dozent(in) auf Fragen innerhalb der LV ein?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Ging der/die Dozent(in) auf Fragen innerhalb der LV ein?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, immer", (short) 1));
             add(new Choice("ja, wenn Zeit war", (short) 2));
@@ -298,7 +304,7 @@ public class DBInit {
             add(new Choice("selten", (short) 4));
             add(new Choice("nein, nie", (short) 5));
         }}));
-        out.add(new MCQuestion("War er/sie auch ausserhalb der LV zu diesen Themen ansprechbar?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"War er/sie auch ausserhalb der LV zu diesen Themen ansprechbar?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, immer", (short) 1));
             add(new Choice("ja, wenn Zeit war", (short) 2));
@@ -306,7 +312,7 @@ public class DBInit {
             add(new Choice("selten", (short) 4));
             add(new Choice("nein, nie", (short) 5));
         }}));
-        out.add(new MCQuestion("War der/die Dozent(in) gut vorbereitet?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"War der/die Dozent(in) gut vorbereitet?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("ja, immer", (short) 1));
             add(new Choice("sehr häufig", (short) 2));
@@ -314,7 +320,7 @@ public class DBInit {
             add(new Choice("selten", (short) 4));
             add(new Choice("nie", (short) 5));
         }}));
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie dem/der Dozenten(in)?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Welche Gesamtnote geben Sie dem/der Dozenten(in)?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -323,7 +329,7 @@ public class DBInit {
             add(new Choice("ungenügend", (short) 5));
         }}));
         //Lehrunterlagen
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie den Lehrunterlagen?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Welche Gesamtnote geben Sie den Lehrunterlagen?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -332,7 +338,7 @@ public class DBInit {
             add(new Choice("ungenügend", (short) 5));
         }}));
         //Lehrveranstaltung
-        out.add(new MCQuestion("Wie war die Vorgehensweise und Stoffpräsentation in der LV?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie war die Vorgehensweise und Stoffpräsentation in der LV?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("sehr klar", (short) 1));
             add(new Choice("gut strukturiert", (short) 2));
@@ -341,7 +347,7 @@ public class DBInit {
             add(new Choice("Roter Faden fehlte", (short) 5));
         }}));
         //TODO sort
-        out.add(new MCQuestion("Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("zu viel Stoff in zuwenig Zeit", (short) 5));
             add(new Choice("viel Stoff", (short) 3));
@@ -350,7 +356,7 @@ public class DBInit {
             add(new Choice("zu viel Zeit für zuwenig Stoff", (short) 5));
         }}));
         //TODO sort
-        out.add(new MCQuestion("Die Übung war nützlich. Sie war sehr gut geeignet, die Vorlesungsinhalte zu verdeutlichen und zu vertiefen.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Die Übung war nützlich. Sie war sehr gut geeignet, die Vorlesungsinhalte zu verdeutlichen und zu vertiefen.", new ArrayList<Choice>() {{
             add(new Choice("keine Ü/L vorhanden", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme weitgehend zu", (short) 2));
@@ -358,7 +364,7 @@ public class DBInit {
             add(new Choice("stimme weitgehend nicht zu", (short) 4));
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
-        out.add(new MCQuestion("Wie beurteilen Sie die Ausstattung des Übungs- oder Laborraumes?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie die Ausstattung des Übungs- oder Laborraumes?", new ArrayList<Choice>() {{
             add(new Choice("keine Ü/L vorhanden", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -367,7 +373,7 @@ public class DBInit {
             add(new Choice("ungenügend", (short) 5));
         }}));
         //TODO sort
-        out.add(new MCQuestion("Wie beurteilen Sie den Medieneinsatz (Beamer, Tafel, Overhead-Projektor, usw.)?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie den Medieneinsatz (Beamer, Tafel, Overhead-Projektor, usw.)?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("viel zu viele Medien eingesetzt"/*"zuviele Medien eingesetzt"*/, (short) 5));
             add(new Choice("etwas zu viele Medien eingesetzt"/*"reichhaltiger Medieneinsatz"*/, (short) 3));
@@ -375,7 +381,7 @@ public class DBInit {
             add(new Choice("etwas zu wenige Medien eingesetzt"/*"wenig Medien genutzt"*/, (short) 3)); // genutzt genutzt ;)
             add(new Choice("viel zu wenig Medien eingesetzt"/*"keine Medien"*/, (short) 5));
         }}));
-        out.add(new MCQuestion("Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser Lehrveranstaltung?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser Lehrveranstaltung?", new ArrayList<Choice>() {{
             add(new Choice("weiss ich nicht", (short) 0));
             add(new Choice("habe sehr viel gelernt", (short) 1));
             add(new Choice("habe viel gelernt", (short) 2));
@@ -383,7 +389,7 @@ public class DBInit {
             add(new Choice("habe wenig gelernt", (short) 4));
             add(new Choice("habe sehr wenig gelernt", (short) 5));
         }}));
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie der Lehrveranstaltung?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Welche Gesamtnote geben Sie der Lehrveranstaltung?", new ArrayList<Choice>() {{
             add(new Choice("keine Angabe", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -398,10 +404,10 @@ public class DBInit {
     * Kindsmueller/Socher approved! Update of old questionnaire
      */
 
-    public static List<MCQuestion> getComputerScienceMCQuestionsV2(){
-        List<MCQuestion> out = new ArrayList<>();
+    public static List<SingleChoiceQuestion> getComputerScienceMCQuestionsV2(){
+        List<SingleChoiceQuestion> out = new ArrayList<>();
         //Studentin
-        out.add(new MCQuestion("Haben Sie die LV regelmäßig besucht?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Haben Sie die LV regelmäßig besucht?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("immer", (short) 1));
             add(new Choice("oft", (short) 2));
@@ -410,7 +416,7 @@ public class DBInit {
             add(new Choice("nie", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Haben Sie Interesse an dem Fach?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Haben Sie Interesse an dem Fach?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr groß", (short) 1));
             add(new Choice("groß", (short) 2));
@@ -419,7 +425,7 @@ public class DBInit {
             add(new Choice("sehr klein", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Wie fanden Sie das Niveau der Lehrveranstaltung?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie fanden Sie das Niveau der Lehrveranstaltung?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("zu hoch", (short) 1));
             add(new Choice("hoch", (short) 2));
@@ -428,7 +434,7 @@ public class DBInit {
             add(new Choice("zu niedrig", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
@@ -437,7 +443,7 @@ public class DBInit {
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Er/Sie kann schwierige Sachverhalte verständlich erklären.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Er/Sie kann schwierige Sachverhalte verständlich erklären.", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
@@ -446,7 +452,7 @@ public class DBInit {
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Ging er/sie auf Fragen innerhalb der LV ein?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Ging er/sie auf Fragen innerhalb der LV ein?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("immer", (short) 1));
             add(new Choice("oft", (short) 2));
@@ -455,7 +461,7 @@ public class DBInit {
             add(new Choice("nie", (short) 5));
         }}));
 
-        out.add(new MCQuestion("War er/sie stets gut auf die LV vorbereitet?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"War er/sie stets gut auf die LV vorbereitet?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("immer", (short) 1));
             add(new Choice("oft", (short) 2));
@@ -464,7 +470,7 @@ public class DBInit {
             add(new Choice("nie", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -473,7 +479,7 @@ public class DBInit {
             add(new Choice("ungenügend", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie den Lehrunterlagen?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Welche Gesamtnote geben Sie den Lehrunterlagen?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -482,7 +488,7 @@ public class DBInit {
             add(new Choice("ungenügend", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Die Stoffpräsentation der LV war stets klar und gut strukturiert.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Die Stoffpräsentation der LV war stets klar und gut strukturiert.", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
@@ -491,7 +497,7 @@ public class DBInit {
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr viel Stoff", (short) 1));
             add(new Choice("viel Stoff", (short) 2));
@@ -500,7 +506,7 @@ public class DBInit {
             add(new Choice("sehr wenig Stoff", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Die Übung war nützlich. Sie war sehr gut geeignet, die Vorlesungsinhalte zu verdeutlichen und zu vertiefen.", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Die Übung war nützlich. Sie war sehr gut geeignet, die Vorlesungsinhalte zu verdeutlichen und zu vertiefen.", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
@@ -509,7 +515,7 @@ public class DBInit {
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Wie beurteilen Sie den Übungsanteil im Vergleich zum Vorlesungsanteil?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie den Übungsanteil im Vergleich zum Vorlesungsanteil?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr viel Übung", (short) 1));
             add(new Choice("viel Übung", (short) 2));
@@ -518,7 +524,7 @@ public class DBInit {
             add(new Choice("zu wenig Übung", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Wie beurteilen Sie den Medieneinsatz der LV? (Beamer, Tafel, Overheadprojektor, Mobil-Telefone...)", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie den Medieneinsatz der LV? (Beamer, Tafel, Overheadprojektor, Mobil-Telefone...)", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr viel Medien", (short) 1));
             add(new Choice("viel Medien", (short) 2));
@@ -527,7 +533,7 @@ public class DBInit {
             add(new Choice("sehr wenig Medien", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser LV?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser LV?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr groß", (short) 1));
             add(new Choice("groß", (short) 2));
@@ -536,7 +542,7 @@ public class DBInit {
             add(new Choice("sehr klein", (short) 5));
         }}));
 
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie der LV?", new ArrayList<Choice>() {{
+        out.add(new SingleChoiceQuestion(QuestionType.SingleChoiceQuestion,"Welche Gesamtnote geben Sie der LV?", new ArrayList<Choice>() {{
             add(new Choice("k.A", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
@@ -548,43 +554,40 @@ public class DBInit {
         return out;
     }
 
-    public static  List<Question> getComputerScienceQuestionsV2(){
-        return new ArrayList<Question>() {{
-            add(new Question("Was fanden Sie positiv?", false, 1000));
-            add(new Question("Was fanden Sie negativ?", false, 1000));
-            add(new Question("Welche Verbesserungsvorschläge würden Sie machen?", false, 1000));
-            add(new Question("Weitere Anmerkungen?", false, 1000));
+    public static  List<TextQuestion> getComputerScienceQuestionsV2(){
+        return new ArrayList<TextQuestion>() {{
+            add(new TextQuestion(QuestionType.TextQuestion,"Was fanden Sie positiv?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Was fanden Sie negativ?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Welche Verbesserungsvorschläge würden Sie machen?", false, 1000));
+            add(new TextQuestion(QuestionType.TextQuestion,"Weitere Anmerkungen?", false, 1000));
         }};
     }
 
 
     public static List<Tutor> getComputerScienceTutors() {
         List<Tutor> out = new ArrayList<>();
-        out.add(new Tutor("socher", "Rolf", "Socher", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("boersc", "Ingo", "Boersch", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("heinsohn", "Jochen", "Heinsohn", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("loose", "Harald", "Loose", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("preuss", "Thomas", "Preuss", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("kindsmueller", "Martin Christof", "Kindsmueller", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("buchholz", "Sven", "Buchholz", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("schmidt", "Gabriele", "Schmidt", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("busse", "Susanne", "Busse", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("kim", "Stefan", "Kim", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("syrjakow", "Michael", "Syrjakow", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("vielhaauer", "Claus", "Vielhauer", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("homeister", "Mathias", "Homeister", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("kell", "Gerald", "Kell", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("creutzburg", "Reiner", "Creuzburg", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("hasche", "Eberhard", "Hasche", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("urban", "Alexander", "Urban", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("schaffoe", "Martin", "Schafföner", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("beck", "Eberhard", "Beck", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("schrader", "Thomas", "Schrader", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("jaenicke", "Karl-Heinz", "Jänicke", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("developer", "Account", "Developer", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("bartz", "Bartz", "Tobias", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("anderst", "Anders", "Toni", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("muellerb", "Müller", "Ben", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Rolf", "Socher", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Ingo", "Boersch", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Jochen", "Heinsohn", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Harald", "Loose", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Thomas", "Preuss", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Martin Christof", "Kindsmueller", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Sven", "Buchholz", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Gabriele", "Schmidt", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Susanne", "Busse", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Stefan", "Kim", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Michael", "Syrjakow", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Claus", "Vielhauer", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Mathias", "Homeister", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Gerald", "Kell", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Reiner", "Creuzburg", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Eberhard", "Hasche", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Alexander", "Urban", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Martin", "Schafföner", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Eberhard", "Beck", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Thomas", "Schrader", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Karl-Heinz", "Jänicke", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("Account", "Developer", Department.COMPUTER_SCIENCE_MEDIA, null));
 
         return out;
     }

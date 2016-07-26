@@ -9,16 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.thb.ue.backend.model.Answer;
+import de.thb.ue.backend.model.TextAnswer;
 import de.thb.ue.backend.model.Choice;
 
-@RepositoryDefinition(domainClass = Answer.class, idClass = Integer.class)
+@RepositoryDefinition(domainClass = TextAnswer.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface IAnswer extends CrudRepository<Answer, Serializable> {
+public interface IAnswer extends CrudRepository<TextAnswer, Serializable> {
 
-    List<Answer> findAll();
+    List<TextAnswer> findAll();
 
-    @Query("SELECT a FROM Answer a WHERE a.text = :text")
+    @Query("SELECT a FROM TextAnswer a WHERE a.text = :text")
     Choice findByText(@Param("text") String text);
 
 //    @Query("SELECT w FROM Word w WHERE lower(w.word) LIKE CONCAT('%', LOWER(:search), '%') ORDER BY w.id DESC")

@@ -18,10 +18,7 @@ package de.thb.ue.backend.model;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -42,12 +39,8 @@ public class QuestionRevision extends BaseModel {
     private String name;
 
     @NotNull
-    @ManyToMany
+    @OneToMany
     private List<Question> questions;
-
-    @NotNull
-    @ManyToMany
-    private List<MCQuestion> mcQuestions;
 
     @NotNull
     @ManyToMany
@@ -55,6 +48,7 @@ public class QuestionRevision extends BaseModel {
 
     @NotNull
     private Boolean textQuestionsFirst;
+
 
     @Override
     public boolean equals(Object o) {

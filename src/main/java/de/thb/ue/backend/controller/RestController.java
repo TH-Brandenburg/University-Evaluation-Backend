@@ -96,7 +96,7 @@ public class RestController {
         Evaluation evaluation = participantService.getEvaluation(requestDTO.getVoteToken());
 
         if (!evaluation.getClosed() && !participantService.hasVoted(requestDTO.getVoteToken())) {
-            QuestionsDTO out = questionsService.getAllQuestionsAsDTO(evaluation.getQuestionRevision().getName());
+            QuestionsDTO out = questionsService.getAllQuestionsAsDTO(evaluation.getUid(), evaluation.getQuestionRevision().getId());
             Subject subject = evaluation.getSubject();
             out.setTextQuestionsFirst(evaluation.getQuestionRevision().getTextQuestionsFirst());
             out.setStudyPaths(studyPathService.getByDegreeAndSection(subject.getDegree(), subject.getDepartment()));
@@ -131,6 +131,20 @@ public class RestController {
         }
         return new ResponseEntity<>(new ResponseDTO("Answers successful added", ErrorType.ANSWERS_SUCCESSFULLY_ADDED), HttpStatus.OK);
     }
+/*
+    @RequestMapping(value = API_VERSION + "/textAnswers", method = RequestMethod.POST)
+    @ResponseBody
+    ResponseEntity<ResponseDTO> addTextAnswers(@RequestParam("textAnswers-dto") String answerDTOString, @RequestParam("images") MultipartFile images) throws DBEntryDoesNotExistException, EvaluationException, ParticipantException, IOException, ValidationExeption {
+        AnswersDTO answersDTO = DTOMapper.stringToAnswersDTO(answerDTOString);
+        participantService.setVoted(answersDTO.getVoteToken(), answersDTO.getDeviceID());
+        Evaluation evaluation = participantService.getEvaluation(answersDTO.getVoteToken());
+        Vote vote = voteService.addAnswers(answersDTO, evaluation.getUid());
+        evaluationService.addVote(vote, evaluation.getUid());
+        if(!images.isEmpty()){
+            answerImageService.addAnswerImage(vote, images, evaluation.getUid());
+        }
+        return new ResponseEntity<>(new ResponseDTO("Answers successful added", ErrorType.ANSWERS_SUCCESSFULLY_ADDED), HttpStatus.OK);
+    }*/
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO> handleError(HttpServletRequest req, Exception exception) {

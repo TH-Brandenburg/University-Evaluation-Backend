@@ -20,18 +20,25 @@ package de.thb.ue.backend.service.interfaces;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.StringJoiner;
 
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
+import de.thb.ue.backend.model.Choice;
 import de.thb.ue.backend.model.Evaluation;
+import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.Vote;
+import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
 
 public interface IEvaluationService {
+    @Deprecated
     String add(int semester, int students, String tutor, int subject, SemesterType type,
                String revision) throws ParticipantException, EvaluationException;
+    String add(int semester, int students, String tutor, int subject, SemesterType type,
+               String revision, List<Question> adhocQuestions) throws ParticipantException, EvaluationException;
 
     boolean isClosed(String evaluationUID) throws DBEntryDoesNotExistException;
 

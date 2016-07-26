@@ -18,21 +18,17 @@ package de.thb.ue.backend.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import de.thb.ue.backend.model.*;
 import de.thb.ue.dto.AnswersDTO;
 import de.thb.ue.dto.MultipleChoiceQuestionDTO;
 import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.dto.util.ChoiceDTO;
 import de.thb.ue.dto.util.TextQuestionDTO;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.StudyPath;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DTOMapper {
 
@@ -52,13 +48,13 @@ public class DTOMapper {
         return objectMapper.writeValueAsString(answersDTO);
     }
 
-    public static List<MultipleChoiceQuestionDTO> mcQuestionsToMultipleChoiceQuestionDTOs(List<MCQuestion> mcQuestions) {
+    public static List<MultipleChoiceQuestionDTO> mcQuestionsToMultipleChoiceQuestionDTOs(List<SingleChoiceQuestion> singleChoiceQuestions) {
         ArrayList<MultipleChoiceQuestionDTO> out = new ArrayList<>();
-        for (MCQuestion mcQuestion : mcQuestions) {
+        for (SingleChoiceQuestion singleChoiceQuestion : singleChoiceQuestions) {
             MultipleChoiceQuestionDTO tmpQuestion = new MultipleChoiceQuestionDTO();
-            tmpQuestion.setQuestion(mcQuestion.getText());
+            tmpQuestion.setQuestion(singleChoiceQuestion.getText());
             tmpQuestion.setChoices(new ArrayList<>());
-            for (Choice choice : mcQuestion.getChoices()) {
+            for (Choice choice : singleChoiceQuestion.getChoices()) {
                 tmpQuestion.getChoices().add(new ChoiceDTO(choice.getText(), choice.getGrade()));
             }
 
@@ -67,16 +63,19 @@ public class DTOMapper {
         return out;
     }
 
-    public static QuestionsDTO questionModelsToDTO(List<Question> questions, List<MCQuestion> mcQuestions) {
+    public static QuestionsDTO questionModelsToDTO(List<Question> textQuestions, List<SingleChoiceQuestion> singleChoiceQuestions) {
         QuestionsDTO out = new QuestionsDTO();
-        List<TextQuestionDTO> textQuestionDTOs = new ArrayList<>(questions.size());
-        int questionNumber = mcQuestions.size() + 1;
-        for (Question question : questions) {
-            textQuestionDTOs.add(new TextQuestionDTO(questionNumber, question.getText(), question.getOnlyNumbers(), question.getMaxLength()));
-            questionNumber++;
+        List<TextQuestionDTO> textQuestionDTOs = new ArrayList<>(textQuestions.size());
+        int questionNumber = singleChoiceQuestions.size() + 1;
+        for (Question question : textQuestions) {
+            if (question instanceof TextQuestion) {
+                TextQuestion textQuestion = (TextQuestion) question;
+                textQuestionDTOs.add(new TextQuestionDTO(questionNumber, textQuestion.getText(), textQuestion.getOnlyNumbers(), textQuestion.getMaxLength()));
+                questionNumber++;
+            }
         }
         out.setTextQuestions(textQuestionDTOs);
-        out.setMultipleChoiceQuestionDTOs(mcQuestionsToMultipleChoiceQuestionDTOs(mcQuestions));
+        out.setMultipleChoiceQuestionDTOs(mcQuestionsToMultipleChoiceQuestionDTOs(singleChoiceQuestions));
         return out;
     }
 

@@ -23,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.thb.ue.backend.model.MCAnswer;
+import de.thb.ue.backend.model.SingleChoiceAnswer;
 
-@RepositoryDefinition(domainClass = MCAnswer.class, idClass = Integer.class)
+@RepositoryDefinition(domainClass = SingleChoiceAnswer.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface IMCAnswer extends CrudRepository<MCAnswer, Serializable> {
+public interface ISCAnswer extends CrudRepository<SingleChoiceAnswer, Serializable> {
 
-    List<MCAnswer> findAll();
+    List<SingleChoiceAnswer> findAll();
 
 }

@@ -4,7 +4,7 @@
 
 This project presents a software solution of the evaluation
 problem faced by universities. The software consists of a REST-server (Github: CampusAppEvalBackend) application and to date this Android client project. The software
-features automated processing of given answers, independency
+features automated processing of given textAnswers, independency
 of location, a flexible data model supporting multiple questionnaires
 and an interface designed to be used effectively upon first
 encounter. While our approach aims to support a high participation

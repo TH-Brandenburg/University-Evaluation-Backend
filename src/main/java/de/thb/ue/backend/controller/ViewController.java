@@ -138,8 +138,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
     	model.addAttribute("questionnaire", questionnaire);
     	model.addAttribute("questionCount", questionnaire.getQuestions().size());
-    	model.addAttribute("mcQuestionCount", questionnaire.getMcQuestions().size());
-    	return "questionnaire";
+        return "questionnaire";
     }
 
     @RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.POST)
@@ -155,15 +154,22 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	questionnaire.setTextQuestionsFirst(textQuestionsFirst);
 
     	int mcQuestionCount = Integer.parseInt(allRequestParams.get("mc-question-count"));
-    	List<MCQuestion>allMcQuestions = questionnaire.getMcQuestions();
-    	for(int i=1; i <= mcQuestionCount; i++){
-    		allMcQuestions.get(i-1).setText(allRequestParams.get("mc-question-text-" + i));;
-    	}
+        List<SingleChoiceQuestion> allSingleChoiceQuestions = new ArrayList<>();
+        List<TextQuestion> allTextQuestions = new ArrayList<>();
+        for (Question question : questionnaire.getQuestions()) {
+            if (question instanceof SingleChoiceQuestion) {
+                allSingleChoiceQuestions.add((SingleChoiceQuestion) question);
+            } else if (question instanceof TextQuestion) {
+                allTextQuestions.add((TextQuestion) question);
+            }
+        }
 
+    	for(int i=1; i <= mcQuestionCount; i++){
+    		allSingleChoiceQuestions.get(i-1).setText(allRequestParams.get("mc-question-text-" + i));;
+    	}
     	int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
-    	List<Question>allQuestions = questionnaire.getQuestions();
     	for(int i=1; i <= questionCount; i++){
-    		allQuestions.get(i-1).setText(allRequestParams.get("question-text-" + i));;
+    		allTextQuestions.get(i-1).setText(allRequestParams.get("question-text-" + i));;
     	}
 
     	model.addAttribute("questionaire", questionnaire);
@@ -174,18 +180,18 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
     @RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)
     String deleteMcQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
-    	MCQuestion mcQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
-    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
-    	questionnaire.getMcQuestions().remove(mcQuestion);
-    	questionsService.updateQuestionRevision(questionnaire);
+        Question singleChoiceQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
+        QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
+        questionnaire.getQuestions().remove(singleChoiceQuestion);
+        questionsService.updateQuestionRevision(questionnaire);
     	return "redirect:/questionnaire/" + questionnaireid + "?success";
     }
 
     @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.POST)
     String deleteQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
-    	Question question = questionsService.getQuestionById(Integer.parseInt(id));
-    	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
-    	questionnaire.getQuestions().remove(question);
+        Question textQuestion = questionsService.getQuestionById(Integer.parseInt(id));
+        QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
+    	questionnaire.getQuestions().remove(textQuestion);
     	questionsService.updateQuestionRevision(questionnaire);
     	return "redirect:/questionnaire/" + questionnaireid + "?success";
     }
@@ -200,6 +206,9 @@ public class ViewController extends WebMvcConfigurerAdapter {
     ResponseEntity<Integer> voteCount(@RequestParam String uid, Model model) {
         int out = 0;
         try {
+            if (uid.contains("?")) {
+                uid = uid.replace("?", "");
+            }
             out = evaluationService.getByUID(uid).getStudentsVoted();
         } catch (EvaluationException | DBEntryDoesNotExistException e) {
             log.error("Error while counting votes: " + e.getMessage());

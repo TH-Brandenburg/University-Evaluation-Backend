@@ -16,63 +16,30 @@
 
 package de.thb.ue.backend.model;
 
-import de.thb.ue.backend.util.SemesterType;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Setter
 @Getter
-@Table(name = "evaluation")
-public class Evaluation extends BaseModel {
-
-    @NotNull
-    @Column(unique = true)
-    private String uid;
-
-    @NotNull
-    private LocalDateTime dateOfEvaluation;
-
-    private Integer semester;
-
-    @NotNull
-    @ManyToMany
-    @JoinTable(name = "evaluation_tutor", joinColumns = {@JoinColumn(name = "evaluation_id")} , inverseJoinColumns = {@JoinColumn(name = "tutor_id")})
-    private List<Tutor> tutors;
+@Table(name = "single_choice_answer")
+public class SingleChoiceAnswer extends BaseModel {
 
     @NotNull
     @ManyToOne
-    private Subject subject;
+    private SingleChoiceQuestion question;
 
-    @NotNull
-    private SemesterType semesterType;
-
-    private Boolean closed;
-
-    @NotNull
     @ManyToOne
-    private QuestionRevision questionRevision;
-
-    @OneToMany
-    private List<Vote> votes;
-
-    @NotNull
-    private Integer studentsAll;
-
-    @NotNull
-    private Integer studentsVoted;
-
-    @OneToMany
-    private List<Question> adhocQuestions;
+    private Choice choice;
 
     @Override
     public boolean equals(Object o) {
