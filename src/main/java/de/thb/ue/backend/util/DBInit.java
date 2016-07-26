@@ -181,15 +181,13 @@ public class DBInit {
 
     public static List<Tutor> getBusinessAdministrationTutors() {
         List<Tutor> out = new ArrayList<>();
-        out.add(new Tutor("Robert", "Franz", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("Jochen", "Scheeg", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("Michael", "Hoeding", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("Winfried", "Pfister", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("Dietmar", "Wikarski", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("Dietmar", "Hausmann", Department.BUSINESS_ADMINISTRATION, null));
-        out.add(new Tutor("Katrin", "Sens", Department.BUSINESS_ADMINISTRATION, null));
-
-
+        out.add(new Tutor("franz", "Robert", "Franz", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("scheeg", "Jochen", "Scheeg", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("hoeding", "Michael", "Hoeding", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("pfister", "Winfried", "Pfister", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("wikarski", "Dietmar", "Wikarski", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("hausmann", "Dietmar", "Hausmann", Department.BUSINESS_ADMINISTRATION, null));
+        out.add(new Tutor("sens", "Katrin", "Sens", Department.BUSINESS_ADMINISTRATION, null));
         return out;
     }
 
@@ -566,28 +564,31 @@ public class DBInit {
 
     public static List<Tutor> getComputerScienceTutors() {
         List<Tutor> out = new ArrayList<>();
-        out.add(new Tutor("Rolf", "Socher", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Ingo", "Boersch", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Jochen", "Heinsohn", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Harald", "Loose", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Thomas", "Preuss", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Martin Christof", "Kindsmueller", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Sven", "Buchholz", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Gabriele", "Schmidt", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Susanne", "Busse", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Stefan", "Kim", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Michael", "Syrjakow", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Claus", "Vielhauer", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Mathias", "Homeister", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Gerald", "Kell", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Reiner", "Creuzburg", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Eberhard", "Hasche", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Alexander", "Urban", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Martin", "Schafföner", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Eberhard", "Beck", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Thomas", "Schrader", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Karl-Heinz", "Jänicke", Department.COMPUTER_SCIENCE_MEDIA, null));
-        out.add(new Tutor("Account", "Developer", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("socher", "Rolf", "Socher", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("boersc", "Ingo", "Boersch", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("heinsohn", "Jochen", "Heinsohn", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("loose", "Harald", "Loose", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("preuss", "Thomas", "Preuss", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("kindsmueller", "Martin Christof", "Kindsmueller", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("buchholz", "Sven", "Buchholz", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("schmidt", "Gabriele", "Schmidt", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("busse", "Susanne", "Busse", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("kim", "Stefan", "Kim", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("syrjakow", "Michael", "Syrjakow", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("vielhaauer", "Claus", "Vielhauer", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("homeister", "Mathias", "Homeister", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("kell", "Gerald", "Kell", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("creutzburg", "Reiner", "Creuzburg", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("hasche", "Eberhard", "Hasche", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("urban", "Alexander", "Urban", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("schaffoe", "Martin", "Schafföner", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("beck", "Eberhard", "Beck", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("schrader", "Thomas", "Schrader", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("jaenicke", "Karl-Heinz", "Jänicke", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("developer", "Account", "Developer", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("bartz", "Bartz", "Tobias", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("anderst", "Anders", "Toni", Department.COMPUTER_SCIENCE_MEDIA, null));
+        out.add(new Tutor("muellerb", "Müller", "Ben", Department.COMPUTER_SCIENCE_MEDIA, null));
 
         return out;
     }
