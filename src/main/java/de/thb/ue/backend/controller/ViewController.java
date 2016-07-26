@@ -139,13 +139,6 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
     	model.addAttribute("questionnaire", questionnaire);
     	model.addAttribute("questionCount", questionnaire.getQuestions().size());
-        int i = 0;
-        for (Question question : questionnaire.getQuestions()) {
-            if (question instanceof SingleChoiceQuestion) {
-                i++;
-            }
-        }
-        model.addAttribute("mcQuestionCount", i);
         return "questionnaire";
     }
     
@@ -159,7 +152,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     	if( textQuestionsFirstString != null ) {
     		textQuestionsFirst = true;
     	}
-    	//questionnaire.setTextQuestionsFirst(textQuestionsFirst);
+    	questionnaire.setTextQuestionsFirst(textQuestionsFirst);
     	
     	int mcQuestionCount = Integer.parseInt(allRequestParams.get("mc-question-count"));
         List<SingleChoiceQuestion> allSingleChoiceQuestions = new ArrayList<>();
@@ -214,6 +207,9 @@ public class ViewController extends WebMvcConfigurerAdapter {
     ResponseEntity<Integer> voteCount(@RequestParam String uid, Model model) {
         int out = 0;
         try {
+            if (uid.contains("?")) {
+                uid = uid.replace("?", "");
+            }
             out = evaluationService.getByUID(uid).getStudentsVoted();
         } catch (EvaluationException | DBEntryDoesNotExistException e) {
             log.error("Error while counting votes: " + e.getMessage());
