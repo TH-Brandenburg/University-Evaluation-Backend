@@ -108,6 +108,7 @@ public class TutorService implements ITutorService {
             tutor.setName((String) attrs.get("givenName").get());
             tutor.setUsername((String) attrs.get("uid").get());
             tutor.setEvaluations(new ArrayList<>());
+            //FIXME: Find a way to get the correct Department
             tutor.setDepartment(Department.COMPUTER_SCIENCE_MEDIA);
             return tutor;
         }
