@@ -17,9 +17,11 @@
 package de.thb.ue.backend.service;
 
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.model.Evaluation;
 import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.ISCQuestion;
 import de.thb.ue.backend.repository.ITextQuestion;
@@ -48,26 +50,34 @@ public class QuestionService implements IQuestionsService {
     @Autowired
     private ISCQuestion mcQuestionRepo;
 
+    @Autowired
+    private IEvaluation evaluationRepo;
+
     @Override
-    public QuestionsDTO getAllQuestionsAsDTO(String revisionName) throws DBEntryDoesNotExistException {
-        List<QuestionRevision> questionRevisions = questionRevisionRepo.findByName(revisionName);
+    public QuestionsDTO getAllQuestionsAsDTO(String evaluationUid, int id) throws DBEntryDoesNotExistException {
+        Evaluation evaluation = evaluationRepo.findByUID(evaluationUid);
+        QuestionRevision questionRevision = questionRevisionRepo.findOne(id);
         QuestionsDTO out;
-        if (questionRevisions != null && questionRevisions.size() == 1) {
+        if (evaluation != null && questionRevision != null) {
             List<Question> textQuestions = new ArrayList<Question>();
             List<SingleChoiceQuestion> scQuestions = new ArrayList<>();
-            for (Question element:questionRevisions.get(0).getQuestions()){
+            for (Question element:evaluation.getAdhocQuestions()){
                 if (element.getType()==QuestionType.TextQuestion){
                     textQuestions.add(element);
+                } else if (element.getType()==QuestionType.SingleChoiceQuestion) {
+                    scQuestions.add((SingleChoiceQuestion) element);
                 }
             }
-            for (Question element:questionRevisions.get(0).getQuestions()){
-                if (element.getType()==QuestionType.SingleChoiceQuestion){
+            for (Question element:questionRevision.getQuestions()){
+                if (element.getType()==QuestionType.TextQuestion){
+                    textQuestions.add(element);
+                } else if (element.getType()==QuestionType.SingleChoiceQuestion) {
                     scQuestions.add((SingleChoiceQuestion) element);
                 }
             }
             out = DTOMapper.questionModelsToDTO(textQuestions, scQuestions);
         } else {
-            throw new DBEntryDoesNotExistException("Revision with this name: " + revisionName + " not found or more the one found.");
+            throw new DBEntryDoesNotExistException("Evaluation with this uid: " + evaluationUid + " or Revision with " + id + " not found.");
         }
         return out;
     }

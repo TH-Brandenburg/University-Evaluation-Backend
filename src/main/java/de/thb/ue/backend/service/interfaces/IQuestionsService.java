@@ -13,7 +13,7 @@ import de.thb.ue.backend.model.QuestionRevision;
 
 public interface IQuestionsService {
 
-    QuestionsDTO getAllQuestionsAsDTO(String revisionName) throws DBEntryDoesNotExistException;
+    QuestionsDTO getAllQuestionsAsDTO(String evaluationUid, int id) throws DBEntryDoesNotExistException;
 
     List<Question> getQuestions();
 
