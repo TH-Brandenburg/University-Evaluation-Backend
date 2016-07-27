@@ -70,7 +70,7 @@ public class VoteService implements IVoteService {
 
 
         for (TextAnswerDTO answer : answersDTO.getTextAnswers()) {
-            textAnswers.add(new TextAnswer((TextQuestion) questionRepo.findByText(answer.getQuestionText()), answer.getAnswerText()));
+            textAnswers.add(new TextAnswer((TextQuestion) questionRepo.findByText(answer.getQuestionText()).get(0), answer.getAnswerText()));
         }
         /*
         textAnswers.addAll(answersDTO.getTextAnswers().stream().map(answerDTO ->

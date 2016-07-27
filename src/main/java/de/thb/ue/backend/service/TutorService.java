@@ -50,7 +50,9 @@ public class TutorService implements ITutorService {
         Tutor tutor = tutorRepo.findByUsername(username);
         if (tutor == null) {
             tutor = getLdapUser(username);
-            tutorRepo.save(tutor);
+            if (tutor != null) {
+                tutorRepo.save(tutor);
+            }
         } else {
             if (isDisabled(username)) {
                 tutor = null;
@@ -88,8 +90,12 @@ public class TutorService implements ITutorService {
         filter.and(orFilter);
         filter.and(new EqualsFilter("uid", uid));
 
-        return (Tutor) ldapTemplate.search(
-                "", filter.encode(), new PersonAttributesMapper()).get(0);
+        try {
+            return (Tutor) ldapTemplate.search(
+                    "", filter.encode(), new PersonAttributesMapper()).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     private boolean isDisabled(String uid) {
