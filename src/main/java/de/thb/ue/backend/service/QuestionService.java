@@ -16,6 +16,19 @@
 
 package de.thb.ue.backend.service;
 
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.model.Evaluation;
+import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.QuestionRevision;
+import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.repository.IEvaluation;
+import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.repository.ISCQuestion;
+import de.thb.ue.backend.repository.ITextQuestion;
+import de.thb.ue.backend.service.interfaces.IQuestionsService;
+import de.thb.ue.backend.util.DTOMapper;
+import de.thb.ue.backend.util.QuestionType;
+import de.thb.ue.dto.QuestionsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -23,17 +36,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import de.thb.ue.dto.QuestionsDTO;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.repository.IMCQuestion;
-import de.thb.ue.backend.repository.IQuestion;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.util.DTOMapper;
 
 @Component
 @Service
@@ -43,19 +45,39 @@ public class QuestionService implements IQuestionsService {
     private IQuestionRevision questionRevisionRepo;
 
     @Autowired
-    private IQuestion questionRepo;
+    private ITextQuestion questionRepo;
 
     @Autowired
-    private IMCQuestion mcQuestionRepo;
+    private ISCQuestion mcQuestionRepo;
+
+    @Autowired
+    private IEvaluation evaluationRepo;
 
     @Override
-    public QuestionsDTO getAllQuestionsAsDTO(String revisionName) throws DBEntryDoesNotExistException {
-        List<QuestionRevision> questionRevisions = questionRevisionRepo.findByName(revisionName);
+    public QuestionsDTO getAllQuestionsAsDTO(String evaluationUid, int id) throws DBEntryDoesNotExistException {
+        Evaluation evaluation = evaluationRepo.findByUID(evaluationUid);
+        QuestionRevision questionRevision = questionRevisionRepo.findOne(id);
         QuestionsDTO out;
-        if (questionRevisions != null && questionRevisions.size() == 1) {
-            out = DTOMapper.questionModelsToDTO(questionRevisions.get(0).getQuestions(), questionRevisions.get(0).getMcQuestions());
+        if (evaluation != null && questionRevision != null) {
+            List<Question> textQuestions = new ArrayList<Question>();
+            List<SingleChoiceQuestion> scQuestions = new ArrayList<>();
+            for (Question element:evaluation.getAdhocQuestions()){
+                if (element.getType()==QuestionType.TextQuestion){
+                    textQuestions.add(element);
+                } else if (element.getType()==QuestionType.SingleChoiceQuestion) {
+                    scQuestions.add((SingleChoiceQuestion) element);
+                }
+            }
+            for (Question element:questionRevision.getQuestions()){
+                if (element.getType()==QuestionType.TextQuestion){
+                    textQuestions.add(element);
+                } else if (element.getType()==QuestionType.SingleChoiceQuestion) {
+                    scQuestions.add((SingleChoiceQuestion) element);
+                }
+            }
+            out = DTOMapper.questionModelsToDTO(textQuestions, scQuestions);
         } else {
-            throw new DBEntryDoesNotExistException("Revision with this name: " + revisionName + " not found or more the one found.");
+            throw new DBEntryDoesNotExistException("Evaluation with this uid: " + evaluationUid + " or Revision with " + id + " not found.");
         }
         return out;
     }
@@ -66,7 +88,7 @@ public class QuestionService implements IQuestionsService {
     }
 
     @Override
-    public List<MCQuestion> getMCQuestions() {
+    public List<Question> getMCQuestions() {
         return mcQuestionRepo.findAll();
     }
 
@@ -74,6 +96,12 @@ public class QuestionService implements IQuestionsService {
     public List<Question> getQuestions(String revisionName) {
         List<QuestionRevision> questionRevision = questionRevisionRepo.findByName(revisionName);
         if (questionRevision.size() == 1) {
+            List<Question> tQuestionList = new ArrayList<Question>();
+            for(Question element : questionRevision.get(0).getQuestions()){
+                if (element.getType() == QuestionType.TextQuestion){
+                    tQuestionList.add(element);
+                }
+            }
             return questionRevision.get(0).getQuestions();
         } else {
             return null;
@@ -81,10 +109,16 @@ public class QuestionService implements IQuestionsService {
     }
 
     @Override
-    public List<MCQuestion> getMCQuestions(String revisionName) {
+    public List<Question> getMCQuestions(String revisionName) {
         List<QuestionRevision> questionRevision = questionRevisionRepo.findByName(revisionName);
         if (questionRevision.size() == 1) {
-            return questionRevision.get(0).getMcQuestions();
+            List<Question> sCquestionList = new ArrayList<Question>();
+             for(Question element : questionRevision.get(0).getQuestions()){
+                   if (element.getType() == QuestionType.SingleChoiceQuestion){
+                       sCquestionList.add(element);
+                   }
+            }
+            return sCquestionList;
         } else {
             return null;
         }
@@ -114,7 +148,7 @@ public class QuestionService implements IQuestionsService {
     }
     
     @Override
-    public MCQuestion getMCQuestionById(int id) {
+    public Question getMCQuestionById(int id) {
     	return mcQuestionRepo.findOne(id);
     }
     

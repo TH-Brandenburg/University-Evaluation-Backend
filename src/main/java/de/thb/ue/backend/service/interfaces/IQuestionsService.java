@@ -4,23 +4,24 @@ package de.thb.ue.backend.service.interfaces;
 
 import java.util.List;
 
+import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.QuestionRevision;
 
 public interface IQuestionsService {
 
-    QuestionsDTO getAllQuestionsAsDTO(String revisionName) throws DBEntryDoesNotExistException;
+    QuestionsDTO getAllQuestionsAsDTO(String evaluationUid, int id) throws DBEntryDoesNotExistException;
 
     List<Question> getQuestions();
 
-    List<MCQuestion> getMCQuestions();
+    List<Question> getMCQuestions();
 
     List<Question> getQuestions(String revisionName);
 
-    List<MCQuestion> getMCQuestions(String revisionName);
+    List<Question> getMCQuestions(String revisionName);
 
     List<String> getRevisionNames();
     
@@ -30,7 +31,7 @@ public interface IQuestionsService {
     
     List<QuestionRevision> findAllQuestionRevisions();
     
-    MCQuestion getMCQuestionById(int id);
+    Question getMCQuestionById(int id);
     
     Question getQuestionById(int id);
     

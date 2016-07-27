@@ -16,30 +16,38 @@
 
 package de.thb.ue.backend.model;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+
+import java.util.List;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import de.thb.ue.backend.util.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
+
 @Entity
 @Setter
 @Getter
-@Table(name = "aggregated_mc_answer")
-public class AggregatedMCAnswer extends BaseModel {
+@Table(name = "single_choice_question")
+@PrimaryKeyJoinColumn(name = "QUESTION_ID")
+public class SingleChoiceQuestion extends Question {
 
-    @NotNull
-    @ManyToOne
-    private MCQuestion question;
+    public SingleChoiceQuestion(){
+        super();
+    }
 
-    @NotNull
-    private double meanGrade;
+    public SingleChoiceQuestion(QuestionType type, String text,List<Choice> choices){
+        super(type,text);
+        this.choices=choices;
+    }
+
+    @ManyToMany
+    private List<Choice> choices;
 
     @Override
     public boolean equals(Object o) {

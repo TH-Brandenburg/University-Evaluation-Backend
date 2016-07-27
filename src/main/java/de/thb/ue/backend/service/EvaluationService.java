@@ -18,7 +18,16 @@ package de.thb.ue.backend.service;
 
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-
+import de.thb.ue.backend.exception.AggregatedAnswerException;
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.exception.EvaluationException;
+import de.thb.ue.backend.exception.ParticipantException;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.IEvaluation;
+import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.service.interfaces.*;
+import de.thb.ue.backend.util.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.joda.time.LocalDateTime;
@@ -34,32 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.exception.EvaluationException;
-import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
-import de.thb.ue.backend.model.Participant;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.Subject;
-import de.thb.ue.backend.model.Tutor;
-import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.repository.IEvaluation;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IParticipantService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
-import de.thb.ue.backend.util.QRCGeneration;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.backend.util.ZipHelper;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -104,10 +87,23 @@ public class EvaluationService implements IEvaluationService {
 
         QuestionRevision questionRevision = questionRevisionRepo.findByName(revisionName).get(0);
         Evaluation evaluation = evaluationRepo.save(new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
-                questionRevision, null, students, 0));
+                questionRevision, null, students, 0, null));
         participantService.add(students, evaluation);
         return uid;
     }
+
+    @Override
+    public String add(int semester, int students, String tutor, int subject, SemesterType type, String revision, List<Question> adhocQuestions) throws ParticipantException, EvaluationException {
+        Evaluation evaluation = evaluationRepo.findByUID(add(semester, students, tutor, subject, type, revision));
+        for (Question element : adhocQuestions){
+            if(!element.isAdhocQuestion()){
+                element.setAdhocQuestion(true);
+            }
+        }
+        evaluation.setAdhocQuestions(adhocQuestions);
+        return evaluation.getUid();
+    }
+
 
     @Override
     public void addVote(Vote vote, String evaluationUID) {
@@ -128,7 +124,7 @@ public class EvaluationService implements IEvaluationService {
         for (Participant participant : participantService.getByEvaluation(evaluation)) {
             try {
                 out.add(QRCGeneration.generateQRC("{\"host\":\"" + hostAddress + "\", \"token\":\"" + participant.getVoteToken() + " \"}",
-                        QRCGeneration.SIZE_LARGE, ErrorCorrectionLevel.Q, QRCGeneration.ENCODING_UTF_8));
+                        QRCGeneration.SIZE_LARGE, ErrorCorrectionLevel.L, QRCGeneration.ENCODING_UTF_8));
             } catch (IOException | WriterException e) {
                 log.error("Error while generating Token list for Evaluation: " + evaluationUID);
             }
@@ -155,18 +151,19 @@ public class EvaluationService implements IEvaluationService {
     @Override
     public void close(String evaluationUID) throws AggregatedAnswerException {
         Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
-        List<AggregatedMCAnswer> aggregatedMCAnswers;
+        List<AggregatedSingleChoiceAnswer> aggregatedSingleChoiceAnswers;
         try {
             File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
             File qrCodesFile = new File(workingDirectory, "qrcodes.pdf");
             List<Vote> votes = evaluation.getVotes();
             if (votes != null && !votes.isEmpty()) {
-                aggregatedMCAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
+                aggregatedSingleChoiceAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
 
                 List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getFamilyName()).collect(Collectors.toList());
-                List<String> mcQuestions = evaluation.getQuestionRevision().getMcQuestions().stream().map(MCQuestion::getText).collect(Collectors.toList());
+                //TODO: Buggy?
+                List<String> mcQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
                 List<String> textualQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
-                new EvaluationExcelFileGenerator(evaluationUID, aggregatedMCAnswers, tutors, mcQuestions,
+                new EvaluationExcelFileGenerator(evaluationUID, aggregatedSingleChoiceAnswers, tutors, mcQuestions,
                         textualQuestions, evaluation.getVotes(), evaluation.getSubject().getName(),
                         evaluation.getSemesterType(), evaluation.getDateOfEvaluation(), evaluation.getStudentsAll(),
                         evaluation.getStudentsVoted()).generateExcelFile();

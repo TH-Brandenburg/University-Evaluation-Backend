@@ -16,6 +16,7 @@
 
 package de.thb.ue.backend.repository;
 
+import de.thb.ue.backend.model.Question;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -25,21 +26,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
-import de.thb.ue.backend.model.MCQuestion;
-
-@RepositoryDefinition(domainClass = MCQuestion.class, idClass = Integer.class)
+@RepositoryDefinition(domainClass = Question.class, idClass = Integer.class)
 @Transactional(readOnly = true)
-public interface IMCQuestion extends CrudRepository<MCQuestion, Serializable> {
+public interface ISCQuestion extends CrudRepository<Question, Serializable> {
 
     /**
      * @return all multiple choice questions from DB
      */
-    List<MCQuestion> findAll();
+    @Query("SELECT q FROM Question q WHERE q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
+    List<Question> findAll();
 
-    @Query("SELECT q FROM MCQuestion q WHERE q.text = :text")
-    MCQuestion findByText(@Param("text") String text);
+    @Query("SELECT q FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
+    Question findByText(@Param("text") String text);
 
-    @Query("SELECT COUNT(q) FROM MCQuestion q WHERE q.text = :text")
+    @Query("SELECT COUNT(q) FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
     long count(@Param("text") String text);
 
 }
