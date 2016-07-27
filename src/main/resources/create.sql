@@ -899,7 +899,11 @@ INSERT INTO `question_revision_questions` (`question_revision_id`, `questions_id
 (1, 13),
 (1, 14),
 (1, 15),
-(1, 16);
+  (1, 16),
+  (1, 42),
+  (1, 43),
+  (1, 44),
+  (1, 45);
 -- (2, 17),
 -- (3, 18),
 -- (3, 19),

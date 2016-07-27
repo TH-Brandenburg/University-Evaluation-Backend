@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
 <head th:replace="stdTemplate :: #head"></head>
 
 <body>
@@ -55,34 +55,38 @@
                 </form>
             </th:block>
 
-				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
-					<input type="hidden" name="question-count" th:value="${questionCount}" />
-					<input type="hidden" name="mc-question-count" th:value="${mcQuestionCount}" />
-					<div class="panel panel-thb">
-						<div class="panel-heading panel-heading-thb">
-							<h3 class="panel-title">Allgemeine Angaben</h3>
-						</div>
-						<div class="panel-body">
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Name</label>
-								<div class="col-sm-9">
-									<input type="text" name="name" th:value="${questionnaire.name}" class="form-control" />
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-9">
-									<div class="checkbox">
-										<label> <th:block th:if="${questionnaire.textQuestionsFirst}">
-												<input type="checkbox" name="text-questions-first" checked="checked" value="true" />Textfragen zuerst
-											</th:block> <th:block th:unless="${questionnaire.textQuestionsFirst}">
-												<input type="checkbox" name="text-questions-first" value="true" />Textfragen zuerst
-											</th:block>
-										</label>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+            <form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
+                <input type="hidden" name="question-count" th:value="${questionCount}"/>
+                <input type="hidden" name="mc-question-count" th:value="${mcQuestionCount}"/>
+                <div class="panel panel-thb">
+                    <div class="panel-heading panel-heading-thb">
+                        <h3 class="panel-title">Allgemeine Angaben</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="name" th:value="${questionnaire.name}" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <div class="checkbox">
+                                    <label>
+                                        <th:block th:if="${questionnaire.textQuestionsFirst}">
+                                            <input type="checkbox" name="text-questions-first" checked="checked"
+                                                   value="true"/>Textfragen zuerst
+                                        </th:block>
+                                        <th:block th:unless="${questionnaire.textQuestionsFirst}">
+                                            <input type="checkbox" name="text-questions-first" value="true"/>Textfragen
+                                            zuerst
+                                        </th:block>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <th:block th:each="question, rowStat : ${questionnaire.questions}">
                     <div class="panel panel-thb">
@@ -117,13 +121,13 @@
                                           title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
                                           th:attr="data-delete-method=@{'deleteQuestion(' + ${question.id} + ')'}"></span>
                             </h3>
-                        </div>
-                        <div class="panel-body">
-                            <label class="col-sm-3 control-label">Fragetext</label>
-                            <div class="col-sm-9">
+                            <div class="panel-body">
+                                <label class="col-sm-3 control-label">Fragetext</label>
+                                <div class="col-sm-9">
 									<textarea th:name="'mc-question-text-' + ${rowStat.count}" class="form-control"
                                               rows="4"><th:block
                                             th:text="${question.text}">Fragetext</th:block></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>

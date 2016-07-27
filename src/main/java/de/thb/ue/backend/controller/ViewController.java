@@ -206,6 +206,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
     ResponseEntity<Integer> voteCount(@RequestParam String uid, Model model) {
         int out = 0;
         try {
+            //TODO: Find better solution
             if (uid.contains("?")) {
                 uid = uid.replace("?", "");
             }
