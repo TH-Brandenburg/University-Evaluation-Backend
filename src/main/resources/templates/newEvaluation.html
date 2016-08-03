@@ -104,7 +104,8 @@
 						<div class="panel-heading panel-heading-thb">
 							<h3 class="panel-title" style="display: inline-block" th:text="'Zusatzfrage ' + ${i}"></h3>
 							<div class="checkbox pull-right" style="padding-top: 0px;">
-								<label> <input type="checkbox" class="omit-question" checked="checked" />Frage auslassen
+								<label> <input type="checkbox" class="omit-question" checked="checked"
+										th:name="'omit-question-' + ${i}" />Frage auslassen
 								</label>
 							</div>
 						</div>
@@ -144,8 +145,7 @@
 					</div>
 
 					<div class="text-center">
-						<button id="test" type="submit" class="btn btn-danger btn-lg" name="create">Evaluation
-							erstellen</button>
+						<button type="submit" class="btn btn-danger btn-lg" name="create">Evaluation erstellen</button>
 						<p>&nbsp;</p>
 					</div>
 				</form>

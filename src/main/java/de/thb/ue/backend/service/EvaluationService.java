@@ -25,6 +25,8 @@ import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
 import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.repository.ISCQuestion;
+import de.thb.ue.backend.repository.ITextQuestion;
 import de.thb.ue.backend.service.interfaces.*;
 import de.thb.ue.backend.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,12 @@ public class EvaluationService implements IEvaluationService {
 
     @Autowired
     private IQuestionRevision questionRevisionRepo;
+    
+    @Autowired
+    private ISCQuestion scQuestionRepo;
+
+    @Autowired
+    private ITextQuestion textQuestionRepo;
 
     @Override
     public String add(int semester, int students, String tutor, int subject, SemesterType type, String revisionName) throws ParticipantException, EvaluationException {
@@ -94,13 +102,34 @@ public class EvaluationService implements IEvaluationService {
 
     @Override
     public String add(int semester, int students, String tutor, int subject, SemesterType type, String revision, List<Question> adhocQuestions) throws ParticipantException, EvaluationException {
-        Evaluation evaluation = evaluationRepo.findByUID(add(semester, students, tutor, subject, type, revision));
-        for (Question element : adhocQuestions){
+        
+    	for (Question element : adhocQuestions){
             if(!element.isAdhocQuestion()){
                 element.setAdhocQuestion(true);
             }
+            if(element instanceof TextQuestion) {
+            	textQuestionRepo.save(element);
+            } else if (element instanceof SingleChoiceQuestion) {
+            	scQuestionRepo.save(element);
+            }
         }
-        evaluation.setAdhocQuestions(adhocQuestions);
+    	
+        Subject subjectToEvaluate = subjectService.getByID(subject);
+
+        List<Tutor> tutorsForEvaluation = tutorService.getByFamilyName(tutor);
+        if (tutorsForEvaluation == null || tutorsForEvaluation.isEmpty()) {
+            log.error("Tutor was unknown!");
+        }
+
+        String uid = UUID.randomUUID().toString();
+
+        QuestionRevision questionRevision = questionRevisionRepo.findByName(revision).get(0);   
+        Evaluation evaluation = new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
+                questionRevision, null, students, 0, adhocQuestions);
+        
+        evaluationRepo.save(evaluation);
+        participantService.add(students, evaluation);
+        
         return evaluation.getUid();
     }
 

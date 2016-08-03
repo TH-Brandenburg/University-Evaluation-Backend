@@ -26,7 +26,9 @@ $(document).on("click", ".omit-question", function(event) {
  * Sets the onChange behavior of the select boxes "question type" and "number of choices"
  */
 function setSelectOnChange() {
-	$("select").change(function() {
+	$("select").filter(function() {
+		return this.id.match(/(question-type|choices-number)-\d+/);
+	}).unbind('change').change(function() {
 		var selectBox = $(this);
 
 		if (selectBox.attr('id').match(/question-type-\d+/)) {
@@ -47,19 +49,20 @@ function setSelectOnChange() {
  */
 function replaceQuestionType(questionTypeSelectBox, panelBody) {
 	switch (questionTypeSelectBox.val()) {
-		case "Textfrage" :
-			drawTextQuestion(panelBody);
-			break;
-		case "Best First" :
-			drawBestFirst(panelBody);
-			break;
-		case "Best In The Middle" :
-			drawBestInTheMiddle(panelBody);
+	case "Textfrage":
+		drawTextQuestion(panelBody);
+		break;
+	case "Best First":
+		drawBestFirst(panelBody);
+		break;
+	case "Best In The Middle":
+		drawBestInTheMiddle(panelBody);
 	}
 }
 
 /**
- * Redraws the choices of a multiple choice question depending on the selected number of choices and question type
+ * Redraws the choices of a multiple choice question depending on the selected number of choices and question
+ * type
  * 
  * @param choicesNumberSelectBox
  * @param panelBody
@@ -67,20 +70,19 @@ function replaceQuestionType(questionTypeSelectBox, panelBody) {
 function replaceChoices(choicesNumberSelectBox, panelBody) {
 	var choicesPanel = panelBody.find('.panel');
 	var questionNumber = panelBody.attr('id').split("-").pop();
-	var questionTypeSelectBox = $(panelBody).find(
-			"#question-type-" + questionNumber);
+	var questionTypeSelectBox = $(panelBody).find("#question-type-" + questionNumber);
 	var questionType = questionTypeSelectBox.val();
 	var numberOfChoices = choicesNumberSelectBox.val();
 
 	if (questionType == "Best First") {
 		var lowestRank = 1;
 		choicesPanel.remove();
-		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
+		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices, panelBody));
 		setNoAnswerOnChange();
 	} else if (questionType == "Best In The Middle") {
 		var lowestRank = (parseInt(numberOfChoices) + 1) / -2;
 		choicesPanel.remove();
-		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
+		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices, panelBody));
 		setNoAnswerOnChange();
 	}
 }
@@ -168,7 +170,7 @@ function drawBestFirst(panelBody) {
 		</div> \
 	</div>';
 
-	formGroups = formGroups.concat(createChoicesPanel(1, 5));
+	formGroups = formGroups.concat(createChoicesPanel(1, 5, panelBody));
 
 	var questionNumber = panelBody.attr('id').split("-").pop();
 	formGroups = formGroups.replace(/%i/g, questionNumber);
@@ -213,7 +215,7 @@ function drawBestInTheMiddle(panelBody) {
 		</div> \
 	</div>';
 
-	formGroups = formGroups.concat(createChoicesPanel(-3, 5));
+	formGroups = formGroups.concat(createChoicesPanel(-3, 5, panelBody));
 
 	var questionNumber = panelBody.attr('id').split("-").pop();
 	formGroups = formGroups.replace(/%i/g, questionNumber);
@@ -232,7 +234,7 @@ function drawBestInTheMiddle(panelBody) {
  * @param numberOfChoices
  * @returns {String}
  */
-function createChoicesPanel(lowestRank, numberOfChoices) {
+function createChoicesPanel(lowestRank, numberOfChoices, panelBody) {
 	var choices = '<!-- Choices --> \
 		<div class="panel panel-thb"> \
 			<div class="panel-heading panel-heading-thb"> \
@@ -251,6 +253,9 @@ function createChoicesPanel(lowestRank, numberOfChoices) {
 		formGroups = createChoicesBestInTheMiddle(lowestRank, numberOfChoices);
 	}
 
+	var questionNumber = panelBody.attr('id').split("-").pop();
+	formGroups = formGroups.replace(/%i/g, questionNumber);
+
 	choices = choices.replace("%formGroups", formGroups);
 
 	return choices;
@@ -267,16 +272,18 @@ function createChoicesBestFist(lowestRank, numberOfChoices) {
 	var formGroups = '';
 
 	// create choices except n/a choice
-	for (choiceNumber = lowestRank; choiceNumber <= numberOfChoices; choiceNumber++) {
+	for (choiceNumber = 1; choiceNumber <= numberOfChoices; choiceNumber++) {
 		var formGroup = '<div class="form-group"> \
-			<label for="choice-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
+			<label for="choice-text-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
 			<div class="col-sm-11"> \
-				<input type="text" class="form-control" id="choice-%i-%choiceNumber" name="choice-%i-%choiceNumber" \
+				<input type="text" class="form-control" id="choice-text-%i-%choiceNumber" name="choice-text-%i-%choiceNumber" \
 					required="required" placeholder="Text" /> \
+				<input type="hidden" name="choice-grade-%i-%choiceNumber" value="%grade"/> \
 			</div> \
 		</div>';
 
 		formGroup = formGroup.replace(/%choiceNumber/g, choiceNumber);
+		formGroup = formGroup.replace(/%grade/g, choiceNumber);
 		formGroups = formGroups.concat(formGroup);
 	}
 
@@ -298,6 +305,7 @@ function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 
 	// create choices except n/a choice
 	var highestRank = lowestRank * -1;
+	var grade = 1;
 	for (choiceNumber = highestRank; choiceNumber >= lowestRank; choiceNumber--) {
 		// always skip grade -1 and 0
 		if (choiceNumber == -1 || choiceNumber == 0) {
@@ -305,15 +313,19 @@ function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 		}
 
 		var formGroup = '<div class="form-group"> \
-			<label for="choice-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
+			<label for="choice-text-%i-%grade" class="col-sm-1 control-label">%choiceNumber</label> \
 			<div class="col-sm-11"> \
-				<input type="text" class="form-control" id="choice-%i-%choiceNumber" name="choice-%i-%choiceNumber" \
+				<input type="text" class="form-control" id="choice-text-%i-%grade" name="choice-text-%i-%grade" \
 					required="required" placeholder="Text" /> \
+				<input type="hidden" name="choice-grade-%i-%grade" value="%choiceNumber"/> \
 			</div> \
 		</div>';
 
 		formGroup = formGroup.replace(/%choiceNumber/g, choiceNumber);
+		formGroup = formGroup.replace(/%grade/g, grade);
 		formGroups = formGroups.concat(formGroup);
+
+		grade++;
 	}
 
 	// add n/a choice
@@ -333,15 +345,15 @@ function createNoAnswerOption() {
 	    <div class="col-sm-11">\
 		    <div class="checkbox">\
 		      <label>\
-		        <input type="checkbox" class="allow-no-choice-checkbox">"keine Angabe" erlauben\
+		        <input type="checkbox" class="allow-no-answer-checkbox" name="no-answer-%i">"keine Angabe" erlauben\
 		      </label>\
 		    </div>\
 	  </div>\
 	</div>\
-	<div class="form-group hidden allow-no-choice-div"> \
+	<div class="form-group hidden allow-no-answer-div"> \
 		<label for="choice-%i-0" class="col-sm-1 control-label"></label> \
 		<div class="col-sm-11"> \
-			<input type="text" class="form-control" id="choice-%i-0" name="choice-%i-0" placeholder="Text"/>\
+			<input type="text" class="form-control" id="choice-text-%i-0" name="choice-%i-0" placeholder="Text"/>\
 		</div> \
 	</div>';
 }
@@ -350,10 +362,10 @@ function createNoAnswerOption() {
  * Enables the toggling of the text field of the n/a checkbox
  */
 function setNoAnswerOnChange() {
-	$(".allow-no-choice-checkbox").change(function() {
+	$(".allow-no-answer-checkbox").change(function() {
 		var checkBox = $(this);
 		var panelBody = checkBox.closest(".panel-body");
-		var allowNoChoiceDiv = panelBody.find(".allow-no-choice-div");
+		var allowNoChoiceDiv = panelBody.find(".allow-no-answer-div");
 		var textBox = allowNoChoiceDiv.find(".form-control");
 
 		if (checkBox.is(":checked")) {
