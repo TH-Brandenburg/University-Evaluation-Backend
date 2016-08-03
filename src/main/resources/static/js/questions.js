@@ -351,9 +351,9 @@ function createNoAnswerOption() {
 	  </div>\
 	</div>\
 	<div class="form-group hidden allow-no-answer-div"> \
-		<label for="choice-%i-0" class="col-sm-1 control-label"></label> \
+		<label for="choice-text-%i-0" class="col-sm-1 control-label"></label> \
 		<div class="col-sm-11"> \
-			<input type="text" class="form-control" id="choice-text-%i-0" name="choice-%i-0" placeholder="Text"/>\
+			<input type="text" class="form-control" id="choice-text-%i-0" name="choice-text-%i-0" placeholder="Text"/>\
 		</div> \
 	</div>';
 }
