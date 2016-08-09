@@ -304,15 +304,17 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String startEvaluation(Model model, @RequestParam int semester, @RequestParam int students, @RequestParam String tutors, @RequestParam int subject,
 			@RequestParam String semesterType, @RequestParam String revision, @RequestParam Map<String, String> allRequestParams)
 					throws ParticipantException, EvaluationException {
-
+		
+		int questionPosition = questionsService.findByName(revision).getQuestions().size(); 
+		
 		if (semester > 0 && semester <= 8 && students > 1 && students < 1000) {
 			String generatedUid;
 
 			List<Question> adhocQuestions = new ArrayList<Question>();
 
-			int questionCount = 2;
+			int additionalQuestionCount = 2;
 
-			for (int j = 1; j <= questionCount; j++) {
+			for (int j = 1; j <= additionalQuestionCount; j++) {
 				boolean omitQuestion = false;
 				String omitQuestionString = allRequestParams.get("omit-question-" + j);
 				if (omitQuestionString != null) {
@@ -323,6 +325,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
 					String questionType = allRequestParams.get("question-type-" + j);
 					if (questionType.equals("Textfrage")) {
 						TextQuestion textQuestion = new TextQuestion();
+						questionPosition++;
+						textQuestion.setQuestionPosition(questionPosition);
 						String text = allRequestParams.get("question-" + j);
 						int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + j));
 						boolean onlyNumbers = false;
@@ -340,6 +344,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
 					}
 					if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
 						SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+						questionPosition++;
+						singleChoiceQuestion.setQuestionPosition(questionPosition);
 						String text = allRequestParams.get("question-" + j);
 						List<Choice> choices = new ArrayList<Choice>();
 						int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + j));
@@ -347,6 +353,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 							Choice choice = new Choice();
 							choice.setText(allRequestParams.get("choice-text-" + j + "-" + i));
 							choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + j + "-" + i)));
+							choices.add(choice);
 						}
 						boolean noAnswer = false;
 						String noAnswerString = allRequestParams.get("no-answer-" + j);

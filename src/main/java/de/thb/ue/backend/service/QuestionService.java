@@ -18,9 +18,11 @@ package de.thb.ue.backend.service;
 
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.model.Evaluation;
+import de.thb.ue.backend.model.Choice;
 import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.ISCQuestion;
@@ -59,19 +61,20 @@ public class QuestionService implements IQuestionsService {
         QuestionRevision questionRevision = questionRevisionRepo.findOne(id);
         QuestionsDTO out;
         if (evaluation != null && questionRevision != null) {
-            List<Question> textQuestions = new ArrayList<Question>();
-            List<SingleChoiceQuestion> scQuestions = new ArrayList<>();
+        	List<TextQuestion> textQuestions = new ArrayList<TextQuestion>();
+        	List<SingleChoiceQuestion> scQuestions = new ArrayList<SingleChoiceQuestion>();
+	        for (Question element:questionRevision.getQuestions()){
+	        	if ( element.getType() == QuestionType.TextQuestion ){
+	        		textQuestions.add((TextQuestion)element);
+	        	} else if (element.getType()==QuestionType.SingleChoiceQuestion) {
+	        		scQuestions.add((SingleChoiceQuestion) element);
+	        	}
+	        }
+            
             for (Question element:evaluation.getAdhocQuestions()){
-                if (element.getType()==QuestionType.TextQuestion){
-                    textQuestions.add(element);
-                } else if (element.getType()==QuestionType.SingleChoiceQuestion) {
-                    scQuestions.add((SingleChoiceQuestion) element);
-                }
-            }
-            for (Question element:questionRevision.getQuestions()){
-                if (element.getType()==QuestionType.TextQuestion){
-                    textQuestions.add(element);
-                } else if (element.getType()==QuestionType.SingleChoiceQuestion) {
+                if (element.getType() == QuestionType.TextQuestion){
+                    textQuestions.add((TextQuestion)element);
+                } else if (element.getType() == QuestionType.SingleChoiceQuestion) {
                     scQuestions.add((SingleChoiceQuestion) element);
                 }
             }
@@ -135,6 +138,11 @@ public class QuestionService implements IQuestionsService {
     @Override
     public QuestionRevision getRevisionById(int id) {
     	return questionRevisionRepo.findOne(id);
+    }
+    
+    @Override
+    public QuestionRevision findByName(String name) {
+    	return questionRevisionRepo.findByName(name).get(0);
     }
     
     @Override

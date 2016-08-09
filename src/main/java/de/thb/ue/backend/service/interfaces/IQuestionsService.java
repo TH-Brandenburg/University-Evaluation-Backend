@@ -27,6 +27,8 @@ public interface IQuestionsService {
     
     QuestionRevision getRevisionById(int id);
     
+    QuestionRevision findByName(String name);
+    
     void updateQuestionRevision(QuestionRevision questionaire);
     
     List<QuestionRevision> findAllQuestionRevisions();

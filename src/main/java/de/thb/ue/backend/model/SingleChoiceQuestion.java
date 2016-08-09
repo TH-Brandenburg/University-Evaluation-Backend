@@ -19,6 +19,7 @@ package de.thb.ue.backend.model;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -43,7 +44,7 @@ public class SingleChoiceQuestion extends Question {
 		this.choices = choices;
 	}
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	private List<Choice> choices;
 
 	@Override

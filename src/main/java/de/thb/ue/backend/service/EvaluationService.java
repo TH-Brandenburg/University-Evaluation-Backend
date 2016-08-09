@@ -23,6 +23,7 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.IChoice;
 import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.ISCQuestion;
@@ -80,6 +81,9 @@ public class EvaluationService implements IEvaluationService {
 
     @Autowired
     private ITextQuestion textQuestionRepo;
+    
+    @Autowired
+    private IChoice choiceRepo;
 
     @Override
     public String add(int semester, int students, String tutor, int subject, SemesterType type, String revisionName) throws ParticipantException, EvaluationException {
@@ -110,6 +114,11 @@ public class EvaluationService implements IEvaluationService {
             if(element instanceof TextQuestion) {
             	textQuestionRepo.save(element);
             } else if (element instanceof SingleChoiceQuestion) {
+            	SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) element;
+            	List<Choice> choiceList = singleChoiceQuestion.getChoices();
+            	for(Choice choice : choiceList){
+            		choiceRepo.save(choice);
+            	}
             	scQuestionRepo.save(element);
             }
         }
@@ -222,7 +231,21 @@ public class EvaluationService implements IEvaluationService {
                 participantService.deleteByEvaluation(evaluation);
             } else {
                 participantService.deleteByEvaluation(evaluation);
+                List<Question> additionalQuestions = evaluation.getAdhocQuestions();
                 evaluationRepo.delete(evaluation);
+                for ( Question question : additionalQuestions ){
+                	if(question.getType() == QuestionType.TextQuestion){
+                		textQuestionRepo.delete(question);
+                	} else if (question.getType() == QuestionType.SingleChoiceQuestion){
+                		SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) question;
+                		List<Choice> choices = singleChoiceQuestion.getChoices();
+                		scQuestionRepo.delete(question);
+                		for (Choice choice : choices) {
+                			choiceRepo.delete(choice);
+                		}
+                		
+                	}
+                }      
             }
             if (qrCodesFile.exists()) {
                 qrCodesFile.delete();

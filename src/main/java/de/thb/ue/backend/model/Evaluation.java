@@ -71,7 +71,7 @@ public class Evaluation extends BaseModel {
     @NotNull
     private Integer studentsVoted;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Question> adhocQuestions;
 
     @Override
