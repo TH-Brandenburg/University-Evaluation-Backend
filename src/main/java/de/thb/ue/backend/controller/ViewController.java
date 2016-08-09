@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
@@ -154,7 +155,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	}
 
 	@RequestMapping(value = "/newQuestionnaire", method = RequestMethod.POST)
-	String saveNewQuestionnaire(@RequestParam Map<String, String> allRequestParams) {
+	String saveNewQuestionnaire(@RequestParam Map<String, String> allRequestParams, Model model, RedirectAttributes redirectAttributes) {
 		int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
 		List<Question> questions = new ArrayList<Question>();
 		List<Choice> questionRevisionChoices = new ArrayList<Choice>();
@@ -232,6 +233,9 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		questionnaire.setQuestions(questions);
 		int id = questionsService.saveQuestionRevision(questionnaire).getId();
 
+		redirectAttributes.addFlashAttribute("success", true);
+		redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich erstellt.");
+
 		return "redirect:/questionnaire/" + id;
 	}
 
@@ -293,7 +297,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	}
 
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.POST)
-	String updateQuestionRevision(@PathVariable String id, @RequestParam Map<String, String> allRequestParams, Model model) {
+	String updateQuestionRevision(@PathVariable String id, @RequestParam Map<String, String> allRequestParams, Model model,
+			RedirectAttributes redirectAttributes) {
 		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
 		questionnaire.setName(allRequestParams.get("name"));
 
@@ -324,9 +329,11 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		}
 
 		model.addAttribute("questionaire", questionnaire);
+		redirectAttributes.addFlashAttribute("success", true);
+		redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
 
 		questionsService.updateQuestionRevision(questionnaire);
-		return "redirect:/questionnaire/" + id + "?success";
+		return "redirect:/questionnaire/" + id;
 	}
 
 	@RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)

@@ -39,9 +39,9 @@
 			<div class="col-sm-3"></div>
 
 			<div class="col-sm-6">
-				<div th:if="${param.success}" class="alert alert-success alert-dismissable alert-link" role="alert">
+				<div th:if="${success != null}" class="alert alert-dismissable alert-link" th:classappend="${success} ? 'alert-success' : 'alert-danger'" role="alert">
 					<button class="close" type="button" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<p>Der Fragebogen wurde erfolgreich aktualisiert.</p>
+					<p th:text="${message}"></p>
 				</div>
 			</div>
 
