@@ -39,4 +39,6 @@ public interface IQuestionsService {
     
     void deleteQuestionRevisionById(int id);
     
+    QuestionRevision saveQuestionRevision(QuestionRevision questionRevision);
+    
 }

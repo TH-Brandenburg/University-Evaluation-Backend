@@ -152,6 +152,88 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String getNewQuestionnaire(Model model) {
 		return "newQuestionnaire";
 	}
+	
+	@RequestMapping(value = "/newQuestionnaire", method = RequestMethod.POST)
+	String saveNewQuestionnaire(@RequestParam Map<String, String> allRequestParams) {
+		int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
+		List<Question> questions = new ArrayList<Question>();
+		List<Choice> questionRevisionChoices = new ArrayList<Choice>();
+		QuestionRevision questionnaire = new QuestionRevision();
+		
+		String questionnaireName = allRequestParams.get("name");
+		List<String> revisionNames = questionsService.getRevisionNames();
+		for (String revisionName : revisionNames){
+			if (revisionName.equals(questionnaireName)){
+				return "newQuestionnaire";
+			}
+		}
+		questionnaire.setName(questionnaireName);
+		boolean textQuestionsFirst = false;
+		String textQuestionsFirstString = allRequestParams.get("text-questions-first");
+		if (textQuestionsFirstString != null) {
+			textQuestionsFirst = true;
+		}
+		questionnaire.setTextQuestionsFirst(textQuestionsFirst);
+
+		for( int i= 1 ;i <= questionCount ; i++){
+			String questionType = allRequestParams.get("question-type-" + i);
+			if (questionType.equals("Textfrage")) {
+				TextQuestion textQuestion = new TextQuestion();
+				textQuestion.setQuestionPosition(i);
+				String text = allRequestParams.get("question-" + i);
+				int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + i));
+				boolean onlyNumbers = false;
+				String onlyNumbersString = allRequestParams.get("numbers-only-" + i);
+				if (onlyNumbersString != null) {
+					onlyNumbers = true;
+				}
+
+				textQuestion.setType(QuestionType.TextQuestion);
+				textQuestion.setText(text);
+				textQuestion.setMaxLength(maxLength);
+				textQuestion.setOnlyNumbers(onlyNumbers);
+				questions.add(textQuestion);
+
+			}
+			if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
+				SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+				singleChoiceQuestion.setQuestionPosition(i);
+				String text = allRequestParams.get("question-" + i);
+				List<Choice> choices = new ArrayList<Choice>();
+				int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + i));
+				for (int j = 1; j <= choicesNumber; j++) {
+					Choice choice = new Choice();
+					choice.setText(allRequestParams.get("choice-text-" + i + "-" + j));
+					choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + i + "-" + j)));
+					choices.add(choice);
+				}
+				boolean noAnswer = false;
+				String noAnswerString = allRequestParams.get("no-answer-" + i);
+				if (noAnswerString != null) {
+					noAnswer = true;
+				}
+
+				if (noAnswer) {
+					Choice noAnswerChoice = new Choice();
+					noAnswerChoice.setText(allRequestParams.get("choice-text-" + i + "-" + 0));
+					noAnswerChoice.setGrade((short) 0);
+					choices.add(noAnswerChoice);
+				}
+
+				singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+				singleChoiceQuestion.setText(text);
+				singleChoiceQuestion.setChoices(choices);
+				questionRevisionChoices.addAll(choices);
+				questions.add(singleChoiceQuestion);
+			}
+		}
+		
+		questionnaire.setChoices(questionRevisionChoices);
+		questionnaire.setQuestions(questions);
+		int id = questionsService.saveQuestionRevision(questionnaire).getId();
+		
+		return "redirect:/questionnaire/" + id; 
+	}
 
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
 	String getQuestionRevision(@PathVariable String id, Model model) {

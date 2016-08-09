@@ -23,6 +23,7 @@ import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.SingleChoiceQuestion;
 import de.thb.ue.backend.model.TextQuestion;
+import de.thb.ue.backend.repository.IChoice;
 import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.ISCQuestion;
@@ -54,6 +55,9 @@ public class QuestionService implements IQuestionsService {
 
     @Autowired
     private IEvaluation evaluationRepo;
+    
+    @Autowired
+    private IChoice choiceRepo;
 
     @Override
     public QuestionsDTO getAllQuestionsAsDTO(String evaluationUid, int id) throws DBEntryDoesNotExistException {
@@ -167,6 +171,29 @@ public class QuestionService implements IQuestionsService {
     
     @Override
     public void deleteQuestionRevisionById(int id) {
+    	QuestionRevision questionRevision = questionRevisionRepo.findOne(id);
     	questionRevisionRepo.delete(id);
+    	
+    	List<Question> questions = questionRevision.getQuestions();
+    	for (Question question : questions){
+    		questionRepo.delete(question);
+    	}
+    	List<Choice> choices = questionRevision.getChoices();
+    	for (Choice choice : choices){
+    		choiceRepo.delete(choice);
+    	}
+    }
+    
+    @Override
+    public QuestionRevision saveQuestionRevision(QuestionRevision questionRevision) {
+    	List<Choice> choices = questionRevision.getChoices();
+    	for (Choice choice : choices){
+    		choiceRepo.save(choice);
+    	}
+    	List<Question> questions = questionRevision.getQuestions();
+    	for (Question question : questions){
+    		questionRepo.save(question);
+    	}
+    	return questionRevisionRepo.save(questionRevision);
     }
 }
