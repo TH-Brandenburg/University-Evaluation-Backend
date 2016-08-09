@@ -17,6 +17,7 @@ function setSelectOnChange() {
 		if (selectBox.attr('id').match(/question-type-.+/)) {
 			var panelBody = selectBox.closest(".panel-body");
 			replaceQuestionType(selectBox, panelBody);
+			scrollToElement($(panelBody.closest(".panel")), 500);
 		} else if (selectBox.attr('id').match(/choices-number-.+/)) {
 			var panelBody = selectBox.closest(".panel-body");
 			replaceChoices(selectBox, panelBody);
@@ -60,12 +61,12 @@ function replaceChoices(choicesNumberSelectBox, panelBody) {
 	if (questionType == "Best First") {
 		var lowestRank = 1;
 		choicesPanel.remove();
-		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices, panelBody));
+		panelBody.hide().append(createChoicesPanel(lowestRank, numberOfChoices, panelBody)).fadeIn(400);
 		setNoAnswerOnChange();
 	} else if (questionType == "Best In The Middle") {
 		var lowestRank = (parseInt(numberOfChoices) + 1) / -2;
 		choicesPanel.remove();
-		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices, panelBody));
+		panelBody.hide().append(createChoicesPanel(lowestRank, numberOfChoices, panelBody)).fadeIn(400);
 		setNoAnswerOnChange();
 	}
 }
@@ -112,7 +113,7 @@ function drawTextQuestion(panelBody) {
 	formGroups = formGroups.replace(/%i/g, questionNumber);
 
 	panelBody.empty();
-	panelBody.append(formGroups);
+	panelBody.hide().append(formGroups).fadeIn(400);
 
 	setSelectOnChange();
 }
@@ -159,7 +160,7 @@ function drawBestFirst(panelBody) {
 	formGroups = formGroups.replace(/%i/g, questionNumber);
 
 	panelBody.empty();
-	panelBody.append(formGroups);
+	panelBody.hide().append(formGroups).fadeIn(400);
 
 	setSelectOnChange();
 	setNoAnswerOnChange();
@@ -204,7 +205,7 @@ function drawBestInTheMiddle(panelBody) {
 	formGroups = formGroups.replace(/%i/g, questionNumber);
 
 	panelBody.empty();
-	panelBody.append(formGroups);
+	panelBody.hide().append(formGroups).fadeIn(400);
 
 	setSelectOnChange();
 	setNoAnswerOnChange();
@@ -388,12 +389,13 @@ function setNewQuestionOnClick() {
 						var newQuestionButton = $(this);
 						var questionPanelAbove = newQuestionButton.parent().prev();
 						newQuestionPanelHtml = newQuestionPanelHtml.replace(/%i/g, questionCount);
-						questionPanelAbove.after(newQuestionPanelHtml);
+						questionPanelAbove.after(newQuestionPanelHtml).fadeIn(400);
 
 						// fill question panel body
 						var newQuestionPanel = newQuestionButton.parent().prev();
 						var questionPanelBody = newQuestionPanel.find('.panel-body');
 						drawTextQuestion(questionPanelBody);
+						scrollToElement($(questionPanelBody.closest(".panel")), 750);
 					});
 }
 
@@ -450,7 +452,9 @@ function removeQuestionPanel(panelId) {
 	});
 
 	// remove question panel and hide dialog
-	questionPanelToDelete.remove();
+	questionPanelToDelete.hide("slow", function() {
+		this.remove();
+	});
 	$("#delete-dialog").modal('hide');
 }
 
@@ -466,4 +470,16 @@ function setModalOnShow() {
 		var modal = $(this);
 		modal.find('#delete-button').attr("onclick", deleteMethod);
 	});
+}
+
+/**
+ * Scrolls the page to the specified element within specified duration
+ * 
+ * @param element
+ * @param duration
+ */
+function scrollToElement(element, duration) {
+	$('html, body').animate({
+		scrollTop : element.offset().top
+	}, duration);
 }
