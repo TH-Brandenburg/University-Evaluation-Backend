@@ -134,6 +134,11 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		model.addAttribute("questionnaires", questionsService.findAllQuestionRevisions());
 		return "questionnaires";
 	}
+	
+	@RequestMapping(value = "/newQuestionnaire", method = RequestMethod.GET)
+	String getNewQuestionnaire(Model model) {
+		return "newQuestionnaire";
+	}
 
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
 	String getQuestionRevision(@PathVariable String id, Model model) {

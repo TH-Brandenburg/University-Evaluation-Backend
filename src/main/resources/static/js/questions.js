@@ -1,5 +1,8 @@
 $(document).ready(function() {
 	setSelectOnChange();
+	setNoAnswerOnChange();
+	setModalOnShow();
+	setNewQuestionOnClick()
 });
 
 /**
@@ -27,14 +30,14 @@ $(document).on("click", ".omit-question", function(event) {
  */
 function setSelectOnChange() {
 	$("select").filter(function() {
-		return this.id.match(/(question-type|choices-number)-\d+/);
+		return this.id.match(/(question-type|choices-number)-.+/);
 	}).unbind('change').change(function() {
 		var selectBox = $(this);
 
-		if (selectBox.attr('id').match(/question-type-\d+/)) {
+		if (selectBox.attr('id').match(/question-type-.+/)) {
 			var panelBody = selectBox.closest(".panel-body");
 			replaceQuestionType(selectBox, panelBody);
-		} else if (selectBox.attr('id').match(/choices-number-\d+/)) {
+		} else if (selectBox.attr('id').match(/choices-number-.+/)) {
 			var panelBody = selectBox.closest(".panel-body");
 			replaceChoices(selectBox, panelBody);
 		}
@@ -376,5 +379,111 @@ function setNoAnswerOnChange() {
 			textBox.removeAttr('required');
 			textBox.val("");
 		}
+	});
+}
+
+/**
+ * Enables the insertion of a new question below the last question
+ */
+function setNewQuestionOnClick() {
+	$("#new-question")
+			.click(
+					function() {
+						var newQuestionPanelHtml = '<div id="question-panel-%i" class="panel panel-thb"> \
+							<div class="panel-heading panel-heading-thb"> \
+								<h3 class="panel-title">Frage %i \
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;" \
+										title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"></span> \
+								</h3> \
+							</div> \
+							<div id="question-panel-body-%i" class="panel-body"></div> \
+						</div>';
+
+						// increment question count
+						var questionCountField = $("#question-count");
+						var questionCount = parseInt(questionCountField.val()) + 1;
+						questionCountField.val(questionCount.toString());
+
+						// create new question panel
+						var newQuestionButton = $(this);
+						var questionPanelAbove = newQuestionButton.parent().prev();
+						newQuestionPanelHtml = newQuestionPanelHtml.replace(/%i/g, questionCount);
+						questionPanelAbove.after(newQuestionPanelHtml);
+
+						// fill question panel body
+						var newQuestionPanel = newQuestionButton.parent().prev();
+						var questionPanelBody = newQuestionPanel.find('.panel-body');
+						drawTextQuestion(questionPanelBody);
+					});
+}
+
+/**
+ * Removes the question panel with id = panelId and adjusts the attribute values of subsequent question panels
+ * 
+ * @param panelId
+ */
+function removeQuestionPanel(panelId) {
+	// decrement question count
+	var questionCountField = $("#question-count");
+	var questionCount = parseInt(questionCountField.val()) - 1;
+	questionCountField.val(questionCount.toString());
+
+	// increment attribute values in subsequent question panels
+	var questionPanelToDelete = $("#" + panelId);
+	questionPanelToDelete.nextAll("div[id|='question-panel']").each(function(counter, element) {
+		var questionPanel = $(element);
+		var questionNumberOld = parseInt(questionPanel.attr('id').split("-").pop());
+		var questionNumberNew = questionNumberOld - 1;
+
+		questionPanel.attr('id', 'question-panel-' + questionNumberNew);
+		questionPanel.find('h3').html(questionPanel.find('h3').html().replace('Frage ' + questionNumberOld, 'Frage ' + questionNumberNew));
+		questionPanel.find('#question-panel-body-' + questionNumberOld).attr('id', 'question-panel-body-' + questionNumberNew);
+		var attributeNames = ["question-type-", "question-", "max-chars-", "numbers-only-", "choices-number-"];
+		for (i = 0; i < attributeNames.length; i++) {
+			questionPanel.find("label[for='" + attributeNames[i] + questionNumberOld + "']").attr('for', attributeNames[i] + questionNumberNew);
+			questionPanel.find("#" + attributeNames[i] + questionNumberOld).attr({
+				'id' : attributeNames[i] + questionNumberNew,
+				'name' : attributeNames[i] + questionNumberNew
+			});
+		}
+		questionPanel.find("label[for|='choice-text-" + questionNumberOld + "']").each(function(counter, element) {
+			var label = $(element);
+			var labelFor = label.attr('for');
+			label.attr('for', labelFor.replace('choice-text-' + questionNumberOld, 'choice-text-' + questionNumberNew));
+		});
+		questionPanel.find("input[id|='choice-text-" + questionNumberOld + "']").each(function(counter, element) {
+			var input = $(element);
+			var inputIdOld = input.attr('id');
+			var inputIdNew = inputIdOld.replace('choice-text-' + questionNumberOld, 'choice-text-' + questionNumberNew);
+			input.attr({
+				'id' : inputIdNew,
+				'name' : inputIdNew
+			});
+		});
+		questionPanel.find("input[name|='choice-grade-" + questionNumberOld + "']").each(function(counter, element) {
+			var input = $(element);
+			var inputNameOld = input.attr('name');
+			var inputNameNew = inputNameOld.replace('choice-grade-' + questionNumberOld, 'choice-grade-' + questionNumberNew);
+			input.attr('name', inputNameNew);
+		});
+		questionPanel.find("input[name='no-answer-" + questionNumberOld + "']").attr('name', 'no-answer-' + questionNumberNew);
+	});
+
+	// remove question panel and hide dialog
+	questionPanelToDelete.remove();
+	$("#delete-dialog").modal('hide');
+}
+
+/**
+ * Displays the modal dialog when the delete button of a question panel is clicked and sets the behavior of the affirmative button. 
+ * The affirmative button causes the removal of the question panel.
+ */
+function setModalOnShow() {
+	$('#delete-dialog').on('show.bs.modal', function(event) {
+		var button = $(event.relatedTarget);
+		var panelId = button.closest('.panel').attr('id');
+		var deleteMethod = "removeQuestionPanel(" + "'" + panelId + "'" + ")";
+		var modal = $(this);
+		modal.find('#delete-button').attr("onclick", deleteMethod);
 	});
 }
