@@ -321,4 +321,10 @@ public class EvaluationService implements IEvaluationService {
         }
         return out;
     }
+    
+    @Override
+    public boolean evaluationWithQuestionRevisionExists(int questionRevisionId){
+    	List<Evaluation> evaluationList = evaluationRepo.findByQuestionRevisionId(questionRevisionId);
+    	return !evaluationList.isEmpty();
+    }
 }

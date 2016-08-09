@@ -20,8 +20,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -300,40 +302,170 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String updateQuestionRevision(@PathVariable String id, @RequestParam Map<String, String> allRequestParams, Model model,
 			RedirectAttributes redirectAttributes) {
 		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
-		questionnaire.setName(allRequestParams.get("name"));
-
-		boolean textQuestionsFirst = false;
-		String textQuestionsFirstString = allRequestParams.get("text-questions-first");
-		if (textQuestionsFirstString != null) {
-			textQuestionsFirst = true;
-		}
-		questionnaire.setTextQuestionsFirst(textQuestionsFirst);
-
-		int mcQuestionCount = Integer.parseInt(allRequestParams.get("mc-question-count"));
-		List<SingleChoiceQuestion> allSingleChoiceQuestions = new ArrayList<>();
-		List<TextQuestion> allTextQuestions = new ArrayList<>();
-		for (Question question : questionnaire.getQuestions()) {
-			if (question instanceof SingleChoiceQuestion) {
-				allSingleChoiceQuestions.add((SingleChoiceQuestion) question);
-			} else if (question instanceof TextQuestion) {
-				allTextQuestions.add((TextQuestion) question);
+		String name = allRequestParams.get("name");
+		
+		boolean evaluationExistsForQuestionRevision = evaluationService.evaluationWithQuestionRevisionExists(Integer.parseInt(id));
+			
+		if (evaluationExistsForQuestionRevision) {
+			QuestionRevision newQuestionnaire = new QuestionRevision();
+			
+			List<String> revisionNames = questionsService.getRevisionNames();
+			for (String revisionName : revisionNames){
+				if (revisionName.equals(name)){
+					String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+					name = name + " " + timestamp;
+				}
 			}
-		}
+			
+			newQuestionnaire.setName(name);
+			
+			int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
+			List<Question> questions = new ArrayList<Question>();
+			List<Choice> questionRevisionChoices = new ArrayList<Choice>();
 
-		for (int i = 1; i <= mcQuestionCount; i++) {
-			allSingleChoiceQuestions.get(i - 1).setText(allRequestParams.get("mc-question-text-" + i));
-		}
-		int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
-		for (int i = 1; i <= questionCount; i++) {
-			allTextQuestions.get(i - 1).setText(allRequestParams.get("question-text-" + i));
-		}
+			boolean textQuestionsFirst = false;
+			String textQuestionsFirstString = allRequestParams.get("text-questions-first");
+			if (textQuestionsFirstString != null) {
+				textQuestionsFirst = true;
+			}
+			newQuestionnaire.setTextQuestionsFirst(textQuestionsFirst);
 
-		model.addAttribute("questionaire", questionnaire);
-		redirectAttributes.addFlashAttribute("success", true);
-		redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
+			for( int i= 1 ;i <= questionCount ; i++){
+				String questionType = allRequestParams.get("question-type-" + i);
+				if (questionType.equals("Textfrage")) {
+					TextQuestion textQuestion = new TextQuestion();
+					textQuestion.setQuestionPosition(i);
+					String text = allRequestParams.get("question-" + i);
+					int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + i));
+					boolean onlyNumbers = false;
+					String onlyNumbersString = allRequestParams.get("numbers-only-" + i);
+					if (onlyNumbersString != null) {
+						onlyNumbers = true;
+					}
 
-		questionsService.updateQuestionRevision(questionnaire);
-		return "redirect:/questionnaire/" + id;
+					textQuestion.setType(QuestionType.TextQuestion);
+					textQuestion.setText(text);
+					textQuestion.setMaxLength(maxLength);
+					textQuestion.setOnlyNumbers(onlyNumbers);
+					questions.add(textQuestion);
+
+				}
+				if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
+					SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+					singleChoiceQuestion.setQuestionPosition(i);
+					String text = allRequestParams.get("question-" + i);
+					List<Choice> choices = new ArrayList<Choice>();
+					int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + i));
+					for (int j = 1; j <= choicesNumber; j++) {
+						Choice choice = new Choice();
+						choice.setText(allRequestParams.get("choice-text-" + i + "-" + j));
+						choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + i + "-" + j)));
+						choices.add(choice);
+					}
+					boolean noAnswer = false;
+					String noAnswerString = allRequestParams.get("no-answer-" + i);
+					if (noAnswerString != null) {
+						noAnswer = true;
+					}
+
+					if (noAnswer) {
+						Choice noAnswerChoice = new Choice();
+						noAnswerChoice.setText(allRequestParams.get("choice-text-" + i + "-" + 0));
+						noAnswerChoice.setGrade((short) 0);
+						choices.add(noAnswerChoice);
+					}
+
+					singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+					singleChoiceQuestion.setText(text);
+					singleChoiceQuestion.setChoices(choices);
+					questionRevisionChoices.addAll(choices);
+					questions.add(singleChoiceQuestion);
+				}
+			}
+			
+			newQuestionnaire.setChoices(questionRevisionChoices);
+			newQuestionnaire.setQuestions(questions);
+			int questionnaireId = questionsService.saveQuestionRevision(newQuestionnaire).getId();
+			redirectAttributes.addFlashAttribute("success", true);
+			redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
+			return "redirect:/questionnaire/" + questionnaireId; 
+
+		} else {	
+			List<Choice> oldChoices = questionnaire.getChoices();
+			List<Question> oldQuestions = questionnaire.getQuestions();
+			
+			int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
+			List<Question> questions = new ArrayList<Question>();
+			List<Choice> questionRevisionChoices = new ArrayList<Choice>();
+			
+			questionnaire.setName(name);
+		
+			boolean textQuestionsFirst = false;
+			String textQuestionsFirstString = allRequestParams.get("text-questions-first");
+			if (textQuestionsFirstString != null) {
+				textQuestionsFirst = true;
+			}
+			questionnaire.setTextQuestionsFirst(textQuestionsFirst);
+
+			for( int i= 1 ;i <= questionCount ; i++){
+				String questionType = allRequestParams.get("question-type-" + i);
+				if (questionType.equals("Textfrage")) {
+					TextQuestion textQuestion = new TextQuestion();
+					textQuestion.setQuestionPosition(i);
+					String text = allRequestParams.get("question-" + i);
+					int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + i));
+					boolean onlyNumbers = false;
+					String onlyNumbersString = allRequestParams.get("numbers-only-" + i);
+					if (onlyNumbersString != null) {
+						onlyNumbers = true;
+					}
+
+					textQuestion.setType(QuestionType.TextQuestion);
+					textQuestion.setText(text);
+					textQuestion.setMaxLength(maxLength);
+					textQuestion.setOnlyNumbers(onlyNumbers);
+					questions.add(textQuestion);
+				}
+				if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
+					SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+					singleChoiceQuestion.setQuestionPosition(i);
+					String text = allRequestParams.get("question-" + i);
+					List<Choice> choices = new ArrayList<Choice>();
+					int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + i));
+					for (int j = 1; j <= choicesNumber; j++) {
+						Choice choice = new Choice();
+						choice.setText(allRequestParams.get("choice-text-" + i + "-" + j));
+						choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + i + "-" + j)));
+						choices.add(choice);
+					}
+					boolean noAnswer = false;
+					String noAnswerString = allRequestParams.get("no-answer-" + i);
+					if (noAnswerString != null) {
+						noAnswer = true;
+					}
+
+					if (noAnswer) {
+						Choice noAnswerChoice = new Choice();
+						noAnswerChoice.setText(allRequestParams.get("choice-text-" + i + "-" + 0));
+						noAnswerChoice.setGrade((short) 0);
+						choices.add(noAnswerChoice);
+					}
+		
+					singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+					singleChoiceQuestion.setText(text);
+					singleChoiceQuestion.setChoices(choices);
+					questionRevisionChoices.addAll(choices);
+					questions.add(singleChoiceQuestion);
+				}
+			}
+			questionnaire.setChoices(questionRevisionChoices);
+			questionnaire.setQuestions(questions);
+			questionsService.updateQuestionRevision(questionnaire);
+			questionsService.deleteQuestionsAndChoices(oldChoices, oldQuestions);
+			redirectAttributes.addFlashAttribute("success", true);
+			redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
+			return "redirect:/questionnaire/" + id;
+		}
 	}
 
 	@RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)

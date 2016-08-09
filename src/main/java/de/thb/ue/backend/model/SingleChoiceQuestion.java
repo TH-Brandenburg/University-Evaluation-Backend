@@ -18,11 +18,13 @@ package de.thb.ue.backend.model;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
 
 import de.thb.ue.backend.util.QuestionType;
 import lombok.Getter;
@@ -44,7 +46,7 @@ public class SingleChoiceQuestion extends Question {
 		this.choices = choices;
 	}
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Choice> choices;
 
 	@Override

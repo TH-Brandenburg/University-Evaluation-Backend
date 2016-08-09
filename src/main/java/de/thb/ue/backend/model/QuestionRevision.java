@@ -42,12 +42,12 @@ public class QuestionRevision extends BaseModel {
     private String name;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch (FetchMode.SELECT)
     private List<Question> questions;
 
     @NotNull
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch (FetchMode.SELECT)
     private List<Choice> choices;
 

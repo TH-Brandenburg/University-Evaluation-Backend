@@ -36,5 +36,6 @@ public interface IEvaluation extends CrudRepository<Evaluation, Serializable> {
     @Query("SELECT e FROM Evaluation e WHERE e.uid = :uid")
     Evaluation findByUID(@Param(value = "uid") String uid);
 
-
+    @Query("SELECT e FROM Evaluation e inner join e.questionRevision as question_revision WHERE question_revision.id = :qrid")
+    List<Evaluation> findByQuestionRevisionId(@Param(value = "qrid") int qrid);
 }

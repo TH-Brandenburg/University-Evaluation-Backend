@@ -175,13 +175,8 @@ public class QuestionService implements IQuestionsService {
     	questionRevisionRepo.delete(id);
     	
     	List<Question> questions = questionRevision.getQuestions();
-    	for (Question question : questions){
-    		questionRepo.delete(question);
-    	}
     	List<Choice> choices = questionRevision.getChoices();
-    	for (Choice choice : choices){
-    		choiceRepo.delete(choice);
-    	}
+    	deleteQuestionsAndChoices(choices, questions);
     }
     
     @Override
@@ -195,5 +190,25 @@ public class QuestionService implements IQuestionsService {
     		questionRepo.save(question);
     	}
     	return questionRevisionRepo.save(questionRevision);
+    }
+    
+    @Override
+    public void deleteQuestionsAndChoices(List<Choice> choices, List<Question> questions) {
+    	for (Question question : questions){
+    		questionRepo.delete(question);
+    	}
+    	for (Choice choice : choices){
+    		choiceRepo.delete(choice);
+    	}
+    }
+    
+    @Override
+    public void saveQuestionsAndChoices(List<Choice> choices, List<Question> questions) {
+    	for (Choice choice : choices){
+    		choiceRepo.save(choice);
+    	}
+    	for (Question question : questions){
+    		questionRepo.save(question);
+    	}
     }
 }

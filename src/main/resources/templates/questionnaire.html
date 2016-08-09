@@ -3,8 +3,6 @@
 <head th:replace="stdTemplate :: #head"></head>
 
 <body>
-	<input type="hidden" id="question-count" th:value="${textQuestions.size()} + ${singleChoiceQuestions.size()}" />
-
 	<!-- Navigation bar -->
 	<nav class="navbar navbar-default">
 		<div class="container-fluid">
@@ -54,6 +52,7 @@
 			<div class="col-sm-6">
 				<!-- General Information -->
 				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
+					<input type="hidden" id="question-count" name="question-count" th:value="${textQuestions.size()} + ${singleChoiceQuestions.size()}" />
 					<div class="panel panel-thb">
 						<div class="panel-heading panel-heading-thb">
 							<h3 class="panel-title">Allgemeine Angaben</h3>
