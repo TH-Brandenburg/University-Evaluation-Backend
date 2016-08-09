@@ -8,8 +8,7 @@
 		<div class="container-fluid">
 			<!-- Brand and toggle get grouped for better mobile display -->
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
 					<span class="sr-only">Toggle navigation</span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
@@ -39,6 +38,7 @@
 
 			<div class="col-sm-6">
 				<form action="#" th:action="@{/evaluation}" method="post" class="form-horizontal">
+					<input type="hidden" id="question-count" name="question-count" value="0" />
 					<div class="panel panel-thb">
 						<div class="panel-heading panel-heading-thb">
 							<h3 class="panel-title">Allgemeine Angaben</h3>
@@ -50,8 +50,7 @@
 									<label for="tutors" class="col-sm-4 control-label">Tutor</label>
 									<div class="col-sm-8">
 										<select name="tutors" aria-required="true" required="required" id="tutors" class="form-control">
-											<option th:each="tutor : ${tutors}" th:value="${tutor.familyName}"
-												th:text="${tutor.name} + ' ' + ${tutor.familyName}"></option>
+											<option th:each="tutor : ${tutors}" th:value="${tutor.familyName}" th:text="${tutor.name} + ' ' + ${tutor.familyName}"></option>
 										</select>
 									</div>
 								</div>
@@ -59,16 +58,14 @@
 									<label for="subject" class="col-sm-4 control-label">Lehrveranstaltung</label>
 									<div class="col-sm-8">
 										<select name="subject" aria-required="true" required="required" id="subject" class="form-control">
-											<option th:each="subject : ${subjects}" th:value="${subject.id}"
-												th:text="${subject.name} + ' ' + ${subject.degree}"></option>
+											<option th:each="subject : ${subjects}" th:value="${subject.id}" th:text="${subject.name} + ' ' + ${subject.degree}"></option>
 										</select>
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="semesterType" class="col-sm-4 control-label">Semesterart</label>
 									<div class="col-sm-8">
-										<select name="semesterType" aria-required="true" required="required" id="semesterType"
-											class="form-control">
+										<select name="semesterType" aria-required="true" required="required" id="semesterType" class="form-control">
 											<option th:each="type : ${semesterTypes}" th:value="${type}" th:text="${type}"></option>
 										</select>
 									</div>
@@ -76,8 +73,7 @@
 								<div class="form-group">
 									<label for="semester" class="col-sm-4 control-label">Semester</label>
 									<div class="col-sm-8">
-										<input name="semester" type="number" min="1" max="8" value="1" aria-required="true"
-											required="required" id="semester" class="form-control" />
+										<input name="semester" type="number" min="1" max="8" value="1" aria-required="true" required="required" id="semester" class="form-control" />
 									</div>
 								</div>
 								<div class="form-group">
@@ -91,8 +87,7 @@
 								<div class="form-group">
 									<label for="students" class="col-sm-4 control-label">Anzahl der Studenten</label>
 									<div class="col-sm-8">
-										<input name="students" type="number" min="2" max="999" value="10" aria-required="true"
-											required="required" id="students" class="form-control" />
+										<input name="students" type="number" min="2" max="999" value="10" aria-required="true" required="required" id="students" class="form-control" />
 									</div>
 								</div>
 							</fieldset>
@@ -100,58 +95,35 @@
 					</div>
 
 					<!-- Additional Questions -->
-					<div class="panel panel-thb" th:each="i : ${#numbers.sequence(1, 2)}" th:id="'question-panel-' + ${i}">
-						<div class="panel-heading panel-heading-thb">
-							<h3 class="panel-title" style="display: inline-block" th:text="'Zusatzfrage ' + ${i}"></h3>
-							<div class="checkbox pull-right" style="padding-top: 0px;">
-								<label> <input type="checkbox" class="omit-question" checked="checked"
-										th:name="'omit-question-' + ${i}" />Frage auslassen
-								</label>
-							</div>
-						</div>
-						<div th:id="'collapse' + ${i}" class="collapse" role="tabpanel" aria-labelledby="headingOne">
-							<div class="panel-body" th:id="'question-panel-body-' + ${i}">
-								<div class="form-group">
-									<label th:for="'question-type-' + ${i}" class="col-sm-3 control-label">Fragetyp</label>
-									<div class="col-sm-9">
-										<select th:id="'question-type-' + ${i}" th:name="'question-type-' + ${i}" class="form-control">
-											<option selected="selected">Textfrage</option>
-											<option>Best First</option>
-											<option>Best In The Middle</option>
-										</select>
-									</div>
-								</div>
-								<div class="form-group">
-									<label th:for="'question-' + ${i}" class="col-sm-3 control-label">Frage</label>
-									<div class="col-sm-9">
-										<textarea class="form-control" rows="3" th:id="'question-' + ${i}" th:name="'question-' + ${i}"></textarea>
-									</div>
-								</div>
-								<div class="form-group">
-									<label th:for="'max-chars-' + ${i}" class="col-sm-3 control-label">Max Zeichen</label>
-									<div class="col-sm-9">
-										<input type="number" class="form-control" th:id="'max-chars-' + ${i}" th:name="'max-chars-' + ${i}"
-											min="2" max="1000" value="1000" />
-									</div>
-								</div>
-								<div class="form-group">
-									<label th:for="'numbers-only-' + ${i}" class="col-sm-3 control-label">Nur Zahlen</label>
-									<div class="col-sm-9">
-										<input type="checkbox" th:id="'numbers-only-' + ${i}" th:name="'numbers-only-' + ${i}" />
-									</div>
-								</div>
-							</div>
-						</div>
+					<div class="pull-left">
+						<button id="new-question" class="btn btn-danger" type="button">Neue Zusatzfrage</button>
 					</div>
-
-					<div class="text-center">
-						<button type="submit" class="btn btn-danger btn-lg" name="create">Evaluation erstellen</button>
+					<div class="pull-right">
+						<button class="btn btn-danger" type="submit">Speichern</button>
 						<p>&nbsp;</p>
 					</div>
 				</form>
 			</div>
 
 			<div class="col-sm-3"></div>
+		</div>
+	</div>
+
+	<!-- Delete Dialog-->
+	<div class="modal fade" id="delete-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="delete-dialog-label">Frage wirklich löschen?</h4>
+				</div>
+				<div class="modal-footer">
+					<button id="delete-button" class="btn btn-danger">Ja</button>
+					<button class="btn btn-default" data-dismiss="modal">Nein</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>

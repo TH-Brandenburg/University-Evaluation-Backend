@@ -6,26 +6,6 @@ $(document).ready(function() {
 });
 
 /**
- * Toggles the omit question functionality
- */
-$(document).on("click", ".omit-question", function(event) {
-	var omitQuestionCheckBox = $(this);
-
-	var panel = omitQuestionCheckBox.closest(".panel");
-	var panelBody = panel.find(".panel-body");
-	var panelBodyParent = panelBody.parent();
-	var formInputs = panelBody.find("input:not(:checkbox), textarea, select");
-
-	if (omitQuestionCheckBox.is(":checked")) {
-		formInputs.removeAttr("required");
-		panelBodyParent.collapse('hide');
-	} else {
-		formInputs.attr("required", "required");
-		panelBodyParent.collapse('show');
-	}
-});
-
-/**
  * Sets the onChange behavior of the select boxes "question type" and "number of choices"
  */
 function setSelectOnChange() {

@@ -580,67 +580,59 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
 			List<Question> adhocQuestions = new ArrayList<Question>();
 
-			int additionalQuestionCount = 2;
+			int additionalQuestionCount = Integer.parseInt(allRequestParams.get("question-count"));
 
 			for (int j = 1; j <= additionalQuestionCount; j++) {
-				boolean omitQuestion = false;
-				String omitQuestionString = allRequestParams.get("omit-question-" + j);
-				if (omitQuestionString != null) {
-					omitQuestion = true;
+				String questionType = allRequestParams.get("question-type-" + j);
+				if (questionType.equals("Textfrage")) {
+					TextQuestion textQuestion = new TextQuestion();
+					questionPosition++;
+					textQuestion.setQuestionPosition(questionPosition);
+					String text = allRequestParams.get("question-" + j);
+					int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + j));
+					boolean onlyNumbers = false;
+					String onlyNumbersString = allRequestParams.get("numbers-only-" + j);
+					if (onlyNumbersString != null) {
+						onlyNumbers = true;
+					}
+
+					textQuestion.setType(QuestionType.TextQuestion);
+					textQuestion.setText(text);
+					textQuestion.setMaxLength(maxLength);
+					textQuestion.setOnlyNumbers(onlyNumbers);
+					adhocQuestions.add(textQuestion);
+
 				}
-
-				if (!omitQuestion) {
-					String questionType = allRequestParams.get("question-type-" + j);
-					if (questionType.equals("Textfrage")) {
-						TextQuestion textQuestion = new TextQuestion();
-						questionPosition++;
-						textQuestion.setQuestionPosition(questionPosition);
-						String text = allRequestParams.get("question-" + j);
-						int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + j));
-						boolean onlyNumbers = false;
-						String onlyNumbersString = allRequestParams.get("numbers-only-" + j);
-						if (onlyNumbersString != null) {
-							onlyNumbers = true;
-						}
-
-						textQuestion.setType(QuestionType.TextQuestion);
-						textQuestion.setText(text);
-						textQuestion.setMaxLength(maxLength);
-						textQuestion.setOnlyNumbers(onlyNumbers);
-						adhocQuestions.add(textQuestion);
-
+				if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
+					SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+					questionPosition++;
+					singleChoiceQuestion.setQuestionPosition(questionPosition);
+					String text = allRequestParams.get("question-" + j);
+					List<Choice> choices = new ArrayList<Choice>();
+					int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + j));
+					for (int i = 1; i <= choicesNumber; i++) {
+						Choice choice = new Choice();
+						choice.setText(allRequestParams.get("choice-text-" + j + "-" + i));
+						choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + j + "-" + i)));
+						choices.add(choice);
 					}
-					if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
-						SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
-						questionPosition++;
-						singleChoiceQuestion.setQuestionPosition(questionPosition);
-						String text = allRequestParams.get("question-" + j);
-						List<Choice> choices = new ArrayList<Choice>();
-						int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + j));
-						for (int i = 1; i <= choicesNumber; i++) {
-							Choice choice = new Choice();
-							choice.setText(allRequestParams.get("choice-text-" + j + "-" + i));
-							choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + j + "-" + i)));
-							choices.add(choice);
-						}
-						boolean noAnswer = false;
-						String noAnswerString = allRequestParams.get("no-answer-" + j);
-						if (noAnswerString != null) {
-							noAnswer = true;
-						}
-
-						if (noAnswer) {
-							Choice noAnswerChoice = new Choice();
-							noAnswerChoice.setText(allRequestParams.get("choice-text-" + j + "-" + 0));
-							noAnswerChoice.setGrade((short) 0);
-							choices.add(noAnswerChoice);
-						}
-
-						singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
-						singleChoiceQuestion.setText(text);
-						singleChoiceQuestion.setChoices(choices);
-						adhocQuestions.add(singleChoiceQuestion);
+					boolean noAnswer = false;
+					String noAnswerString = allRequestParams.get("no-answer-" + j);
+					if (noAnswerString != null) {
+						noAnswer = true;
 					}
+
+					if (noAnswer) {
+						Choice noAnswerChoice = new Choice();
+						noAnswerChoice.setText(allRequestParams.get("choice-text-" + j + "-" + 0));
+						noAnswerChoice.setGrade((short) 0);
+						choices.add(noAnswerChoice);
+					}
+
+					singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+					singleChoiceQuestion.setText(text);
+					singleChoiceQuestion.setChoices(choices);
+					adhocQuestions.add(singleChoiceQuestion);
 				}
 			}
 
