@@ -152,18 +152,18 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String getNewQuestionnaire(Model model) {
 		return "newQuestionnaire";
 	}
-	
+
 	@RequestMapping(value = "/newQuestionnaire", method = RequestMethod.POST)
 	String saveNewQuestionnaire(@RequestParam Map<String, String> allRequestParams) {
 		int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
 		List<Question> questions = new ArrayList<Question>();
 		List<Choice> questionRevisionChoices = new ArrayList<Choice>();
 		QuestionRevision questionnaire = new QuestionRevision();
-		
+
 		String questionnaireName = allRequestParams.get("name");
 		List<String> revisionNames = questionsService.getRevisionNames();
-		for (String revisionName : revisionNames){
-			if (revisionName.equals(questionnaireName)){
+		for (String revisionName : revisionNames) {
+			if (revisionName.equals(questionnaireName)) {
 				return "newQuestionnaire";
 			}
 		}
@@ -175,7 +175,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		}
 		questionnaire.setTextQuestionsFirst(textQuestionsFirst);
 
-		for( int i= 1 ;i <= questionCount ; i++){
+		for (int i = 1; i <= questionCount; i++) {
 			String questionType = allRequestParams.get("question-type-" + i);
 			if (questionType.equals("Textfrage")) {
 				TextQuestion textQuestion = new TextQuestion();
@@ -227,12 +227,12 @@ public class ViewController extends WebMvcConfigurerAdapter {
 				questions.add(singleChoiceQuestion);
 			}
 		}
-		
+
 		questionnaire.setChoices(questionRevisionChoices);
 		questionnaire.setQuestions(questions);
 		int id = questionsService.saveQuestionRevision(questionnaire).getId();
-		
-		return "redirect:/questionnaire/" + id; 
+
+		return "redirect:/questionnaire/" + id;
 	}
 
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
@@ -317,12 +317,10 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
 		for (int i = 1; i <= mcQuestionCount; i++) {
 			allSingleChoiceQuestions.get(i - 1).setText(allRequestParams.get("mc-question-text-" + i));
-			;
 		}
 		int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
 		for (int i = 1; i <= questionCount; i++) {
 			allTextQuestions.get(i - 1).setText(allRequestParams.get("question-text-" + i));
-			;
 		}
 
 		model.addAttribute("questionaire", questionnaire);
