@@ -82,7 +82,7 @@
 
 					<!-- Text questions -->
 					<th:block th:each="question, rowStat : ${textQuestions}">
-						<div class="panel panel-thb" th:id="'question-panel-' + ${rowStat.count}" th:attr="data-question-id=${question.id}" data-question-type="text">
+						<div class="panel panel-thb" th:id="'question-panel-' + ${rowStat.count}">
 							<div class="panel-heading panel-heading-thb">
 								<h3 class="panel-title">
 									<th:block th:text="'Frage ' + ${rowStat.count}"></th:block>
@@ -127,8 +127,7 @@
 
 					<!-- Single choice questions -->
 					<th:block th:each="entry, rowStat : ${singleChoiceQuestions}">
-						<div class="panel panel-thb" th:id="'question-panel-' + ${rowStat.count + textQuestions.size()}" th:attr="data-question-id=${entry.value.id}"
-							data-question-type="sc">
+						<div class="panel panel-thb" th:id="'question-panel-' + ${rowStat.count + textQuestions.size()}">
 							<div class="panel-heading panel-heading-thb">
 								<h3 class="panel-title">
 									<th:block th:text="'Frage ' + ${rowStat.count + textQuestions.size()}"></th:block>
