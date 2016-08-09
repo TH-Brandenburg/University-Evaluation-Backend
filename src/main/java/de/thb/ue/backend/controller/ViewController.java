@@ -16,19 +16,19 @@
 
 package de.thb.ue.backend.controller;
 
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.exception.EvaluationException;
-import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.*;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.QuestionType;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.dto.util.Department;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,21 +37,34 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import de.thb.ue.backend.exception.AggregatedAnswerException;
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.exception.EvaluationException;
+import de.thb.ue.backend.exception.ParticipantException;
+import de.thb.ue.backend.model.Choice;
+import de.thb.ue.backend.model.Evaluation;
+import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.QuestionRevision;
+import de.thb.ue.backend.model.SingleChoiceQuestion;
+import de.thb.ue.backend.model.TextQuestion;
+import de.thb.ue.backend.model.Tutor;
+import de.thb.ue.backend.service.interfaces.IEvaluationService;
+import de.thb.ue.backend.service.interfaces.IQuestionsService;
+import de.thb.ue.backend.service.interfaces.ISubjectService;
+import de.thb.ue.backend.service.interfaces.ITutorService;
+import de.thb.ue.backend.util.QuestionType;
+import de.thb.ue.backend.util.SemesterType;
+import de.thb.ue.dto.util.Department;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @org.springframework.stereotype.Controller
@@ -134,7 +147,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		model.addAttribute("questionnaires", questionsService.findAllQuestionRevisions());
 		return "questionnaires";
 	}
-	
+
 	@RequestMapping(value = "/newQuestionnaire", method = RequestMethod.GET)
 	String getNewQuestionnaire(Model model) {
 		return "newQuestionnaire";
@@ -143,8 +156,57 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
 	String getQuestionRevision(@PathVariable String id, Model model) {
 		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
+
+		// Unterscheiden zwischen Textfragen und Single-Choice-Fragen
+		List<TextQuestion> textQuestions = new ArrayList<TextQuestion>();
+		List<SingleChoiceQuestion> singleChoiceQuestionsTemp = new ArrayList<SingleChoiceQuestion>();
+		for (Question question : questionnaire.getQuestions()) {
+			if (question instanceof TextQuestion) {
+				textQuestions.add((TextQuestion) question);
+			} else if (question instanceof SingleChoiceQuestion) {
+				singleChoiceQuestionsTemp.add((SingleChoiceQuestion) question);
+			}
+		}
+
+		// Unterscheiden zwischen Best-First-Fragen und Best-In-The-Middle-Fragen
+		List<SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<SimpleEntry<String, SingleChoiceQuestion>>();
+		List<Choice> noAnswerChoices = new ArrayList<Choice>();
+		for (SingleChoiceQuestion question : singleChoiceQuestionsTemp) {
+			List<Choice> choicesTemp = question.getChoices();
+			Choice noAnswerChoice = null;
+			boolean containsNegativeGrade = false;
+
+			for (Choice choice : choicesTemp) {
+				if (choice.getGrade() < 0) {
+					containsNegativeGrade = true;
+				}
+				if (choice.getGrade() == 0) {
+					noAnswerChoice = choice;
+				}
+			}
+
+			// "keine Angabe"-Choice aus der Liste aller Choices entfernen und einer separaten Liste hinzufügen
+			if (noAnswerChoice != null) {
+				choicesTemp.remove(noAnswerChoice);
+			}
+			noAnswerChoices.add(noAnswerChoice);
+
+			if (containsNegativeGrade) {
+				// Choices absteigend sortieren und Frage der Liste von Best-In-The-Middle-Fragen hinzufügen
+				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
+				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
+			} else {
+				// Choices aufsteigend sortieren und Frage der Liste von Best-First-Fragen hinzufügen
+				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
+				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
+			}
+		}
+
 		model.addAttribute("questionnaire", questionnaire);
-		model.addAttribute("questionCount", questionnaire.getQuestions().size());
+		model.addAttribute("textQuestions", textQuestions);
+		model.addAttribute("singleChoiceQuestions", singleChoiceQuestions);
+		model.addAttribute("noAnswerChoices", noAnswerChoices);
+
 		return "questionnaire";
 	}
 
@@ -308,10 +370,10 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	@RequestMapping(value = "/evaluation", method = RequestMethod.POST)
 	String startEvaluation(Model model, @RequestParam int semester, @RequestParam int students, @RequestParam String tutors, @RequestParam int subject,
 			@RequestParam String semesterType, @RequestParam String revision, @RequestParam Map<String, String> allRequestParams)
-					throws ParticipantException, EvaluationException {
-		
-		int questionPosition = questionsService.findByName(revision).getQuestions().size(); 
-		
+			throws ParticipantException, EvaluationException {
+
+		int questionPosition = questionsService.findByName(revision).getQuestions().size();
+
 		if (semester > 0 && semester <= 8 && students > 1 && students < 1000) {
 			String generatedUid;
 
