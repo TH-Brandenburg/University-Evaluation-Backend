@@ -303,22 +303,22 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			RedirectAttributes redirectAttributes) {
 		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
 		String name = allRequestParams.get("name");
-		
+
 		boolean evaluationExistsForQuestionRevision = evaluationService.evaluationWithQuestionRevisionExists(Integer.parseInt(id));
-			
+
 		if (evaluationExistsForQuestionRevision) {
 			QuestionRevision newQuestionnaire = new QuestionRevision();
-			
+
 			List<String> revisionNames = questionsService.getRevisionNames();
-			for (String revisionName : revisionNames){
-				if (revisionName.equals(name)){
+			for (String revisionName : revisionNames) {
+				if (revisionName.equals(name)) {
 					String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 					name = name + " " + timestamp;
 				}
 			}
-			
+
 			newQuestionnaire.setName(name);
-			
+
 			int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
 			List<Question> questions = new ArrayList<Question>();
 			List<Choice> questionRevisionChoices = new ArrayList<Choice>();
@@ -330,7 +330,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			}
 			newQuestionnaire.setTextQuestionsFirst(textQuestionsFirst);
 
-			for( int i= 1 ;i <= questionCount ; i++){
+			for (int i = 1; i <= questionCount; i++) {
 				String questionType = allRequestParams.get("question-type-" + i);
 				if (questionType.equals("Textfrage")) {
 					TextQuestion textQuestion = new TextQuestion();
@@ -382,24 +382,24 @@ public class ViewController extends WebMvcConfigurerAdapter {
 					questions.add(singleChoiceQuestion);
 				}
 			}
-			
+
 			newQuestionnaire.setChoices(questionRevisionChoices);
 			newQuestionnaire.setQuestions(questions);
 			int questionnaireId = questionsService.saveQuestionRevision(newQuestionnaire).getId();
 			redirectAttributes.addFlashAttribute("success", true);
 			redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
-			return "redirect:/questionnaire/" + questionnaireId; 
+			return "redirect:/questionnaire/" + questionnaireId;
 
-		} else {	
+		} else {
 			List<Choice> oldChoices = questionnaire.getChoices();
 			List<Question> oldQuestions = questionnaire.getQuestions();
-			
+
 			int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
 			List<Question> questions = new ArrayList<Question>();
 			List<Choice> questionRevisionChoices = new ArrayList<Choice>();
-			
+
 			questionnaire.setName(name);
-		
+
 			boolean textQuestionsFirst = false;
 			String textQuestionsFirstString = allRequestParams.get("text-questions-first");
 			if (textQuestionsFirstString != null) {
@@ -407,7 +407,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			}
 			questionnaire.setTextQuestionsFirst(textQuestionsFirst);
 
-			for( int i= 1 ;i <= questionCount ; i++){
+			for (int i = 1; i <= questionCount; i++) {
 				String questionType = allRequestParams.get("question-type-" + i);
 				if (questionType.equals("Textfrage")) {
 					TextQuestion textQuestion = new TextQuestion();
@@ -450,7 +450,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 						noAnswerChoice.setGrade((short) 0);
 						choices.add(noAnswerChoice);
 					}
-		
+
 					singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
 					singleChoiceQuestion.setText(text);
 					singleChoiceQuestion.setChoices(choices);
@@ -466,24 +466,6 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
 			return "redirect:/questionnaire/" + id;
 		}
-	}
-
-	@RequestMapping(value = "/deleteMcQuestion/{id}", method = RequestMethod.POST)
-	String deleteMcQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
-		Question singleChoiceQuestion = questionsService.getMCQuestionById(Integer.parseInt(id));
-		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
-		questionnaire.getQuestions().remove(singleChoiceQuestion);
-		questionsService.updateQuestionRevision(questionnaire);
-		return "redirect:/questionnaire/" + questionnaireid + "?success";
-	}
-
-	@RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.POST)
-	String deleteQuestion(@PathVariable String id, @RequestParam String questionnaireid) {
-		Question textQuestion = questionsService.getQuestionById(Integer.parseInt(id));
-		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(questionnaireid));
-		questionnaire.getQuestions().remove(textQuestion);
-		questionsService.updateQuestionRevision(questionnaire);
-		return "redirect:/questionnaire/" + questionnaireid + "?success";
 	}
 
 	@RequestMapping(value = "/deleteQuestionnaire/{id}", method = RequestMethod.POST)
