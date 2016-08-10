@@ -214,10 +214,26 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
 		} else {
 			QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
+			String oldQuestionnaireName = questionnaire.getName();
+			int questionnaireId = questionnaire.getId();
 			List<Choice> oldChoices = questionnaire.getChoices();
 			List<Question> oldQuestions = questionnaire.getQuestions();
-
+			
+			String questionnaireName = allRequestParams.get("name");
+			List<String> revisionNames = questionsService.getRevisionNames();
+			
 			questionnaire = hydrateQuestionRevision(questionnaire, allRequestParams);
+			if(!oldQuestionnaireName.equals(questionnaireName)){
+				for (String revisionName : revisionNames) {
+					if (revisionName.equals(questionnaireName)) {
+						model.addAttribute("questionnaire", questionnaire);
+						model.addAttribute("success", false);
+						model.addAttribute("message", "Ein Fragebogen mit diesem Namen existiert bereits.");
+						setupQuestionnaireModel(model, questionnaire);
+						return "redirect:/questionnaire/" + questionnaireId;
+					}
+				}
+			}
 
 			questionsService.updateQuestionRevision(questionnaire);
 			questionsService.deleteQuestionsAndChoices(oldChoices, oldQuestions);
