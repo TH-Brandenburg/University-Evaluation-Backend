@@ -183,7 +183,16 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
 	String getQuestionRevision(@PathVariable String id, Model model) {
-		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
+		QuestionRevision questionnaire = null;
+		
+        if (model.containsAttribute("questionnaire")) {
+            Object questionnaireTemp = model.asMap().get("questionnaire");
+            if (questionnaireTemp != null && questionnaireTemp instanceof QuestionRevision) {
+                questionnaire = (QuestionRevision) questionnaireTemp;
+            }
+        } else {
+            questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
+        }
 
 		setupQuestionnaireModel(model, questionnaire);
 
@@ -226,10 +235,9 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			if(!oldQuestionnaireName.equals(questionnaireName)){
 				for (String revisionName : revisionNames) {
 					if (revisionName.equals(questionnaireName)) {
-						model.addAttribute("questionnaire", questionnaire);
-						model.addAttribute("success", false);
-						model.addAttribute("message", "Ein Fragebogen mit diesem Namen existiert bereits.");
-						setupQuestionnaireModel(model, questionnaire);
+						redirectAttributes.addFlashAttribute("questionnaire", questionnaire);
+						redirectAttributes.addFlashAttribute("success", false);
+						redirectAttributes.addFlashAttribute("message", "Ein Fragebogen mit diesem Namen existiert bereits.");
 						return "redirect:/questionnaire/" + questionnaireId;
 					}
 				}
