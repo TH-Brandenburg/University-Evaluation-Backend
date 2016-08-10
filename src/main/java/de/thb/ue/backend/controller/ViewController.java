@@ -162,13 +162,17 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		questionnaire = hydrateQuestionRevision(questionnaire, allRequestParams);
 		String questionnaireName = allRequestParams.get("name");
 		List<String> revisionNames = questionsService.getRevisionNames();
+
 		for (String revisionName : revisionNames) {
 			if (revisionName.equals(questionnaireName)) {
 				model.addAttribute("questionnaire", questionnaire);
+				model.addAttribute("success", false);
+				model.addAttribute("message", "Ein Fragebogen mit diesem Namen existiert bereits.");
+				setupQuestionnaireModel(model, questionnaire);
 				return "newQuestionnaire";
 			}
 		}
-		
+
 		int id = questionsService.saveQuestionRevision(questionnaire).getId();
 
 		redirectAttributes.addFlashAttribute("success", true);
@@ -181,55 +185,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String getQuestionRevision(@PathVariable String id, Model model) {
 		QuestionRevision questionnaire = questionsService.getRevisionById(Integer.parseInt(id));
 
-		// Unterscheiden zwischen Textfragen und Single-Choice-Fragen
-		List<TextQuestion> textQuestions = new ArrayList<TextQuestion>();
-		List<SingleChoiceQuestion> singleChoiceQuestionsTemp = new ArrayList<SingleChoiceQuestion>();
-		for (Question question : questionnaire.getQuestions()) {
-			if (question instanceof TextQuestion) {
-				textQuestions.add((TextQuestion) question);
-			} else if (question instanceof SingleChoiceQuestion) {
-				singleChoiceQuestionsTemp.add((SingleChoiceQuestion) question);
-			}
-		}
-
-		// Unterscheiden zwischen Best-First-Fragen und Best-In-The-Middle-Fragen
-		List<SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<SimpleEntry<String, SingleChoiceQuestion>>();
-		List<Choice> noAnswerChoices = new ArrayList<Choice>();
-		for (SingleChoiceQuestion question : singleChoiceQuestionsTemp) {
-			List<Choice> choicesTemp = question.getChoices();
-			Choice noAnswerChoice = null;
-			boolean containsNegativeGrade = false;
-
-			for (Choice choice : choicesTemp) {
-				if (choice.getGrade() < 0) {
-					containsNegativeGrade = true;
-				}
-				if (choice.getGrade() == 0) {
-					noAnswerChoice = choice;
-				}
-			}
-
-			// "keine Angabe"-Choice aus der Liste aller Choices entfernen und einer separaten Liste hinzufügen
-			if (noAnswerChoice != null) {
-				choicesTemp.remove(noAnswerChoice);
-			}
-			noAnswerChoices.add(noAnswerChoice);
-
-			if (containsNegativeGrade) {
-				// Choices absteigend sortieren und Frage der Liste von Best-In-The-Middle-Fragen hinzufügen
-				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
-				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
-			} else {
-				// Choices aufsteigend sortieren und Frage der Liste von Best-First-Fragen hinzufügen
-				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
-				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
-			}
-		}
-
-		model.addAttribute("questionnaire", questionnaire);
-		model.addAttribute("textQuestions", textQuestions);
-		model.addAttribute("singleChoiceQuestions", singleChoiceQuestions);
-		model.addAttribute("noAnswerChoices", noAnswerChoices);
+		setupQuestionnaireModel(model, questionnaire);
 
 		return "questionnaire";
 	}
@@ -250,7 +206,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 					newQuestionnaire.setName(name);
 				}
 			}
-			
+
 			int questionnaireId = questionsService.saveQuestionRevision(newQuestionnaire).getId();
 			redirectAttributes.addFlashAttribute("success", true);
 			redirectAttributes.addFlashAttribute("message", "Der Fragebogen wurde erfolgreich aktualisiert.");
@@ -262,7 +218,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			List<Question> oldQuestions = questionnaire.getQuestions();
 
 			questionnaire = hydrateQuestionRevision(questionnaire, allRequestParams);
-			
+
 			questionsService.updateQuestionRevision(questionnaire);
 			questionsService.deleteQuestionsAndChoices(oldChoices, oldQuestions);
 			redirectAttributes.addFlashAttribute("success", true);
@@ -480,15 +436,15 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		return mav;
 
 	}
-	
-	private QuestionRevision hydrateQuestionRevision(QuestionRevision questionRevision, Map<String, String> allRequestParams){
+
+	private QuestionRevision hydrateQuestionRevision(QuestionRevision questionRevision, Map<String, String> allRequestParams) {
 		int questionCount = Integer.parseInt(allRequestParams.get("question-count"));
 		List<Question> questions = new ArrayList<Question>();
 		List<Choice> questionRevisionChoices = new ArrayList<Choice>();
 
 		String questionnaireName = allRequestParams.get("name");
 		questionRevision.setName(questionnaireName);
-		
+
 		boolean textQuestionsFirst = false;
 		String textQuestionsFirstString = allRequestParams.get("text-questions-first");
 		if (textQuestionsFirstString != null) {
@@ -551,8 +507,60 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
 		questionRevision.setChoices(questionRevisionChoices);
 		questionRevision.setQuestions(questions);
-		
+
 		return questionRevision;
+	}
+
+	private void setupQuestionnaireModel(Model model, QuestionRevision questionnaire) {
+		// Unterscheiden zwischen Textfragen und Single-Choice-Fragen
+		List<TextQuestion> textQuestions = new ArrayList<TextQuestion>();
+		List<SingleChoiceQuestion> singleChoiceQuestionsTemp = new ArrayList<SingleChoiceQuestion>();
+		for (Question question : questionnaire.getQuestions()) {
+			if (question instanceof TextQuestion) {
+				textQuestions.add((TextQuestion) question);
+			} else if (question instanceof SingleChoiceQuestion) {
+				singleChoiceQuestionsTemp.add((SingleChoiceQuestion) question);
+			}
+		}
+
+		// Unterscheiden zwischen Best-First-Fragen und Best-In-The-Middle-Fragen
+		List<SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<SimpleEntry<String, SingleChoiceQuestion>>();
+		List<Choice> noAnswerChoices = new ArrayList<Choice>();
+		for (SingleChoiceQuestion question : singleChoiceQuestionsTemp) {
+			List<Choice> choicesTemp = question.getChoices();
+			Choice noAnswerChoice = null;
+			boolean containsNegativeGrade = false;
+
+			for (Choice choice : choicesTemp) {
+				if (choice.getGrade() < 0) {
+					containsNegativeGrade = true;
+				}
+				if (choice.getGrade() == 0) {
+					noAnswerChoice = choice;
+				}
+			}
+
+			// "keine Angabe"-Choice aus der Liste aller Choices entfernen und einer separaten Liste hinzufügen
+			if (noAnswerChoice != null) {
+				choicesTemp.remove(noAnswerChoice);
+			}
+			noAnswerChoices.add(noAnswerChoice);
+
+			if (containsNegativeGrade) {
+				// Choices absteigend sortieren und Frage der Liste von Best-In-The-Middle-Fragen hinzufügen
+				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
+				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
+			} else {
+				// Choices aufsteigend sortieren und Frage der Liste von Best-First-Fragen hinzufügen
+				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
+				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
+			}
+		}
+
+		model.addAttribute("questionnaire", questionnaire);
+		model.addAttribute("textQuestions", textQuestions);
+		model.addAttribute("singleChoiceQuestions", singleChoiceQuestions);
+		model.addAttribute("noAnswerChoices", noAnswerChoices);
 	}
 
 }
