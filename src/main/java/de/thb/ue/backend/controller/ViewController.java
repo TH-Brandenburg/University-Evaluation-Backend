@@ -160,7 +160,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String saveNewQuestionnaire(@RequestParam Map<String, String> allRequestParams, Model model, RedirectAttributes redirectAttributes) {
 		QuestionRevision questionnaire = new QuestionRevision();
 		questionnaire = hydrateQuestionRevision(questionnaire, allRequestParams);
-		String questionnaireName = allRequestParams.get("name");
+		String questionnaireName = allRequestParams.get("name").trim();
 		List<String> revisionNames = questionsService.getRevisionNames();
 
 		for (String revisionName : revisionNames) {
@@ -206,7 +206,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		if (evaluationExistsForQuestionRevision) {
 			QuestionRevision newQuestionnaire = new QuestionRevision();
 			newQuestionnaire = hydrateQuestionRevision(newQuestionnaire, allRequestParams);
-			String name = allRequestParams.get("name");
+			String name = allRequestParams.get("name").trim();
 			List<String> revisionNames = questionsService.getRevisionNames();
 			for (String revisionName : revisionNames) {
 				if (revisionName.equals(name)) {
@@ -228,7 +228,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			List<Choice> oldChoices = questionnaire.getChoices();
 			List<Question> oldQuestions = questionnaire.getQuestions();
 			
-			String questionnaireName = allRequestParams.get("name");
+			String questionnaireName = allRequestParams.get("name").trim();
 			List<String> revisionNames = questionsService.getRevisionNames();
 			
 			questionnaire = hydrateQuestionRevision(questionnaire, allRequestParams);
