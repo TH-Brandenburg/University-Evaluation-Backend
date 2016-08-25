@@ -210,8 +210,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			List<String> revisionNames = questionsService.getRevisionNames();
 			for (String revisionName : revisionNames) {
 				if (revisionName.equals(name)) {
-					String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-					name = name + " " + timestamp;
+					String timestamp = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date());
+					name = name + " (" + timestamp + ")";
 					newQuestionnaire.setName(name);
 				}
 			}
