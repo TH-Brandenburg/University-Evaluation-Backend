@@ -211,6 +211,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			for (String revisionName : revisionNames) {
 				if (revisionName.equals(name)) {
 					String timestamp = new SimpleDateFormat("(yyyy.MM.dd HH:mm:ss)").format(new Date());
+					name = name.replaceAll("^(.*)\\(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2}:\\d{2}\\)$", "$1");
 					name = name + " " + timestamp;
 					newQuestionnaire.setName(name);
 				}
