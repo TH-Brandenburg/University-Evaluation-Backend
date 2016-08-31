@@ -409,144 +409,144 @@ public class DBInit {
 
     public static List<MCQuestion> getComputerScienceMCQuestionsV2(){
         List<MCQuestion> out = new ArrayList<>();
-//1
+        //Studentin
         out.add(new MCQuestion("Haben Sie die LV regelmäßig besucht?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("immer", (short) 1));
             add(new Choice("oft", (short) 2));
             add(new Choice("mittel", (short) 3));
             add(new Choice("selten", (short) 4));
             add(new Choice("nie", (short) 5));
         }}));
-//2
+
         out.add(new MCQuestion("Haben Sie Interesse an dem Fach?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("sehr groß", (short) 1));
             add(new Choice("groß", (short) 2));
             add(new Choice("mittel", (short) 3));
             add(new Choice("klein", (short) 4));
             add(new Choice("sehr klein", (short) 5));
         }}));
-//3
+
         out.add(new MCQuestion("Wie fanden Sie das Niveau der Lehrveranstaltung?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
-            add(new Choice("zu hoch", (short) 5));
-            add(new Choice("hoch", (short) 3));
-            add(new Choice("optimal", (short) 1));
-            add(new Choice("niedrig", (short) -3));
-            add(new Choice("zu niedrig", (short) -5));
+            add(new Choice("k.A", (short) 0));
+            add(new Choice("zu hoch", (short) 1));
+            add(new Choice("hoch", (short) 2));
+            add(new Choice("optimal", (short) 3));
+            add(new Choice("niedrig", (short) 4));
+            add(new Choice("zu niedrig", (short) 5));
         }}));
-//4
+
         out.add(new MCQuestion("Seine/Ihre Sprache und Ausdrucksweise sind stets klar verständlich.", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
             add(new Choice("unentschieden", (short) 3));
             add(new Choice("stimme eher nicht zu", (short) 4));
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
-//5
+
         out.add(new MCQuestion("Er/Sie kann schwierige Sachverhalte verständlich erklären.", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
             add(new Choice("unentschieden", (short) 3));
             add(new Choice("stimme eher nicht zu", (short) 4));
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
-//6
+
         out.add(new MCQuestion("Ging er/sie auf Fragen innerhalb der LV ein?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("immer", (short) 1));
             add(new Choice("oft", (short) 2));
             add(new Choice("mittel", (short) 3));
             add(new Choice("selten", (short) 4));
             add(new Choice("nie", (short) 5));
         }}));
-//7
+
         out.add(new MCQuestion("War er/sie stets gut auf die LV vorbereitet?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("immer", (short) 1));
             add(new Choice("oft", (short) 2));
             add(new Choice("mittel", (short) 3));
             add(new Choice("selten", (short) 4));
             add(new Choice("nie", (short) 5));
         }}));
-//8
+
         out.add(new MCQuestion("Welche Gesamtnote geben Sie dem Dozenten/der Dozentin?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
             add(new Choice("befriedigend", (short) 3));
             add(new Choice("ausreichend", (short) 4));
             add(new Choice("ungenügend", (short) 5));
         }}));
-//9
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie den Lehrunterlagen (Skript, Moodle, Handouts)?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+
+        out.add(new MCQuestion("Welche Gesamtnote geben Sie den Lehrunterlagen?", new ArrayList<Choice>() {{
+            add(new Choice("k.A", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
             add(new Choice("befriedigend", (short) 3));
             add(new Choice("ausreichend", (short) 4));
             add(new Choice("ungenügend", (short) 5));
         }}));
-//10
+
         out.add(new MCQuestion("Die Stoffpräsentation der LV war stets klar und gut strukturiert.", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
             add(new Choice("unentschieden", (short) 3));
             add(new Choice("stimme eher nicht zu", (short) 4));
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
-//11
+
         out.add(new MCQuestion("Wie war die Stoffmenge im Verhältnis zur verfügbaren Zeit?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
-            add(new Choice("sehr viel Stoff", (short) 5));
-            add(new Choice("viel Stoff", (short) 3));
-            add(new Choice("optimal", (short) 1));
-            add(new Choice("wenig Stoff", (short) -3));
-            add(new Choice("sehr wenig Stoff", (short) -5));
+            add(new Choice("k.A", (short) 0));
+            add(new Choice("sehr viel Stoff", (short) 1));
+            add(new Choice("viel Stoff", (short) 2));
+            add(new Choice("optimal", (short) 3));
+            add(new Choice("wenig Stoff", (short) 4));
+            add(new Choice("sehr wenig Stoff", (short) 5));
         }}));
-//12
+
         out.add(new MCQuestion("Die Übung war nützlich. Sie war sehr gut geeignet, die Vorlesungsinhalte zu verdeutlichen und zu vertiefen.", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("stimme zu", (short) 1));
             add(new Choice("stimme eher zu", (short) 2));
             add(new Choice("unentschieden", (short) 3));
             add(new Choice("stimme eher nicht zu", (short) 4));
             add(new Choice("stimme nicht zu", (short) 5));
         }}));
-//13
+
         out.add(new MCQuestion("Wie beurteilen Sie den Übungsanteil im Vergleich zum Vorlesungsanteil?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
-            add(new Choice("sehr viel Übung", (short) 5));
-            add(new Choice("viel Übung", (short) 3));
-            add(new Choice("optimal", (short) 1));
-            add(new Choice("wenig Übung", (short) -3));
-            add(new Choice("sehr wenig Übung", (short) -5));
+            add(new Choice("k.A", (short) 0));
+            add(new Choice("sehr viel Übung", (short) 1));
+            add(new Choice("viel Übung", (short) 2));
+            add(new Choice("optimal", (short) 3));
+            add(new Choice("wenig Übung", (short) 4));
+            add(new Choice("zu wenig Übung", (short) 5));
         }}));
-//14
+
         out.add(new MCQuestion("Wie beurteilen Sie den Medieneinsatz der LV? (Beamer, Tafel, Overheadprojektor, Mobil-Telefone...)", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
-            add(new Choice("sehr viel Medien", (short) 5));
-            add(new Choice("viel Medien", (short) 3));
-            add(new Choice("optimal", (short) 1));
-            add(new Choice("wenig Medien", (short) -3));
-            add(new Choice("sehr wenig Medien", (short) -5));
+            add(new Choice("k.A", (short) 0));
+            add(new Choice("sehr viel Medien", (short) 1));
+            add(new Choice("viel Medien", (short) 2));
+            add(new Choice("optimal", (short) 3));
+            add(new Choice("wenig Medien", (short) 4));
+            add(new Choice("sehr wenig Medien", (short) 5));
         }}));
-//15
+
         out.add(new MCQuestion("Wie beurteilen Sie Ihren persönlichen Lernerfolg in dieser LV?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+            add(new Choice("k.A", (short) 0));
             add(new Choice("sehr groß", (short) 1));
             add(new Choice("groß", (short) 2));
             add(new Choice("mittel", (short) 3));
             add(new Choice("klein", (short) 4));
             add(new Choice("sehr klein", (short) 5));
         }}));
-//16
-        out.add(new MCQuestion("Welche Gesamtnote geben Sie der Lehrveranstaltung?", new ArrayList<Choice>() {{
-            add(new Choice("keine Angabe", (short) 0));
+
+        out.add(new MCQuestion("Welche Gesamtnote geben Sie der LV?", new ArrayList<Choice>() {{
+            add(new Choice("k.A", (short) 0));
             add(new Choice("sehr gut", (short) 1));
             add(new Choice("gut", (short) 2));
             add(new Choice("befriedigend", (short) 3));

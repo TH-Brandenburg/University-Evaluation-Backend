@@ -19,6 +19,7 @@ package de.thb.ue.backend.service;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
+import de.thb.ue.backend.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.joda.time.LocalDateTime;
@@ -55,10 +56,6 @@ import de.thb.ue.backend.service.interfaces.IEvaluationService;
 import de.thb.ue.backend.service.interfaces.IParticipantService;
 import de.thb.ue.backend.service.interfaces.ISubjectService;
 import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
-import de.thb.ue.backend.util.QRCGeneration;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.backend.util.ZipHelper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -103,8 +100,7 @@ public class EvaluationService implements IEvaluationService {
         String uid = UUID.randomUUID().toString();
 
         QuestionRevision questionRevision = questionRevisionRepo.findByName(revisionName).get(0);
-        Evaluation evaluation = evaluationRepo.save(new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
-                questionRevision, null, students, 0));
+        Evaluation evaluation = evaluationRepo.save(new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false, questionRevision, null, students, 0));
         participantService.add(students, evaluation);
         return uid;
     }
@@ -183,7 +179,8 @@ public class EvaluationService implements IEvaluationService {
                                 FileUtils.moveFile(tmpFile, new File(workingDirectory, newName + ".zip"));
                             }
                         }
-                        if (imageFolder.exists()) {
+                        if (false){ //<-löschen
+                                //imageFolder.exists()) {
                             imageFolder.delete();
                         }
                     }
@@ -271,5 +268,38 @@ public class EvaluationService implements IEvaluationService {
             throw new DBEntryDoesNotExistException("Evaluation with uid: " + evaluationUID + " does not exist");
         }
         return out;
+    }
+
+    public File getImageFile(String evaluationUID, int voteID) throws
+            EvaluationException, DBEntryDoesNotExistException {
+        Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
+        File out;
+        File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
+
+        if (evaluation != null && evaluation.getClosed()) {
+            File file = new File(workingDirectory, (voteID+".zip"));
+            if (file.exists() && file.canRead()) {
+                out = file;
+            } else {
+                throw new EvaluationException(EvaluationException.READ_RESULT_FILE, "Image file does not exist or can't be read ");
+            }
+        } else {
+            throw new DBEntryDoesNotExistException("Picturecomments from Vote: " + voteID + " does not exist in this Evaluation");
+        }
+        return out;
+    }
+
+    public Boolean imageExists(String evaluationUID, int voteID) {
+        Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
+        Boolean exists = false;
+        File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
+
+        if (evaluation != null && evaluation.getClosed()) {
+            File file = new File(workingDirectory, (voteID+".zip"));
+            if (file.exists() && file.canRead()) {
+                exists=true;
+            }
+        }
+        return exists;
     }
 }

@@ -57,4 +57,8 @@ public interface IEvaluationService {
 
     File getSummaryFile(String evaluationUID) throws EvaluationException, DBEntryDoesNotExistException;
 
+    File getImageFile(String evaluationUID, int voteID) throws EvaluationException, DBEntryDoesNotExistException;
+
+    Boolean imageExists(String evaluationUID, int voteID);
+
 }
