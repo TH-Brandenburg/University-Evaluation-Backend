@@ -29,10 +29,7 @@ import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.ISCQuestion;
 import de.thb.ue.backend.repository.ITextQuestion;
 import de.thb.ue.backend.service.interfaces.*;
-import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
-import de.thb.ue.backend.util.QRCGeneration;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.backend.util.ZipHelper;
+import de.thb.ue.backend.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -130,15 +127,15 @@ public class EvaluationService implements IEvaluationService {
         Subject subjectToEvaluate = subjectService.getByID(subject);
 
         //FIXME: getByUsername()
-        List<Tutor> tutorsForEvaluation = tutorService.getByFamilyName(tutor);
-        if (tutorsForEvaluation == null || tutorsForEvaluation.isEmpty()) {
+        Tutor tutorForEvaluation = tutorService.getByUsername(tutor);
+        if (tutorForEvaluation == null) {
             log.error("Tutor was unknown!");
         }
 
         String uid = UUID.randomUUID().toString();
 
         QuestionRevision questionRevision = questionRevisionRepo.findByName(revision).get(0);
-        Evaluation evaluation = new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
+        Evaluation evaluation = new Evaluation(uid, LocalDateTime.now(), semester, Collections.singletonList(tutorForEvaluation), subjectToEvaluate, type, false,
                 questionRevision, null, students, 0, adhocQuestions);
 
         evaluationRepo.save(evaluation);

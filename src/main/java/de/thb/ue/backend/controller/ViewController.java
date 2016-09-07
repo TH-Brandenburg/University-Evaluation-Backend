@@ -97,13 +97,11 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String index(Model model) {
 		// TODO
 		LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		List<Tutor> tutors = tutorService.getByFamilyName(user.getUsername());
+		Tutor tutor = tutorService.getByUsername(user.getUsername());
 		List<Evaluation> evaluations;
 
-		if (tutors != null && !tutors.isEmpty()) {
-
-			evaluations = tutors.get(0).getEvaluations().stream().filter(evaluation -> !evaluation.getClosed()).collect(Collectors.toList());
-
+		if (tutor != null) {
+			evaluations = tutor.getEvaluations().stream().filter(evaluation -> !evaluation.getClosed()).collect(Collectors.toList());
 		} else {
 			// TODO delete workaround
 			log.debug("Logged in user was no tutor.");
@@ -129,7 +127,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		// TODo
 		model.addAttribute("tutors", new ArrayList<Tutor>() {
 			{
-				add(new Tutor("", user.getUsername(), Department.COMPUTER_SCIENCE_MEDIA, null));
+				add(new Tutor("", "", user.getUsername(), Department.COMPUTER_SCIENCE_MEDIA, null));
 			}
 		});
 		model.addAttribute("subjects", subjectService.getAll());

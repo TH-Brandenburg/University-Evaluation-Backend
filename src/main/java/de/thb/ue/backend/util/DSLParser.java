@@ -44,12 +44,12 @@ public class DSLParser {
 	 * aText + QUOTE; }
 	 */
 
-	public static void main(String[] args) throws IOException {
+	//public static void main(String[] args) throws IOException {
 		// ReadWithScanner parser = new ReadWithScanner("test.txt");
 		// parser.processLineByLine();
 		// CreateXML(data_out);
 		// log("\nDone.");
-	}
+	//}
 
 	public DSLParser(String FileName) {
 		FilePath = Paths.get(FileName);
