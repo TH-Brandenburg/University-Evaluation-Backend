@@ -23,8 +23,11 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.IChoice;
 import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
+import de.thb.ue.backend.repository.ISCQuestion;
+import de.thb.ue.backend.repository.ITextQuestion;
 import de.thb.ue.backend.service.interfaces.*;
 import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
 import de.thb.ue.backend.util.QRCGeneration;
@@ -77,6 +80,15 @@ public class EvaluationService implements IEvaluationService {
     @Autowired
     private IQuestionRevision questionRevisionRepo;
 
+    @Autowired
+    private ISCQuestion scQuestionRepo;
+
+    @Autowired
+    private ITextQuestion textQuestionRepo;
+
+    @Autowired
+    private IChoice choiceRepo;
+
     @Override
     public String add(int semester, int students, String tutor, int subject, SemesterType type, String revisionName) throws ParticipantException, EvaluationException {
 
@@ -98,13 +110,40 @@ public class EvaluationService implements IEvaluationService {
 
     @Override
     public String add(int semester, int students, String tutor, int subject, SemesterType type, String revision, List<Question> adhocQuestions) throws ParticipantException, EvaluationException {
-        Evaluation evaluation = evaluationRepo.findByUID(add(semester, students, tutor, subject, type, revision));
-        for (Question element : adhocQuestions){
+
+    	for (Question element : adhocQuestions){
             if(!element.isAdhocQuestion()){
                 element.setAdhocQuestion(true);
             }
+            if(element instanceof TextQuestion) {
+            	textQuestionRepo.save(element);
+            } else if (element instanceof SingleChoiceQuestion) {
+            	SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) element;
+            	List<Choice> choiceList = singleChoiceQuestion.getChoices();
+            	for(Choice choice : choiceList){
+            		choiceRepo.save(choice);
+            	}
+            	scQuestionRepo.save(element);
+            }
         }
-        evaluation.setAdhocQuestions(adhocQuestions);
+
+        Subject subjectToEvaluate = subjectService.getByID(subject);
+
+        //FIXME: getByUsername()
+        List<Tutor> tutorsForEvaluation = tutorService.getByFamilyName(tutor);
+        if (tutorsForEvaluation == null || tutorsForEvaluation.isEmpty()) {
+            log.error("Tutor was unknown!");
+        }
+
+        String uid = UUID.randomUUID().toString();
+
+        QuestionRevision questionRevision = questionRevisionRepo.findByName(revision).get(0);
+        Evaluation evaluation = new Evaluation(uid, LocalDateTime.now(), semester, tutorsForEvaluation, subjectToEvaluate, type, false,
+                questionRevision, null, students, 0, adhocQuestions);
+
+        evaluationRepo.save(evaluation);
+        participantService.add(students, evaluation);
+
         return evaluation.getUid();
     }
 
@@ -128,7 +167,7 @@ public class EvaluationService implements IEvaluationService {
         for (Participant participant : participantService.getByEvaluation(evaluation)) {
             try {
                 out.add(QRCGeneration.generateQRC("{\"host\":\"" + hostAddress + "\", \"token\":\"" + participant.getVoteToken() + " \"}",
-                        QRCGeneration.SIZE_SMALL, ErrorCorrectionLevel.L, QRCGeneration.ENCODING_UTF_8));
+                        QRCGeneration.SIZE_LARGE, ErrorCorrectionLevel.L, QRCGeneration.ENCODING_UTF_8));
             } catch (IOException | WriterException e) {
                 log.error("Error while generating Token list for Evaluation: " + evaluationUID);
             }
@@ -196,7 +235,21 @@ public class EvaluationService implements IEvaluationService {
                 participantService.deleteByEvaluation(evaluation);
             } else {
                 participantService.deleteByEvaluation(evaluation);
+                List<Question> additionalQuestions = evaluation.getAdhocQuestions();
                 evaluationRepo.delete(evaluation);
+                for ( Question question : additionalQuestions ){
+                	if(question.getType() == QuestionType.TextQuestion){
+                		textQuestionRepo.delete(question);
+                	} else if (question.getType() == QuestionType.SingleChoiceQuestion){
+                		SingleChoiceQuestion singleChoiceQuestion = (SingleChoiceQuestion) question;
+                		List<Choice> choices = singleChoiceQuestion.getChoices();
+                		scQuestionRepo.delete(question);
+                		for (Choice choice : choices) {
+                			choiceRepo.delete(choice);
+                		}
+
+                	}
+                }
             }
             if (qrCodesFile.exists()) {
                 qrCodesFile.delete();
@@ -271,5 +324,11 @@ public class EvaluationService implements IEvaluationService {
             throw new DBEntryDoesNotExistException("Evaluation with uid: " + evaluationUID + " does not exist");
         }
         return out;
+    }
+
+    @Override
+    public boolean evaluationWithQuestionRevisionExists(int questionRevisionId){
+    	List<Evaluation> evaluationList = evaluationRepo.findByQuestionRevisionId(questionRevisionId);
+    	return !evaluationList.isEmpty();
     }
 }

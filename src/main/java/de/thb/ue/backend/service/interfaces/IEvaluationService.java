@@ -63,5 +63,7 @@ public interface IEvaluationService {
     File getQRCodeFile(String evaluationUID) throws EvaluationException, DBEntryDoesNotExistException;
 
     File getSummaryFile(String evaluationUID) throws EvaluationException, DBEntryDoesNotExistException;
+    
+    boolean evaluationWithQuestionRevisionExists(int questionRevisionId);
 
 }

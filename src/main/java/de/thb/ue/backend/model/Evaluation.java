@@ -21,6 +21,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
@@ -71,7 +74,8 @@ public class Evaluation extends BaseModel {
     @NotNull
     private Integer studentsVoted;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
+    @Fetch (FetchMode.SELECT)
     private List<Question> adhocQuestions;
 
     @Override

@@ -21,6 +21,9 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,11 +42,13 @@ public class QuestionRevision extends BaseModel {
     private String name;
 
     @NotNull
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch (FetchMode.SELECT)
     private List<Question> questions;
 
     @NotNull
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch (FetchMode.SELECT)
     private List<Choice> choices;
 
     @NotNull

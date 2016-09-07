@@ -1,179 +1,256 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="stdTemplate :: #head"></head>
 
 <body>
-<!-- Navigation bar -->
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">THB Evaluation</a>
-        </div>
+	<!-- Navigation bar -->
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">THB Evaluation</a>
+			</div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li><a th:href="@{/new-evaluation}">Neue Evaluation</a></li>
-                <li><a th:href="@{/}">Dashboard</a></li>
-                <li class="active"><a th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
-                <li><a th:href="@{/archive}">Archiv</a></li>
-                <li><a href="http://evaluation.th-brandenburg.de/mediawiki">Wiki</a></li>
-                <li><a th:href="@{/logout}" id="logout">Log Out</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a th:href="@{/new-evaluation}">Neue Evaluation</a></li>
+					<li><a th:href="@{/}">Dashboard</a></li>
+					<li class="active"><a th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
+					<li><a th:href="@{/archive}">Archiv</a></li>
+					<li><a href="http://evaluation.th-brandenburg.de/mediawiki">Wiki</a></li>
+					<li><a th:href="@{/logout}" id="logout">Log Out</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-<!-- Content -->
-<div class="container">
-    <div class="row">
-        <div class="col-sm-3"></div>
+	<!-- Content -->
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-3"></div>
 
-        <div class="col-sm-6">
-            <div th:if="${param.success}" class="alert alert-success alert-dismissable alert-link" role="alert">
-                <button class="close" type="button" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <p>Der Fragebogen wurde erfolgreich aktualisiert.</p>
-            </div>
-        </div>
-        <div class="col-sm-3"></div>
-    </div>
-    <div class="row">
-        <div class="col-sm-3"></div>
-        <div class="col-sm-6">
-            <th:block th:each="question: ${questionnaire.questions}">
-                <form th:id="'delete-question-' + ${question.id}" th:action="@{'/deleteQuestion/' + ${question.id}}"
-                      th:method="POST">
-                    <input type="hidden" name="questionnaireid" th:value="${questionnaire.id}"/>
-                </form>
-            </th:block>
+			<div class="col-sm-6">
+				<div th:if="${success != null}" class="alert alert-dismissable alert-link" th:classappend="${success} ? 'alert-success' : 'alert-danger'" role="alert">
+					<button class="close" type="button" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<p th:text="${message}"></p>
+				</div>
+			</div>
 
-            <form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
-                <input type="hidden" name="question-count" th:value="${questionCount}"/>
-                <input type="hidden" name="mc-question-count" th:value="${mcQuestionCount}"/>
-                <div class="panel panel-thb">
-                    <div class="panel-heading panel-heading-thb">
-                        <h3 class="panel-title">Allgemeine Angaben</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="name" th:value="${questionnaire.name}" class="form-control"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <div class="checkbox">
-                                    <label>
-                                        <th:block th:if="${questionnaire.textQuestionsFirst}">
-                                            <input type="checkbox" name="text-questions-first" checked="checked"
-                                                   value="true"/>Textfragen zuerst
-                                        </th:block>
-                                        <th:block th:unless="${questionnaire.textQuestionsFirst}">
-                                            <input type="checkbox" name="text-questions-first" value="true"/>Textfragen
-                                            zuerst
-                                        </th:block>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+			<div class="col-sm-3"></div>
+		</div>
 
-                <th:block th:each="question, rowStat : ${questionnaire.questions}">
-                    <div class="panel panel-thb">
+		<div class="row">
+			<div class="col-sm-3"></div>
 
-                        <div th:if="${question.type == T(de.thb.ue.backend.util.QuestionType).TextQuestion}"
-                             class="panel-heading panel-heading-thb">
-                            <h3 class="panel-title">
-                                Textfrage
-                                <th:block th:text="${rowStat.count}">1</th:block>
-									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"
-                                          style="cursor: pointer;"
-                                          title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
-                                          th:attr="data-delete-method=@{'deleteQuestion(' + ${question.id} + ')'}"></span>
-                            </h3>
+			<div class="col-sm-6">
+				<!-- General Information -->
+				<form th:action="@{'/questionnaire/' + ${questionnaire.id}}" th:method="POST" class="form-horizontal">
+					<input type="hidden" id="question-count" name="question-count" th:value="${textQuestions.size()} + ${singleChoiceQuestions.size()}" />
+					<div class="panel panel-thb">
+						<div class="panel-heading panel-heading-thb">
+							<h3 class="panel-title">Allgemeine Angaben</h3>
+						</div>
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Name</label>
+								<div class="col-sm-9">
+									<input type="text" name="name" th:value="${questionnaire.name}" class="form-control" required="required"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-3 col-sm-9">
+									<div class="checkbox">
+										<label> <th:block th:if="${questionnaire.textQuestionsFirst}">
+												<input type="checkbox" name="text-questions-first" checked="checked" value="true" />Textfragen zuerst
+											</th:block> <th:block th:unless="${questionnaire.textQuestionsFirst}">
+												<input type="checkbox" name="text-questions-first" value="true" />Textfragen zuerst
+											</th:block>
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-                            <div class="panel-body">
-                                <label class="col-sm-3 control-label">Fragetext</label>
-                                <div class="col-sm-9">
-									<textarea th:name="'question-text-' + ${rowStat.count}" class="form-control"
-                                              rows="4"><th:block
-                                            th:text="${question.text}">Fragetext</th:block></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div th:if="${question.type == T(de.thb.ue.backend.util.QuestionType).SingleChoiceQuestion}"
-                             class="panel-heading panel-heading-thb">
-                            <h3 class="panel-title">
-                                Ratingfrage
-                                <th:block th:text="${rowStat.count}">1</th:block>
-									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"
-                                          style="cursor: pointer;"
-                                          title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"
-                                          th:attr="data-delete-method=@{'deleteQuestion(' + ${question.id} + ')'}"></span>
-                            </h3>
-                            <div class="panel-body">
-                                <label class="col-sm-3 control-label">Fragetext</label>
-                                <div class="col-sm-9">
-									<textarea th:name="'mc-question-text-' + ${rowStat.count}" class="form-control"
-                                              rows="4"><th:block
-                                            th:text="${question.text}">Fragetext</th:block></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </th:block>
+					<!-- Text questions -->
+					<th:block th:each="question, rowStat : ${textQuestions}">
+						<div class="panel panel-thb" th:id="'question-panel-' + ${rowStat.count}">
+							<div class="panel-heading panel-heading-thb">
+								<h3 class="panel-title">
+									<th:block th:text="'Frage ' + ${rowStat.count}"></th:block>
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;" title="Frage l&ouml;schen" data-toggle="modal"
+										data-target="#delete-dialog"></span>
+								</h3>
+							</div>
+							<div class="panel-body" th:id="'question-panel-body-' + ${rowStat.count}">
+								<div class="form-group">
+									<label th:for="'question-type-' + ${rowStat.count}" class="col-sm-3 control-label">Fragetyp</label>
+									<div class="col-sm-9">
+										<select th:id="'question-type-' + ${rowStat.count}" th:name="'question-type-' + ${rowStat.count}" class="form-control" required="required">
+											<option selected="selected">Textfrage</option>
+											<option>Best First</option>
+											<option>Best In The Middle</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label th:for="'question-' + ${rowStat.count}" class="col-sm-3 control-label">Frage</label>
+									<div class="col-sm-9">
+										<textarea class="form-control" rows="3" th:id="'question-' + ${rowStat.count}" th:name="'question-' + ${rowStat.count}" th:text="${question.text}"
+											required="required"></textarea>
+									</div>
+								</div>
+								<div class="form-group">
+									<label th:for="'max-chars-' + ${rowStat.count}" class="col-sm-3 control-label">Max Zeichen</label>
+									<div class="col-sm-9">
+										<input type="number" class="form-control" th:id="'max-chars-' + ${rowStat.count}" th:name="'max-chars-' + ${rowStat.count}" min="2" max="1000"
+											th:value="${question.maxLength}" required="required" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label th:for="'numbers-only-' + ${rowStat.count}" class="col-sm-3 control-label">Nur Zahlen</label>
+									<div class="col-sm-9">
+										<input type="checkbox" th:id="'numbers-only-' + ${rowStat.count}" th:name="'numbers-only-' + ${rowStat.count}" th:checked="${question.onlyNumbers}" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</th:block>
 
-                <div class="text-center">
-                    <button class="btn btn-danger btn-lg" type="submit">Aktualisieren</button>
-                    <p>&nbsp;</p>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+					<!-- Single choice questions -->
+					<th:block th:each="entry, rowStat : ${singleChoiceQuestions}">
+						<div class="panel panel-thb" th:id="'question-panel-' + ${rowStat.count + textQuestions.size()}">
+							<div class="panel-heading panel-heading-thb">
+								<h3 class="panel-title">
+									<th:block th:text="'Frage ' + ${rowStat.count + textQuestions.size()}"></th:block>
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;" title="Frage l&ouml;schen" data-toggle="modal"
+										data-target="#delete-dialog"></span>
+								</h3>
+							</div>
+							<div class="panel-body" th:id="'question-panel-body-' + ${rowStat.count + textQuestions.size()}" th:each="question: ${entry.value}">
+								<div class="form-group">
+									<label th:for="'question-type-' + ${rowStat.count + textQuestions.size()}" class="col-sm-3 control-label">Fragetyp</label>
+									<div class="col-sm-9">
+										<select th:id="'question-type-' + ${rowStat.count + textQuestions.size()}" th:name="'question-type-' + ${rowStat.count + textQuestions.size()}"
+											class="form-control" required="required">
+											<option>Textfrage</option>
+											<option th:selected="${entry.key == 'BestFirst'}">Best First</option>
+											<option th:selected="${entry.key == 'BestInTheMiddle'}">Best In The Middle</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label th:for="'choices-number-' + ${rowStat.count + textQuestions.size()}" class="col-sm-3 control-label">Anzahl Choices</label>
+									<div class="col-sm-9">
+										<select th:id="'choices-number-' + ${rowStat.count + textQuestions.size()}" th:name="'choices-number-' + ${rowStat.count + textQuestions.size()}"
+											class="form-control" required="required">
+											<th:block th:if="${entry.key == 'BestFirst'}">
+												<th:block th:each="i : ${#numbers.sequence(1, 7)}" th:with="numberOfChoices = ${question.choices.size()}">
+													<option th:selected="${numberOfChoices} == ${i}" th:text="${i}"></option>
+												</th:block>
+											</th:block>
+											<th:block th:if="${entry.key == 'BestInTheMiddle'}">
+												<th:block th:each="i : ${#numbers.sequence(3, 7, 2)}" th:with="numberOfChoices = ${question.choices.size()}">
+													<option th:selected="${numberOfChoices} == ${i}" th:text="${i}"></option>
+												</th:block>
+											</th:block>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label th:for="'question-' + ${rowStat.count + textQuestions.size()}" class="col-sm-3 control-label">Frage</label>
+									<div class="col-sm-9">
+										<textarea class="form-control" rows="3" th:id="'question-' + ${rowStat.count + textQuestions.size()}"
+											th:name="'question-' + ${rowStat.count + textQuestions.size()}" required="required" th:text="${question.text}"></textarea>
+									</div>
+								</div>
 
-<div class="col-sm-3"></div>
+								<!-- Choices -->
+								<div class="panel panel-thb">
+									<div class="panel-heading panel-heading-thb">
+										<h6 class="panel-title">Choices</h6>
+									</div>
+									<div class="panel-body">
+										<th:block th:each="choice, choiceCounter: ${question.choices}">
+											<div class="form-group">
+												<label th:for="'choice-text-' +  ${rowStat.count + textQuestions.size()} + '-' + ${choiceCounter.count}" class="col-sm-1 control-label"
+													th:text="${choice.grade}"></label>
+												<div class="col-sm-11">
+													<input type="text" class="form-control" th:id="'choice-text-' +  ${rowStat.count + textQuestions.size()} + '-' + ${choiceCounter.count}"
+														th:name="'choice-text-' +  ${rowStat.count + textQuestions.size()} + '-' + ${choiceCounter.count}" th:value="${choice.text}" required="required"
+														placeholder="Text" />
+													<input type="hidden" th:name="'choice-grade-' +  ${rowStat.count + textQuestions.size()} + '-' + ${choiceCounter.count}" th:value="${choice.grade}" />
+												</div>
+											</div>
+										</th:block>
 
-<!-- Delete Dialog-->
-<div class="modal fade" id="delete-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="delete-dialog-label">Frage wirklich löschen?</h4>
-            </div>
-            <div class="modal-footer">
-                <button id="delete-button" class="btn btn-danger">Ja</button>
-                <button class="btn btn-default" data-dismiss="modal">Nein</button>
-            </div>
-        </div>
-    </div>
-</div>
+										<th:block th:each="noAnswerChoice, noAnswerChoiceCounter: ${noAnswerChoices}">
+											<th:block th:if="${noAnswerChoiceCounter.count} == ${rowStat.count}">
+												<div class="form-group">
+													<label class="col-sm-1 control-label"></label>
+													<div class="col-sm-11">
+														<div class="checkbox">
+															<label> <input type="checkbox" class="allow-no-answer-checkbox" th:name="'no-answer-' + ${rowStat.count + textQuestions.size()}"
+																	th:checked="${noAnswerChoice != null}" />"keine Angabe" erlauben
+															</label>
+														</div>
+													</div>
+												</div>
+												<div class="form-group allow-no-answer-div" th:classappend="${noAnswerChoice == null} ? 'hidden'">
+													<label th:for="'choice-text-' + ${rowStat.count + textQuestions.size()} + '-0'" class="col-sm-1 control-label"></label>
+													<div class="col-sm-11">
+														<input type="text" class="form-control" th:id="'choice-text-' + ${rowStat.count + textQuestions.size()} + '-0'"
+															th:name="'choice-text-' + ${rowStat.count + textQuestions.size()} + '-0'" placeholder="Text"
+															th:attrappend="value=${noAnswerChoice != null} ? ${noAnswerChoice.text}" />
+													</div>
+												</div>
+											</th:block>
+										</th:block>
+									</div>
+								</div>
+							</div>
+						</div>
+					</th:block>
+
+					<div class="pull-left">
+						<button id="new-question" class="btn btn-danger" type="button">Neue Frage</button>
+					</div>
+					<div class="pull-right">
+						<button class="btn btn-danger" type="submit">Speichern</button>
+						<p>&nbsp;</p>
+					</div>
+				</form>
+			</div>
+
+			<div class="col-sm-3"></div>
+		</div>
+	</div>
+
+
+	<!-- Delete Dialog-->
+	<div class="modal fade" id="delete-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="delete-dialog-label">Frage wirklich löschen?</h4>
+				</div>
+				<div class="modal-footer">
+					<button id="delete-button" class="btn btn-danger">Ja</button>
+					<button class="btn btn-default" data-dismiss="modal">Nein</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
-
-<script>
-    function deleteQuestion(id) {
-        document.getElementById("delete-question-" + id).submit();
-    }
-
-    $('#delete-dialog').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var deleteMethod = button.data('delete-method');
-        var modal = $(this);
-        modal.find('#delete-button').attr("onclick", deleteMethod);
-    });
-</script>
 
 </html>

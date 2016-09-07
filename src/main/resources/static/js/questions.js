@@ -1,38 +1,24 @@
 $(document).ready(function() {
 	setSelectOnChange();
-});
-
-/**
- * Toggles the omit question functionality
- */
-$(document).on("click", ".omit-question", function(event) {
-	var omitQuestionCheckBox = $(this);
-
-	var panel = omitQuestionCheckBox.closest(".panel");
-	var panelBody = panel.find(".panel-body");
-	var panelBodyParent = panelBody.parent();
-	var formInputs = panelBody.find("input:not(:checkbox), textarea, select");
-
-	if (omitQuestionCheckBox.is(":checked")) {
-		formInputs.removeAttr("required");
-		panelBodyParent.collapse('hide');
-	} else {
-		formInputs.attr("required", "required");
-		panelBodyParent.collapse('show');
-	}
+	setNoAnswerOnChange();
+	setModalOnShow();
+	setNewQuestionOnClick()
 });
 
 /**
  * Sets the onChange behavior of the select boxes "question type" and "number of choices"
  */
 function setSelectOnChange() {
-	$("select").change(function() {
+	$("select").filter(function() {
+		return this.id.match(/(question-type|choices-number)-.+/);
+	}).unbind('change').change(function() {
 		var selectBox = $(this);
 
-		if (selectBox.attr('id').match(/question-type-\d+/)) {
+		if (selectBox.attr('id').match(/question-type-.+/)) {
 			var panelBody = selectBox.closest(".panel-body");
 			replaceQuestionType(selectBox, panelBody);
-		} else if (selectBox.attr('id').match(/choices-number-\d+/)) {
+			scrollToElement($(panelBody.closest(".panel")), 500);
+		} else if (selectBox.attr('id').match(/choices-number-.+/)) {
 			var panelBody = selectBox.closest(".panel-body");
 			replaceChoices(selectBox, panelBody);
 		}
@@ -47,19 +33,20 @@ function setSelectOnChange() {
  */
 function replaceQuestionType(questionTypeSelectBox, panelBody) {
 	switch (questionTypeSelectBox.val()) {
-		case "Textfrage" :
-			drawTextQuestion(panelBody);
-			break;
-		case "Best First" :
-			drawBestFirst(panelBody);
-			break;
-		case "Best In The Middle" :
-			drawBestInTheMiddle(panelBody);
+	case "Textfrage":
+		drawTextQuestion(panelBody);
+		break;
+	case "Best First":
+		drawBestFirst(panelBody);
+		break;
+	case "Best In The Middle":
+		drawBestInTheMiddle(panelBody);
 	}
 }
 
 /**
- * Redraws the choices of a multiple choice question depending on the selected number of choices and question type
+ * Redraws the choices of a multiple choice question depending on the selected number of choices and question
+ * type
  * 
  * @param choicesNumberSelectBox
  * @param panelBody
@@ -67,20 +54,19 @@ function replaceQuestionType(questionTypeSelectBox, panelBody) {
 function replaceChoices(choicesNumberSelectBox, panelBody) {
 	var choicesPanel = panelBody.find('.panel');
 	var questionNumber = panelBody.attr('id').split("-").pop();
-	var questionTypeSelectBox = $(panelBody).find(
-			"#question-type-" + questionNumber);
+	var questionTypeSelectBox = $(panelBody).find("#question-type-" + questionNumber);
 	var questionType = questionTypeSelectBox.val();
 	var numberOfChoices = choicesNumberSelectBox.val();
 
 	if (questionType == "Best First") {
 		var lowestRank = 1;
 		choicesPanel.remove();
-		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
+		panelBody.hide().append(createChoicesPanel(lowestRank, numberOfChoices, panelBody)).fadeIn(400);
 		setNoAnswerOnChange();
 	} else if (questionType == "Best In The Middle") {
 		var lowestRank = (parseInt(numberOfChoices) + 1) / -2;
 		choicesPanel.remove();
-		panelBody.append(createChoicesPanel(lowestRank, numberOfChoices));
+		panelBody.hide().append(createChoicesPanel(lowestRank, numberOfChoices, panelBody)).fadeIn(400);
 		setNoAnswerOnChange();
 	}
 }
@@ -127,7 +113,7 @@ function drawTextQuestion(panelBody) {
 	formGroups = formGroups.replace(/%i/g, questionNumber);
 
 	panelBody.empty();
-	panelBody.append(formGroups);
+	panelBody.hide().append(formGroups).fadeIn(400);
 
 	setSelectOnChange();
 }
@@ -168,13 +154,13 @@ function drawBestFirst(panelBody) {
 		</div> \
 	</div>';
 
-	formGroups = formGroups.concat(createChoicesPanel(1, 5));
+	formGroups = formGroups.concat(createChoicesPanel(1, 5, panelBody));
 
 	var questionNumber = panelBody.attr('id').split("-").pop();
 	formGroups = formGroups.replace(/%i/g, questionNumber);
 
 	panelBody.empty();
-	panelBody.append(formGroups);
+	panelBody.hide().append(formGroups).fadeIn(400);
 
 	setSelectOnChange();
 	setNoAnswerOnChange();
@@ -213,13 +199,13 @@ function drawBestInTheMiddle(panelBody) {
 		</div> \
 	</div>';
 
-	formGroups = formGroups.concat(createChoicesPanel(-3, 5));
+	formGroups = formGroups.concat(createChoicesPanel(-3, 5, panelBody));
 
 	var questionNumber = panelBody.attr('id').split("-").pop();
 	formGroups = formGroups.replace(/%i/g, questionNumber);
 
 	panelBody.empty();
-	panelBody.append(formGroups);
+	panelBody.hide().append(formGroups).fadeIn(400);
 
 	setSelectOnChange();
 	setNoAnswerOnChange();
@@ -232,7 +218,7 @@ function drawBestInTheMiddle(panelBody) {
  * @param numberOfChoices
  * @returns {String}
  */
-function createChoicesPanel(lowestRank, numberOfChoices) {
+function createChoicesPanel(lowestRank, numberOfChoices, panelBody) {
 	var choices = '<!-- Choices --> \
 		<div class="panel panel-thb"> \
 			<div class="panel-heading panel-heading-thb"> \
@@ -251,6 +237,9 @@ function createChoicesPanel(lowestRank, numberOfChoices) {
 		formGroups = createChoicesBestInTheMiddle(lowestRank, numberOfChoices);
 	}
 
+	var questionNumber = panelBody.attr('id').split("-").pop();
+	formGroups = formGroups.replace(/%i/g, questionNumber);
+
 	choices = choices.replace("%formGroups", formGroups);
 
 	return choices;
@@ -267,16 +256,18 @@ function createChoicesBestFist(lowestRank, numberOfChoices) {
 	var formGroups = '';
 
 	// create choices except n/a choice
-	for (choiceNumber = lowestRank; choiceNumber <= numberOfChoices; choiceNumber++) {
+	for (choiceNumber = 1; choiceNumber <= numberOfChoices; choiceNumber++) {
 		var formGroup = '<div class="form-group"> \
-			<label for="choice-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
+			<label for="choice-text-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
 			<div class="col-sm-11"> \
-				<input type="text" class="form-control" id="choice-%i-%choiceNumber" name="choice-%i-%choiceNumber" \
+				<input type="text" class="form-control" id="choice-text-%i-%choiceNumber" name="choice-text-%i-%choiceNumber" \
 					required="required" placeholder="Text" /> \
+				<input type="hidden" name="choice-grade-%i-%choiceNumber" value="%grade"/> \
 			</div> \
 		</div>';
 
 		formGroup = formGroup.replace(/%choiceNumber/g, choiceNumber);
+		formGroup = formGroup.replace(/%grade/g, choiceNumber);
 		formGroups = formGroups.concat(formGroup);
 	}
 
@@ -298,6 +289,7 @@ function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 
 	// create choices except n/a choice
 	var highestRank = lowestRank * -1;
+	var grade = 1;
 	for (choiceNumber = highestRank; choiceNumber >= lowestRank; choiceNumber--) {
 		// always skip grade -1 and 0
 		if (choiceNumber == -1 || choiceNumber == 0) {
@@ -305,15 +297,19 @@ function createChoicesBestInTheMiddle(lowestRank, numberOfChoices) {
 		}
 
 		var formGroup = '<div class="form-group"> \
-			<label for="choice-%i-%choiceNumber" class="col-sm-1 control-label">%choiceNumber</label> \
+			<label for="choice-text-%i-%grade" class="col-sm-1 control-label">%choiceNumber</label> \
 			<div class="col-sm-11"> \
-				<input type="text" class="form-control" id="choice-%i-%choiceNumber" name="choice-%i-%choiceNumber" \
+				<input type="text" class="form-control" id="choice-text-%i-%grade" name="choice-text-%i-%grade" \
 					required="required" placeholder="Text" /> \
+				<input type="hidden" name="choice-grade-%i-%grade" value="%choiceNumber"/> \
 			</div> \
 		</div>';
 
 		formGroup = formGroup.replace(/%choiceNumber/g, choiceNumber);
+		formGroup = formGroup.replace(/%grade/g, grade);
 		formGroups = formGroups.concat(formGroup);
+
+		grade++;
 	}
 
 	// add n/a choice
@@ -333,15 +329,15 @@ function createNoAnswerOption() {
 	    <div class="col-sm-11">\
 		    <div class="checkbox">\
 		      <label>\
-		        <input type="checkbox" class="allow-no-choice-checkbox">"keine Angabe" erlauben\
+		        <input type="checkbox" class="allow-no-answer-checkbox" name="no-answer-%i">"keine Angabe" erlauben\
 		      </label>\
 		    </div>\
 	  </div>\
 	</div>\
-	<div class="form-group hidden allow-no-choice-div"> \
-		<label for="choice-%i-0" class="col-sm-1 control-label"></label> \
+	<div class="form-group hidden allow-no-answer-div"> \
+		<label for="choice-text-%i-0" class="col-sm-1 control-label"></label> \
 		<div class="col-sm-11"> \
-			<input type="text" class="form-control" id="choice-%i-0" name="choice-%i-0" placeholder="Text"/>\
+			<input type="text" class="form-control" id="choice-text-%i-0" name="choice-text-%i-0" placeholder="Text"/>\
 		</div> \
 	</div>';
 }
@@ -350,10 +346,10 @@ function createNoAnswerOption() {
  * Enables the toggling of the text field of the n/a checkbox
  */
 function setNoAnswerOnChange() {
-	$(".allow-no-choice-checkbox").change(function() {
+	$(".allow-no-answer-checkbox").change(function() {
 		var checkBox = $(this);
 		var panelBody = checkBox.closest(".panel-body");
-		var allowNoChoiceDiv = panelBody.find(".allow-no-choice-div");
+		var allowNoChoiceDiv = panelBody.find(".allow-no-answer-div");
 		var textBox = allowNoChoiceDiv.find(".form-control");
 
 		if (checkBox.is(":checked")) {
@@ -365,4 +361,125 @@ function setNoAnswerOnChange() {
 			textBox.val("");
 		}
 	});
+}
+
+/**
+ * Enables the insertion of a new question below the last question
+ */
+function setNewQuestionOnClick() {
+	$("#new-question")
+			.click(
+					function() {
+						var newQuestionPanelHtml = '<div id="question-panel-%i" class="panel panel-thb"> \
+							<div class="panel-heading panel-heading-thb"> \
+								<h3 class="panel-title">Frage %i \
+									<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" style="cursor: pointer;" \
+										title="Frage l&ouml;schen" data-toggle="modal" data-target="#delete-dialog"></span> \
+								</h3> \
+							</div> \
+							<div id="question-panel-body-%i" class="panel-body"></div> \
+						</div>';
+
+						// increment question count
+						var questionCountField = $("#question-count");
+						var questionCount = parseInt(questionCountField.val()) + 1;
+						questionCountField.val(questionCount.toString());
+
+						// create new question panel
+						var newQuestionButton = $(this);
+						var questionPanelAbove = newQuestionButton.parent().prev();
+						newQuestionPanelHtml = newQuestionPanelHtml.replace(/%i/g, questionCount);
+						questionPanelAbove.after(newQuestionPanelHtml).fadeIn(400);
+
+						// fill question panel body
+						var newQuestionPanel = newQuestionButton.parent().prev();
+						var questionPanelBody = newQuestionPanel.find('.panel-body');
+						drawTextQuestion(questionPanelBody);
+						scrollToElement($(questionPanelBody.closest(".panel")), 750);
+					});
+}
+
+/**
+ * Removes the question panel with id = panelId and adjusts the attribute values of subsequent question panels
+ * 
+ * @param panelId
+ */
+function removeQuestionPanel(panelId) {
+	// decrement question count
+	var questionCountField = $("#question-count");
+	var questionCount = parseInt(questionCountField.val()) - 1;
+	questionCountField.val(questionCount.toString());
+
+	// increment attribute values in subsequent question panels
+	var questionPanelToDelete = $("#" + panelId);
+	questionPanelToDelete.nextAll("div[id|='question-panel']").each(function(counter, element) {
+		var questionPanel = $(element);
+		var questionNumberOld = parseInt(questionPanel.attr('id').split("-").pop());
+		var questionNumberNew = questionNumberOld - 1;
+
+		questionPanel.attr('id', 'question-panel-' + questionNumberNew);
+		questionPanel.find('h3').html(questionPanel.find('h3').html().replace('Frage ' + questionNumberOld, 'Frage ' + questionNumberNew));
+		questionPanel.find('#question-panel-body-' + questionNumberOld).attr('id', 'question-panel-body-' + questionNumberNew);
+		var attributeNames = ["question-type-", "question-", "max-chars-", "numbers-only-", "choices-number-"];
+		for (i = 0; i < attributeNames.length; i++) {
+			questionPanel.find("label[for='" + attributeNames[i] + questionNumberOld + "']").attr('for', attributeNames[i] + questionNumberNew);
+			questionPanel.find("#" + attributeNames[i] + questionNumberOld).attr({
+				'id' : attributeNames[i] + questionNumberNew,
+				'name' : attributeNames[i] + questionNumberNew
+			});
+		}
+		questionPanel.find("label[for|='choice-text-" + questionNumberOld + "']").each(function(counter, element) {
+			var label = $(element);
+			var labelFor = label.attr('for');
+			label.attr('for', labelFor.replace('choice-text-' + questionNumberOld, 'choice-text-' + questionNumberNew));
+		});
+		questionPanel.find("input[id|='choice-text-" + questionNumberOld + "']").each(function(counter, element) {
+			var input = $(element);
+			var inputIdOld = input.attr('id');
+			var inputIdNew = inputIdOld.replace('choice-text-' + questionNumberOld, 'choice-text-' + questionNumberNew);
+			input.attr({
+				'id' : inputIdNew,
+				'name' : inputIdNew
+			});
+		});
+		questionPanel.find("input[name|='choice-grade-" + questionNumberOld + "']").each(function(counter, element) {
+			var input = $(element);
+			var inputNameOld = input.attr('name');
+			var inputNameNew = inputNameOld.replace('choice-grade-' + questionNumberOld, 'choice-grade-' + questionNumberNew);
+			input.attr('name', inputNameNew);
+		});
+		questionPanel.find("input[name='no-answer-" + questionNumberOld + "']").attr('name', 'no-answer-' + questionNumberNew);
+	});
+
+	// remove question panel and hide dialog
+	questionPanelToDelete.hide("slow", function() {
+		this.remove();
+	});
+	$("#delete-dialog").modal('hide');
+}
+
+/**
+ * Displays the modal dialog when the delete button of a question panel is clicked and sets the behavior of the affirmative button. 
+ * The affirmative button causes the removal of the question panel.
+ */
+function setModalOnShow() {
+	$('#delete-dialog').on('show.bs.modal', function(event) {
+		var button = $(event.relatedTarget);
+		var panelId = button.closest('.panel').attr('id');
+		var deleteMethod = "removeQuestionPanel(" + "'" + panelId + "'" + ")";
+		var modal = $(this);
+		modal.find('#delete-button').attr("onclick", deleteMethod);
+	});
+}
+
+/**
+ * Scrolls the page to the specified element within specified duration
+ * 
+ * @param element
+ * @param duration
+ */
+function scrollToElement(element, duration) {
+	$('html, body').animate({
+		scrollTop : element.offset().top
+	}, duration);
 }

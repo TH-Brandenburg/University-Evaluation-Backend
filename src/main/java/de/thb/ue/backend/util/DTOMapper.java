@@ -49,30 +49,55 @@ public class DTOMapper {
     }
 
     public static List<MultipleChoiceQuestionDTO> mcQuestionsToMultipleChoiceQuestionDTOs(List<SingleChoiceQuestion> singleChoiceQuestions) {
-        ArrayList<MultipleChoiceQuestionDTO> out = new ArrayList<>();
+        ArrayList<MultipleChoiceQuestionDTO> out = new ArrayList<MultipleChoiceQuestionDTO>();
         for (SingleChoiceQuestion singleChoiceQuestion : singleChoiceQuestions) {
             MultipleChoiceQuestionDTO tmpQuestion = new MultipleChoiceQuestionDTO();
             tmpQuestion.setQuestion(singleChoiceQuestion.getText());
-            tmpQuestion.setChoices(new ArrayList<>());
+            tmpQuestion.setChoices(new ArrayList<ChoiceDTO>());
             for (Choice choice : singleChoiceQuestion.getChoices()) {
                 tmpQuestion.getChoices().add(new ChoiceDTO(choice.getText(), choice.getGrade()));
             }
 
             out.add(tmpQuestion);
         }
+        for (MultipleChoiceQuestionDTO element : out){
+        	List<ChoiceDTO> choices = element.getChoices(); 
+        	boolean containsNegativeGrade = false;
+        	
+            for (ChoiceDTO choice : choices) {
+                if (choice.getGrade() < 0) {
+                    containsNegativeGrade = true;
+                    break;
+                }
+            }
+            if (containsNegativeGrade){
+            	ChoiceDTO noAnswerChoice = null;
+            	
+            	for (ChoiceDTO choice : choices) {
+                    if (choice.getGrade() == 0) {
+                       noAnswerChoice = choice;
+                    }
+                }
+            	if(noAnswerChoice != null){
+            		choices.remove(noAnswerChoice);
+            	}
+            	choices.sort((ChoiceDTO choice1, ChoiceDTO choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
+            	if(noAnswerChoice != null){
+            		choices.add(0, noAnswerChoice);
+            	}
+            	
+        	} else {
+            	choices.sort((ChoiceDTO choice1, ChoiceDTO choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
+            }
+        }
         return out;
     }
 
-    public static QuestionsDTO questionModelsToDTO(List<Question> textQuestions, List<SingleChoiceQuestion> singleChoiceQuestions) {
+    public static QuestionsDTO questionModelsToDTO(List<TextQuestion> textQuestions, List<SingleChoiceQuestion> singleChoiceQuestions) {
         QuestionsDTO out = new QuestionsDTO();
-        List<TextQuestionDTO> textQuestionDTOs = new ArrayList<>(textQuestions.size());
-        int questionNumber = singleChoiceQuestions.size() + 1;
-        for (Question question : textQuestions) {
-            if (question instanceof TextQuestion) {
-                TextQuestion textQuestion = (TextQuestion) question;
-                textQuestionDTOs.add(new TextQuestionDTO(questionNumber, textQuestion.getText(), textQuestion.getOnlyNumbers(), textQuestion.getMaxLength()));
-                questionNumber++;
-            }
+        List<TextQuestionDTO> textQuestionDTOs = new ArrayList<TextQuestionDTO>();
+        for (TextQuestion textQuestion : textQuestions) {
+            textQuestionDTOs.add(new TextQuestionDTO(textQuestion.getId(), textQuestion.getText(), textQuestion.getOnlyNumbers(), textQuestion.getMaxLength()));
         }
         out.setTextQuestions(textQuestionDTOs);
         out.setMultipleChoiceQuestionDTOs(mcQuestionsToMultipleChoiceQuestionDTOs(singleChoiceQuestions));

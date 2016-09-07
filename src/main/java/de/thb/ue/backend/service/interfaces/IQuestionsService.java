@@ -4,9 +4,8 @@ package de.thb.ue.backend.service.interfaces;
 
 import java.util.List;
 
+import de.thb.ue.backend.model.Choice;
 import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.SingleChoiceQuestion;
-import de.thb.ue.backend.model.TextQuestion;
 import de.thb.ue.dto.QuestionsDTO;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.model.QuestionRevision;
@@ -27,6 +26,8 @@ public interface IQuestionsService {
     
     QuestionRevision getRevisionById(int id);
     
+    QuestionRevision findByName(String name);
+    
     void updateQuestionRevision(QuestionRevision questionaire);
     
     List<QuestionRevision> findAllQuestionRevisions();
@@ -37,4 +38,9 @@ public interface IQuestionsService {
     
     void deleteQuestionRevisionById(int id);
     
+    QuestionRevision saveQuestionRevision(QuestionRevision questionRevision);
+    
+    void deleteQuestionsAndChoices(List<Choice> choices, List<Question> questions);
+    
+    void saveQuestionsAndChoices(List<Choice> choices, List<Question> questions);
 }

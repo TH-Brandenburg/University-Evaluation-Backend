@@ -49,9 +49,8 @@
 									<a th:href="@{'/questionnaire/' + ${questionnaire.id}}"><th:block th:text="${questionnaire.name}"></th:block></a>
 								</div>
 								<div class="col-sm-3">
-									<button type="submit" class="btn btn-danger btn-xs pull-right"
-										th:attr="data-url=@{'/deleteQuestionnaire/' + ${questionnaire.id}}" data-toggle="modal"
-										data-target="#delete-dialog">L&ouml;schen</button>
+									<button type="submit" class="btn btn-danger btn-xs pull-right" th:attr="data-url=@{'/deleteQuestionnaire/' + ${questionnaire.id}}" data-toggle="modal"
+										data-target="#delete-questionnaire-dialog">L&ouml;schen</button>
 								</div>
 							</div>
 						</th:block>
@@ -68,7 +67,7 @@
 			<div class="col-sm-6">
 				<div class="btn-group btn-group-justified" role="group" aria-label="sd">
 					<div class="btn-group" role="group">
-						<a class="btn btn-danger" href="#">Neuer Fragebogen</a>
+						<a class="btn btn-danger" href="/newQuestionnaire">Neuer Fragebogen</a>
 					</div>
 					<div class="btn-group" role="group">
 						<a class="btn btn-danger" href="#">Fragebogen hochladen</a>
@@ -81,7 +80,7 @@
 	</div>
 
 	<!-- Delete Dialog-->
-	<div class="modal fade" id="delete-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
+	<div class="modal fade" id="delete-questionnaire-dialog" tabindex="-1" role="dialog" aria-labelledby="delete-dialog-label">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -102,7 +101,7 @@
 </body>
 
 <script>
-	$('#delete-dialog').on('show.bs.modal', function(event) {
+	$('#delete-questionnaire-dialog').on('show.bs.modal', function(event) {
 		var button = $(event.relatedTarget);
 		var url = button.data('url');
 		var modal = $(this);
