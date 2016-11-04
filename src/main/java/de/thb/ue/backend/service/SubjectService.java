@@ -17,7 +17,6 @@
 package de.thb.ue.backend.service;
 
 import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
 import de.thb.ue.backend.model.Evaluation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

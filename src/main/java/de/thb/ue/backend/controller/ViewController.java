@@ -24,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,8 +38,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,7 +63,6 @@ import de.thb.ue.backend.service.interfaces.ISubjectService;
 import de.thb.ue.backend.service.interfaces.ITutorService;
 import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.dto.util.Department;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -126,8 +124,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
             return "archive";
         } else {
-            List<Evaluation> evaluations = tutorService.getByFamilyName(user.getUsername()).
-                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            List<Evaluation> evaluations = tutorService.getByUsername(user.getUsername()).getEvaluations()
+                    .stream().filter(Evaluation::getClosed).collect(Collectors.toList());
 
             // Berechnung der Durchschnittsnote eines Professors
             float mainAverageGradeVariable = mainAverageGrade(evaluations, evaluations.size());
@@ -236,8 +234,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
         //TODO
         LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getUsername().equals("socher")) {
-            List<Evaluation> evaluations = tutorService.getByFamilyName(user.getUsername()).
-                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            List<Evaluation> evaluations = tutorService.getByUsername(user.getUsername()).
+                    getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
             model.addAttribute("evaluations", evaluations);
             return "archive";
         } else {
@@ -258,8 +256,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
         }
         else
         {
-            evaluations = tutorService.getByFamilyName(user.getUsername()).
-                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            evaluations = tutorService.getByUsername(user.getUsername()).
+                    getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
         }
 
         //Berechnung der Durchschnittsnote eines Professors
@@ -377,8 +375,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
         }
         else
         {
-            evaluations = tutorService.getByFamilyName(user.getUsername()).
-                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            evaluations = tutorService.getByUsername(user.getUsername()).
+                    getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
         }
 
         List<Evaluation> relEvaList = new ArrayList<Evaluation>();
@@ -926,7 +924,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         }
 
         // Unterscheiden zwischen Best-First-Fragen und Best-In-The-Middle-Fragen
-        List<SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<SimpleEntry<String, SingleChoiceQuestion>>();
+        List<AbstractMap.SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<AbstractMap.SimpleEntry<String, SingleChoiceQuestion>>();
         List<Choice> noAnswerChoices = new ArrayList<Choice>();
         for (SingleChoiceQuestion question : singleChoiceQuestionsTemp) {
             List<Choice> choicesTemp = question.getChoices();
@@ -951,11 +949,11 @@ public class ViewController extends WebMvcConfigurerAdapter {
             if (containsNegativeGrade) {
                 // Choices absteigend sortieren und Frage der Liste von Best-In-The-Middle-Fragen hinzufügen
                 choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
-                singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
+                singleChoiceQuestions.add(new AbstractMap.SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
             } else {
                 // Choices aufsteigend sortieren und Frage der Liste von Best-First-Fragen hinzufügen
                 choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
-                singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
+                singleChoiceQuestions.add(new AbstractMap.SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
             }
         }
 
@@ -970,14 +968,14 @@ public class ViewController extends WebMvcConfigurerAdapter {
         // Berechnung der Durchschnittsnote für das Balkendiagramm
         float gradeAverage = 0;
         int studentsVoted = 0;
-        for (int j = 0; j < evaluationArray.get(evaNumber).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+        for (int j = 0; j < evaluationArray.get(evaNumber).getQuestionRevision().getQuestions().size(); j++)// zählt vorhandene Fragen durch
         {
-            int currentId = evaluationArray.get(evaNumber).getQuestionRevision().getMcQuestions().get(j).getId();
+            int currentId = evaluationArray.get(evaNumber).getQuestionRevision().getQuestions().get(j).getId();
             if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
                 if (evaluationArray.get(evaNumber).getVotes().size() != 0) {
                     for (int stVote = 0; stVote < evaluationArray.get(evaNumber).getVotes().size(); stVote++) {
-                        gradeAverage += evaluationArray.get(evaNumber).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade();
-                        if(evaluationArray.get(evaNumber).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade() == 0)
+                        gradeAverage += evaluationArray.get(evaNumber).getVotes().get(stVote).getSingleChoiceAnswers().get(j).getChoice().getGrade();
+                        if(evaluationArray.get(evaNumber).getVotes().get(stVote).getSingleChoiceAnswers().get(j).getChoice().getGrade() == 0)
                         {
                             studentsVoted -= 1;//wenn "keine Angabe" gewählt wird, wird der Vote abgezogen
                         }
@@ -996,14 +994,14 @@ public class ViewController extends WebMvcConfigurerAdapter {
         int studentsVotetMainQuestions = 0;
         for (int i = 0; i < evaluationLength; i++) // zählt evas durch
         {
-            for (int j = 0; j < evaluationArray.get(i).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+            for (int j = 0; j < evaluationArray.get(i).getQuestionRevision().getQuestions().size(); j++)// zählt vorhandene Fragen durch
             {
-                int currentId = evaluationArray.get(i).getQuestionRevision().getMcQuestions().get(j).getId();
+                int currentId = evaluationArray.get(i).getQuestionRevision().getQuestions().get(j).getId();
                 if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
                     if (evaluationArray.get(i).getVotes().size() != 0) {
                         for (int stVote = 0; stVote < evaluationArray.get(i).getVotes().size(); stVote++) {
-                            subjectNoteDurchschnitt += evaluationArray.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade();
-                            if(evaluationArray.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade() == 0)
+                            subjectNoteDurchschnitt += evaluationArray.get(i).getVotes().get(stVote).getSingleChoiceAnswers().get(j).getChoice().getGrade();
+                            if(evaluationArray.get(i).getVotes().get(stVote).getSingleChoiceAnswers().get(j).getChoice().getGrade() == 0)
                             {
                                 studentsVotetMainQuestions -= 1; //wenn "keine Angabe" gewählt wird, wird der Vote abgezogen
                             }
@@ -1050,8 +1048,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
         int evaListElement = 0;
 
         for (int i = 0; i < tutorCount; i++) {
-            List<Evaluation> evaluationsFromTutor = tutorService.getByFamilyName(tutorService.getAll().get(i).getFamilyName()).
-                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            List<Evaluation> evaluationsFromTutor = tutorService.getByUsername(tutorService.getAll().get(i).getFamilyName()).
+                    getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
             if (evaluationsFromTutor.size() >= 1) {
                 for (int j = 0; j < evaluationsFromTutor.size(); j++) {
                     evaluationArray.add(evaListElement, evaluationsFromTutor.get(j));
@@ -1121,9 +1119,9 @@ public class ViewController extends WebMvcConfigurerAdapter {
         for (int i = 0; i < evaLength; i++)// zählt Evaluationen durch
         {
             boolean questionAvailable = false;
-            for (int j = 0; j < oldEvaluationArray.get(i).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+            for (int j = 0; j < oldEvaluationArray.get(i).getQuestionRevision().getQuestions().size(); j++)// zählt vorhandene Fragen durch
             {
-                int currentId = oldEvaluationArray.get(i).getQuestionRevision().getMcQuestions().get(j).getId();
+                int currentId = oldEvaluationArray.get(i).getQuestionRevision().getQuestions().get(j).getId();
                 if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
                     questionAvailable = true;
                 }
@@ -1163,8 +1161,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
         for (int i = 0; i < tutorCount; i++) //durchläuft tutorIds
         {
             //Liste des jeweiligen Tutors
-            List<Evaluation> evaluationsFromTutor = tutorService.getByFamilyName(tutorService.getAll().get(i).getFamilyName()).
-                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            List<Evaluation> evaluationsFromTutor = tutorService.getByUsername(tutorService.getAll().get(i).getFamilyName()).
+                    getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
             if (evaluationsFromTutor.size() >= 1) {
                 for (int j = 0; j < evaluationsFromTutor.size(); j++) {
                     if (evaluationsFromTutor.get(j).getTutors().get(0).getId() == tutorID) {
@@ -1203,14 +1201,14 @@ public class ViewController extends WebMvcConfigurerAdapter {
             {
                 for (int i = 0; i < singleTutorList.size(); i++) // zählt alle evaluationen eines Professors durch
                 {
-                    for (int j = 0; j < singleTutorList.get(i).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+                    for (int j = 0; j < singleTutorList.get(i).getQuestionRevision().getQuestions().size(); j++)// zählt vorhandene Fragen durch
                     {
-                        int currentId = singleTutorList.get(i).getQuestionRevision().getMcQuestions().get(j).getId();
+                        int currentId = singleTutorList.get(i).getQuestionRevision().getQuestions().get(j).getId();
                         if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
                             if (singleTutorList.get(i).getVotes().size() != 0) {
                                 for (int stVote = 0; stVote < singleTutorList.get(i).getVotes().size(); stVote++) {
-                                    subjectNoteDurchschnitt += singleTutorList.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade();
-                                    if(singleTutorList.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade() == 0)
+                                    subjectNoteDurchschnitt += singleTutorList.get(i).getVotes().get(stVote).getSingleChoiceAnswers().get(j).getChoice().getGrade();
+                                    if(singleTutorList.get(i).getVotes().get(stVote).getSingleChoiceAnswers().get(j).getChoice().getGrade() == 0)
                                     {
                                         studentsVotetMainQuestions -= 1; //wenn "keine Angabe" gewählt wird, wird der Vote abgezogen
                                     }
@@ -1235,7 +1233,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         int [] questionCount= new int[100];
         for(int i = 0; i< evaluationArray.size() ; i++) //geht durch jeden vote in der Evaluation des Fachs und schreibt die Anzahl der Fragen an die entsprechende Stelle des questioncount Arrays
         {
-            questionCount[i]= evaluationArray.get(i).getQuestionRevision().getMcQuestions().size();
+            questionCount[i]= evaluationArray.get(i).getQuestionRevision().getQuestions().size();
         }
 
         float [][] averageGradeList = new float[evaluationArray.size()][100];
@@ -1248,9 +1246,9 @@ public class ViewController extends WebMvcConfigurerAdapter {
                 if (evaluationArray.get(i).getVotes().size() != 0) {
                     for (int v = 0; v < evaluationArray.get(i).getVotes().size(); v++) //zählt votes durch
                     {
-                        if (evaluationArray.get(i).getVotes().get(v).getMcAnswers().get(j).getChoice().getGrade() != 0) //holt grade der aktuellen frage und eva und addiert grade und student++ wenn grade!=0
+                        if (evaluationArray.get(i).getVotes().get(v).getSingleChoiceAnswers().get(j).getChoice().getGrade() != 0) //holt grade der aktuellen frage und eva und addiert grade und student++ wenn grade!=0
                         {
-                            Grade += evaluationArray.get(i).getVotes().get(v).getMcAnswers().get(j).getChoice().getGrade();
+                            Grade += evaluationArray.get(i).getVotes().get(v).getSingleChoiceAnswers().get(j).getChoice().getGrade();
                             studentsVotedQuestion++;
                         }
                     }

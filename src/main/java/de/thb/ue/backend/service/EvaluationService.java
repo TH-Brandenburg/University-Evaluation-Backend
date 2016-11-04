@@ -52,9 +52,7 @@ import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.AggregatedMCAnswer;
 import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.MCQuestion;
 import de.thb.ue.backend.model.Participant;
 import de.thb.ue.backend.model.Question;
 import de.thb.ue.backend.model.QuestionRevision;
@@ -354,4 +352,38 @@ public class EvaluationService implements IEvaluationService {
     	List<Evaluation> evaluationList = evaluationRepo.findByQuestionRevisionId(questionRevisionId);
     	return !evaluationList.isEmpty();
     }
+
+    public File getImageFile(String evaluationUID, int voteID) throws
+            EvaluationException, DBEntryDoesNotExistException {
+        Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
+        File out;
+        File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
+
+        if (evaluation != null && evaluation.getClosed()) {
+            File file = new File(workingDirectory, (voteID+".zip"));
+            if (file.exists() && file.canRead()) {
+                out = file;
+            } else {
+                throw new EvaluationException(EvaluationException.READ_RESULT_FILE, "Image file does not exist or can't be read ");
+            }
+        } else {
+            throw new DBEntryDoesNotExistException("Picturecomments from Vote: " + voteID + " does not exist in this Evaluation");
+        }
+        return out;
+    }
+
+    public Boolean imageExists(String evaluationUID, int voteID) {
+        Evaluation evaluation = evaluationRepo.findByUID(evaluationUID);
+        Boolean exists = false;
+        File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
+
+        if (evaluation != null && evaluation.getClosed()) {
+            File file = new File(workingDirectory, (voteID+".zip"));
+            if (file.exists() && file.canRead()) {
+                exists=true;
+            }
+        }
+        return exists;
+    }
+
 }

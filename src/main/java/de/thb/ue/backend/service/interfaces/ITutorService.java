@@ -26,6 +26,7 @@ public interface ITutorService {
 
     Boolean isSuperuser(String username);
 
+    @Deprecated
     List<Tutor> getByFamilyName(String name);
 
     List<Tutor> getAll();
