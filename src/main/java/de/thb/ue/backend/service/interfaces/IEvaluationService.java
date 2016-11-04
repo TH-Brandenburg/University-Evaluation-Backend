@@ -66,4 +66,8 @@ public interface IEvaluationService {
     
     boolean evaluationWithQuestionRevisionExists(int questionRevisionId);
 
+    File getImageFile(String evaluationUID, int voteID) throws EvaluationException, DBEntryDoesNotExistException;
+
+    Boolean imageExists(String evaluationUID, int voteID);
+
 }

@@ -427,7 +427,7 @@ public class EvaluationExcelFileGenerator {
 
     /**
         returns all comments of the students concerning one of the textual questions
-        It is ensured that only comments for te given question (key) are returned.
+        It is ensured that only comments for the given question (key) are returned.
      */
     private ArrayList<String> aggregateTextAnswers(List<Vote> votes, String key) {
         ArrayList<String> aggregation = new ArrayList<>();

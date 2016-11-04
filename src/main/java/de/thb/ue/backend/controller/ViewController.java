@@ -16,21 +16,6 @@
 
 package de.thb.ue.backend.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +35,18 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import de.thb.ue.dto.util.Department;
 import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
@@ -115,12 +113,366 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	String archive(Model model) {
 		// TODO
 		LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		List<Evaluation> evaluations = tutorService.getByFamilyName(user.getUsername()).get(0).getEvaluations().stream().filter(Evaluation::getClosed)
-				.collect(Collectors.toList());
-		model.addAttribute("evaluations", evaluations);
-		return "archive";
+        if (user.getUsername().equals("socher")) {
+            List<Evaluation> evaluations = new ArrayList<Evaluation>();
+            allEvaluation(evaluations, tutorService.getAll().size()); //alle Evaluationen von allen Tutoren in einer Liste
+            List<Evaluation> profList = new ArrayList<Evaluation>();
+            singleTutorList(profList, evaluations, evaluations.size()); // Liste, bei der jeder Professor nur einmal vorkommt
+            List<Float> averageGradeTutorList = new ArrayList<Float>(); // Liste, in der die Durchschnittsnoten gespeichert sind
+            averageGradeTutor(averageGradeTutorList);
+            model.addAttribute("AverageGradeProf", averageGradeTutorList);
+            model.addAttribute("evaluations", profList);
+            model.addAttribute("tutor", user.getUsername());
+
+            return "archive";
+        } else {
+            List<Evaluation> evaluations = tutorService.getByFamilyName(user.getUsername()).
+                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+
+            // Berechnung der Durchschnittsnote eines Professors
+            float mainAverageGradeVariable = mainAverageGrade(evaluations, evaluations.size());
+            double mainAverageGradeRounded = Math.round(mainAverageGradeVariable * 100.0) / 100.0;
+
+            //Berechnung der Rücklaufquote
+            float mainResponseRate = responseRate(evaluations, evaluations.size());
+
+            //Evaluationen nach Datum sortieren
+            dateSortEvaluation(evaluations, evaluations.size());
+
+            //neue Liste damit eine Veranstaltung nur einmal angezeigt wird
+            List<Evaluation> subjectList = new ArrayList<Evaluation>();
+            singleSubjectList(subjectList, evaluations, evaluations.size());
+
+            //Berechnung der Rücklaufquote für ein Fach insgesamt
+            subjectResponseAnswer(subjectList, evaluations);
+
+            //Berechnung der Durchschnittsnote der letzten 5 Evaluationen
+            List<Evaluation> collumnEvaList = new ArrayList<Evaluation>();
+            evaluationFilter(collumnEvaList,evaluations, evaluations.size());  //Filterung von Evaluationen mit den Fragen 8, 16, 17, 27 und 32
+            String dateFormatString = "dd.MM.YYYY(HH:mm)";
+            float overallGradeSemOne = 0;
+            float overallGradeSemTwo = 0;
+            float overallGradeSemThree = 0;
+            float overallGradeSemFour = 0;
+            float overallGradeSemFive = 0;
+            String overallGradeSemOneDate = "nicht vorhanden";
+            String overallGradeSemTwoDate = "nicht vorhanden";
+            String overallGradeSemThreeDate = "nicht vorhanden";
+            String overallGradeSemFourDate = "nicht vorhanden";
+            String overallGradeSemFiveDate = "nicht vorhanden";
+            String overallGradeSemOneName = "nicht vorhanden";
+            String overallGradeSemTwoName = "nicht vorhanden";
+            String overallGradeSemThreeName = "nicht vorhanden";
+            String overallGradeSemFourName = "nicht vorhanden";
+            String overallGradeSemFiveName = "nicht vorhanden";
+            for (int i = 0; i < collumnEvaList.size(); i++) {
+                if (i == 5) {
+                    break;
+                }
+                if (i == 0) {
+                    overallGradeSemOne = collumnAverageGrade(collumnEvaList, i);
+                    overallGradeSemOneName = collumnEvaList.get(i).getSubject().getName();
+                    overallGradeSemOneDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+                }
+                if (i == 1) {
+                    overallGradeSemTwo = collumnAverageGrade(collumnEvaList, i);
+                    overallGradeSemTwoName = collumnEvaList.get(i).getSubject().getName();
+                    overallGradeSemTwoDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+                }
+                if (i == 2) {
+                    overallGradeSemThree = collumnAverageGrade(collumnEvaList, i);
+                    overallGradeSemThreeName = collumnEvaList.get(i).getSubject().getName();
+                    overallGradeSemThreeDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+                }
+                if (i == 3) {
+                    overallGradeSemFour = collumnAverageGrade(collumnEvaList, i);
+                    overallGradeSemFourName = collumnEvaList.get(i).getSubject().getName();
+                    overallGradeSemFourDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+                }
+                if (i == 4) {
+                    overallGradeSemFive = collumnAverageGrade(collumnEvaList, i);
+                    overallGradeSemFiveName = collumnEvaList.get(i).getSubject().getName();
+                    overallGradeSemFiveDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+                }
+            }
+
+            model.addAttribute("evaluations", subjectList);
+            model.addAttribute("tutor", subjectList.get(0).getTutors().get(0).getFamilyName().toString());
+            if (subjectList.isEmpty() == false) {
+                model.addAttribute("tutorID", subjectList.get(0).getTutors().get(0).getId());
+            }
+
+            model.addAttribute("evaCount", evaluations.size());
+            if (mainAverageGradeVariable >= 1.0) {
+                model.addAttribute("mainAverage", mainAverageGradeRounded);
+            }
+            model.addAttribute("gEvaCount", collumnEvaList.size());
+            model.addAttribute("oGradeSemOneDate", overallGradeSemOneDate);
+            model.addAttribute("oGradeSemTwoDate", overallGradeSemTwoDate);
+            model.addAttribute("oGradeSemThreeDate", overallGradeSemThreeDate);
+            model.addAttribute("oGradeSemFourDate", overallGradeSemFourDate);
+            model.addAttribute("oGradeSemFiveDate", overallGradeSemFiveDate);
+
+            model.addAttribute("oGradeSemOneVName", overallGradeSemOneName);
+            model.addAttribute("oGradeSemTwoVName", overallGradeSemTwoName);
+            model.addAttribute("oGradeSemThreeVName", overallGradeSemThreeName);
+            model.addAttribute("oGradeSemFourVName", overallGradeSemFourName);
+            model.addAttribute("oGradeSemFiveVName", overallGradeSemFiveName);
+
+            model.addAttribute("oGradeSemOne", overallGradeSemOne);
+            model.addAttribute("oGradeSemTwo", overallGradeSemTwo);
+            model.addAttribute("oGradeSemThree", overallGradeSemThree);
+            model.addAttribute("oGradeSemFour", overallGradeSemFour);
+            model.addAttribute("oGradeSemFive", overallGradeSemFive);
+
+            model.addAttribute("mainResponse", mainResponseRate);
+        }
+        return "archive2";
 	}
 
+
+    @RequestMapping(value = "/auswertung", method = RequestMethod.GET)
+    String auswertung(Model model) {
+        //TODO
+        LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getUsername().equals("socher")) {
+            List<Evaluation> evaluations = tutorService.getByFamilyName(user.getUsername()).
+                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            model.addAttribute("evaluations", evaluations);
+            return "archive";
+        } else {
+            return "nope";
+        }
+    }
+
+    //NEW CODE ARCHIVE_EBENE 2
+    @RequestMapping(value = "/archive2", method = RequestMethod.GET)
+    String archive2(@RequestParam int tutorID, Model model) {
+        //TODO
+        List<Evaluation> evaluations = new ArrayList<Evaluation>();
+        LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//Sicherheitsabfrage, damit nur der Superuser auf alle Daten zugriff hat
+        if (user.getUsername().equals("socher"))
+        {
+            tutorIdList(evaluations, tutorID); // Evaluationen von einem Professor
+        }
+        else
+        {
+            evaluations = tutorService.getByFamilyName(user.getUsername()).
+                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+        }
+
+        //Berechnung der Durchschnittsnote eines Professors
+        float mainAverageGradeVariable= mainAverageGrade(evaluations, evaluations.size());
+        double mainAverageGradeRounded = Math.round(mainAverageGradeVariable * 100.0) / 100.0;
+        //Berechnung der Rücklaufquote
+        float mainResponseRate = responseRate(evaluations, evaluations.size());
+
+        //Evaluationen nach Datum sortieren
+        dateSortEvaluation(evaluations, evaluations.size());
+
+        //neue Liste damit eine Veranstaltung nur einmal angezeigt wird
+        List<Evaluation> subjectList = new ArrayList<Evaluation>();
+        singleSubjectList(subjectList, evaluations, evaluations.size());
+
+        //Berechnung der Rücklaufquote für ein Fach insgesamt
+        subjectResponseAnswer(subjectList, evaluations);
+
+        //Berechnung der Durchschnittsnote der letzten 5 Evaluationen mit gesamtnote
+        List<Evaluation> collumnEvaList = new ArrayList<Evaluation>();
+        evaluationFilter(collumnEvaList,evaluations, evaluations.size());  //for-schleife die evaluationen mit den Fragen 8, 16, 17, 27 und 32  herausfiltert
+        //Variablen fuer das Collumn-Diagramm
+        String dateFormatString = "dd.MM.YYYY(HH:mm)";
+        float overallGradeSemOne = 0;
+        float overallGradeSemTwo = 0;
+        float overallGradeSemThree = 0;
+        float overallGradeSemFour = 0;
+        float overallGradeSemFive = 0;
+        String overallGradeSemOneDate = "nicht vorhanden";
+        String overallGradeSemTwoDate = "nicht vorhanden";
+        String overallGradeSemThreeDate = "nicht vorhanden";
+        String overallGradeSemFourDate = "nicht vorhanden";
+        String overallGradeSemFiveDate = "nicht vorhanden";
+        String overallGradeSemOneName = "nicht vorhanden";
+        String overallGradeSemTwoName = "nicht vorhanden";
+        String overallGradeSemThreeName = "nicht vorhanden";
+        String overallGradeSemFourName = "nicht vorhanden";
+        String overallGradeSemFiveName = "nicht vorhanden";
+        for (int i = 0; i < collumnEvaList.size(); i++) {
+            if (i == 5) {
+                break;
+            }
+            if (i == 0) {
+                overallGradeSemOne = collumnAverageGrade(collumnEvaList, i);
+                overallGradeSemOneName = collumnEvaList.get(i).getSubject().getName();
+                overallGradeSemOneDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 1) {
+                overallGradeSemTwo = collumnAverageGrade(collumnEvaList, i);
+                overallGradeSemTwoName = collumnEvaList.get(i).getSubject().getName();
+                overallGradeSemTwoDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 2) {
+                overallGradeSemThree = collumnAverageGrade(collumnEvaList, i);
+                overallGradeSemThreeName = collumnEvaList.get(i).getSubject().getName();
+                overallGradeSemThreeDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 3) {
+                overallGradeSemFour = collumnAverageGrade(collumnEvaList, i);
+                overallGradeSemFourName = collumnEvaList.get(i).getSubject().getName();
+                overallGradeSemFourDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 4) {
+                overallGradeSemFive = collumnAverageGrade(collumnEvaList, i);
+                overallGradeSemFiveName = collumnEvaList.get(i).getSubject().getName();
+                overallGradeSemFiveDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+        }
+
+        model.addAttribute("evaluations", subjectList);
+        model.addAttribute("tutor", subjectList.get(0).getTutors().get(0).getFamilyName().toString());
+        model.addAttribute("tutorID", tutorID);
+
+        model.addAttribute("evaCount", evaluations.size());
+        if (mainAverageGradeVariable >= 1.0) {
+            model.addAttribute("mainAverage", mainAverageGradeRounded);
+        }
+
+        model.addAttribute("gEvaCount", collumnEvaList.size());
+        model.addAttribute("oGradeSemOneDate", overallGradeSemOneDate);
+        model.addAttribute("oGradeSemTwoDate", overallGradeSemTwoDate);
+        model.addAttribute("oGradeSemThreeDate", overallGradeSemThreeDate);
+        model.addAttribute("oGradeSemFourDate", overallGradeSemFourDate);
+        model.addAttribute("oGradeSemFiveDate", overallGradeSemFiveDate);
+
+        model.addAttribute("oGradeSemOneVName", overallGradeSemOneName);
+        model.addAttribute("oGradeSemTwoVName", overallGradeSemTwoName);
+        model.addAttribute("oGradeSemThreeVName", overallGradeSemThreeName);
+        model.addAttribute("oGradeSemFourVName", overallGradeSemFourName);
+        model.addAttribute("oGradeSemFiveVName", overallGradeSemFiveName);
+
+        model.addAttribute("oGradeSemOne", overallGradeSemOne);
+        model.addAttribute("oGradeSemTwo", overallGradeSemTwo);
+        model.addAttribute("oGradeSemThree", overallGradeSemThree);
+        model.addAttribute("oGradeSemFour", overallGradeSemFour);
+        model.addAttribute("oGradeSemFive", overallGradeSemFive);
+
+
+        model.addAttribute("mainResponse", mainResponseRate);
+
+        return "archive2";
+    }
+
+    //NEW CODE ARCHIVE_EBENE 3
+    @RequestMapping(value = "/archive3", method = RequestMethod.GET)
+    String archive3(@RequestParam int subjectID, @RequestParam int tutorID, Model model)
+    {
+        //TODO
+        List<Evaluation> evaluations = new ArrayList<Evaluation>();
+        LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //Sicherheitsabfrage, damit nur der Superuser auf alle Daten zugriff hat
+        if (user.getUsername().equals("socher"))
+        {
+            tutorIdList(evaluations, tutorID); // Evaluationen von einem Professor
+        }
+        else
+        {
+            evaluations = tutorService.getByFamilyName(user.getUsername()).
+                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+        }
+
+        List<Evaluation> relEvaList = new ArrayList<Evaluation>();
+        tutorSubjectIdList(relEvaList, evaluations,tutorID, subjectID); //Herausfiltern relevanter Veranstaltungen
+
+        //Evaluationen nach Datum sortieren
+        dateSortEvaluation(relEvaList, relEvaList.size());
+
+        //Berechnung der Durchschnittsnote einer Veranstaltung
+        float subjectAverageGradeVariable = mainAverageGrade(relEvaList, relEvaList.size());
+        double subjectAverageGradeRounded = Math.round(subjectAverageGradeVariable * 100.0) / 100.0;
+
+        // Rücklaufquote der Veranstaltung
+        float subjectResponseRate = responseRate(relEvaList, relEvaList.size());
+
+        //Berechnung der Durchschnittsnote der letzten 5 Evaluationen
+        List<Evaluation> collumnEvaList = new ArrayList<Evaluation>();
+        evaluationFilter(collumnEvaList,relEvaList, relEvaList.size()); //for-schleife die evaluationen mit den Fragen 8, 16, 17, 27 und 32 herausfiltert
+        // Variablen fuer Collumn-Diagramm
+        String dateFormatString = "dd.MM.YYYY(HH:mm)";
+        float subjectGradeOne = 0;
+        float subjectGradeTwo = 0;
+        float subjectGradeThree = 0;
+        float subjectGradeFour = 0;
+        float subjectGradeFive = 0;
+        String subjectGradeOneDate = "nicht vorhanden";
+        String subjectGradeTwoDate = "nicht vorhanden";
+        String subjectGradeThreeDate = "nicht vorhanden";
+        String subjectGradeFourDate = "nicht vorhanden";
+        String subjectGradeFiveDate = "nicht vorhanden";
+        String subjectGradeOneName = "nicht vorhanden";
+        String subjectGradeTwoName = "nicht vorhanden";
+        String subjectGradeThreeName = "nicht vorhanden";
+        String subjectGradeFourName = "nicht vorhanden";
+        String subjectGradeFiveName = "nicht vorhanden";
+
+        for (int i = 0; i < collumnEvaList.size(); i++) {
+            if (i == 5) {
+                break;
+            }
+            if (i == 0) {
+                subjectGradeOne = collumnAverageGrade(collumnEvaList, i);
+                subjectGradeOneName = collumnEvaList.get(i).getSubject().getName();
+                subjectGradeOneDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 1) {
+                subjectGradeTwo = collumnAverageGrade(collumnEvaList, i);
+                subjectGradeTwoName = collumnEvaList.get(i).getSubject().getName();
+                subjectGradeTwoDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 2) {
+                subjectGradeThree = collumnAverageGrade(collumnEvaList, i);
+                subjectGradeThreeName = collumnEvaList.get(i).getSubject().getName();
+                subjectGradeThreeDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+
+            }
+            if (i == 3) {
+                subjectGradeFour = collumnAverageGrade(collumnEvaList, i);
+                subjectGradeFourName = collumnEvaList.get(i).getSubject().getName();
+                subjectGradeFourDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+            if (i == 4) {
+                subjectGradeFive = collumnAverageGrade(collumnEvaList, i);
+                subjectGradeFiveName = collumnEvaList.get(i).getSubject().getName();
+                subjectGradeFiveDate = collumnEvaList.get(i).getDateOfEvaluation().toString(dateFormatString);
+            }
+        }
+
+        model.addAttribute("evaluations", relEvaList);
+        model.addAttribute("subjectEvaCount", collumnEvaList.size());
+        model.addAttribute("subjectGradeSemOneDate", subjectGradeOneDate);
+        model.addAttribute("subjectGradeSemTwoDate", subjectGradeTwoDate);
+        model.addAttribute("subjectGradeSemThreeDate", subjectGradeThreeDate);
+        model.addAttribute("subjectGradeSemFourDate", subjectGradeFourDate);
+        model.addAttribute("subjectGradeSemFiveDate", subjectGradeFiveDate);
+        model.addAttribute("subjectGradeSemOneVName", subjectGradeOneName);
+        model.addAttribute("subjectGradeSemTwoVName", subjectGradeTwoName);
+        model.addAttribute("subjectGradeSemThreeVName", subjectGradeThreeName);
+        model.addAttribute("subjectGradeSemFourVName", subjectGradeFourName);
+        model.addAttribute("subjectGradeSemFiveVName", subjectGradeFiveName);
+        model.addAttribute("subjectGradeOne", subjectGradeOne);
+        model.addAttribute("subjectGradeTwo", subjectGradeTwo);
+        model.addAttribute("subjectGradeThree", subjectGradeThree);
+        model.addAttribute("subjectGradeFour", subjectGradeFour);
+        model.addAttribute("subjectGradeFive", subjectGradeFive);
+        if (subjectAverageGradeVariable >= 1.0) {
+            model.addAttribute("subjectNotenQ", subjectAverageGradeRounded);
+        }
+        model.addAttribute("subjectResponse", subjectResponseRate);
+        model.addAttribute("averageGradeList", createAverageGradeList(relEvaList));
+        model.addAttribute("pictureCommentList",createPictureCommentList(relEvaList));
+
+        return "archive3";
+    }
 	@RequestMapping(value = "/new-evaluation", method = RequestMethod.GET)
 	String setup(Model model) {
 		LdapUserDetails user = (LdapUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -182,7 +534,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	@RequestMapping(value = "/questionnaire/{id}", method = RequestMethod.GET)
 	String getQuestionRevision(@PathVariable String id, Model model) {
 		QuestionRevision questionnaire = null;
-		
+
         if (model.containsAttribute("questionnaire")) {
             Object questionnaireTemp = model.asMap().get("questionnaire");
             if (questionnaireTemp != null && questionnaireTemp instanceof QuestionRevision) {
@@ -226,10 +578,10 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			int questionnaireId = questionnaire.getId();
 			List<Choice> oldChoices = questionnaire.getChoices();
 			List<Question> oldQuestions = questionnaire.getQuestions();
-			
+
 			String questionnaireName = allRequestParams.get("name").trim();
 			List<String> revisionNames = questionsService.getRevisionNames();
-			
+
 			questionnaire = hydrateQuestionRevision(questionnaire, allRequestParams);
 			if(!oldQuestionnaireName.equals(questionnaireName)){
 				for (String revisionName : revisionNames) {
@@ -313,42 +665,70 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		}
 	}
 
-	@RequestMapping(value = "/resultfile", method = RequestMethod.GET)
-	void getQRCodeFile(@RequestParam String uid, HttpServletResponse response) throws DBEntryDoesNotExistException, IOException, EvaluationException {
-		response.setHeader("Content-Disposition", "attachment; filename=result.zip");
-		InputStream is = null;
-		try {
-			File resultFile = evaluationService.getSummaryFile(uid);
-			if (resultFile == null) {
-				throw new EvaluationException(EvaluationException.READ_RESULT_FILE, "Error while reading result file");
-			}
-			// get your file as InputStream
-			is = new FileInputStream(resultFile);
-			// copy it to response's OutputStream
-			FileCopyUtils.copy(is, response.getOutputStream());
-			response.flushBuffer();
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+    @RequestMapping(value = "/resultfile", method = RequestMethod.GET)
+    void getQRCodeFile(@RequestParam String uid, HttpServletResponse response) throws DBEntryDoesNotExistException, IOException, EvaluationException {
+        response.setHeader("Content-Disposition", "attachment; filename=result.zip");
+        InputStream is = null;
+        try {
+            File resultFile = evaluationService.getSummaryFile(uid);
+            if (resultFile == null)
+            {
+                throw new EvaluationException(EvaluationException.READ_RESULT_FILE, "Error while reading result file");
+            }
+            // get your file as InputStream
+            is = new FileInputStream(resultFile);
+            // copy it to response's OutputStream
+            FileCopyUtils.copy(is, response.getOutputStream());
+            response.flushBuffer();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
-	@RequestMapping(value = "/evaluation/close", method = RequestMethod.GET)
-	String evaluationClose(@RequestParam String uid, Model model) {
-		// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		try {
-			evaluationService.close(uid);
-			return "redirect:/archive";
-		} catch (AggregatedAnswerException e) {
-			model.addAttribute("error message", "Die Evaluation kann erst geschlossen werden, wenn mindestens eine Person abgestimmt hat");
-			return "redirect:/evaluation/" + uid;
-		}
-	}
+    @RequestMapping(value = "/imagefile", method = RequestMethod.GET)
+    void getImageFile(@RequestParam String uid, @RequestParam int voteID, HttpServletResponse response) throws DBEntryDoesNotExistException, IOException, EvaluationException {
+        String responsetxt = "attachment; filename="+voteID+".zip";
+        response.setHeader("Content-Disposition", responsetxt);
+        InputStream is = null;
+        try {
+            File imageFile = evaluationService.getImageFile(uid, voteID);
+            if (imageFile == null)
+            {
+                throw new EvaluationException(EvaluationException.READ_RESULT_FILE, "Error while reading result file");
+            }
+            // get your file as InputStream
+            is = new FileInputStream(imageFile);
+            // copy it to response's OutputStream
+            FileCopyUtils.copy(is, response.getOutputStream());
+            response.flushBuffer();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @RequestMapping(value = "/evaluation/close", method = RequestMethod.GET)
+    String evaluationClose(@RequestParam String uid, Model model) {
+//        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            evaluationService.close(uid);
+            return "redirect:/archive";
+        } catch (AggregatedAnswerException e) {
+            model.addAttribute("error message", "Die Evaluation kann erst geschlossen werden, wenn mindestens eine Person abgestimmt hat");
+            return "redirect:/evaluation/" + uid;
+        }
+    }
 
 	@RequestMapping(value = "/evaluation", method = RequestMethod.POST)
 	String startEvaluation(Model model, @RequestParam int semester, @RequestParam int students, @RequestParam String tutors, @RequestParam int subject,
@@ -474,116 +854,434 @@ public class ViewController extends WebMvcConfigurerAdapter {
 			textQuestionsFirst = true;
 		}
 		questionRevision.setTextQuestionsFirst(textQuestionsFirst);
+        for (int i = 1; i <= questionCount; i++) {
+            String questionType = allRequestParams.get("question-type-" + i);
+            if (questionType.equals("Textfrage")) {
+                TextQuestion textQuestion = new TextQuestion();
+                textQuestion.setQuestionPosition(i);
+                String text = allRequestParams.get("question-" + i);
+                int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + i));
+                boolean onlyNumbers = false;
+                String onlyNumbersString = allRequestParams.get("numbers-only-" + i);
+                if (onlyNumbersString != null) {
+                    onlyNumbers = true;
+                }
 
-		for (int i = 1; i <= questionCount; i++) {
-			String questionType = allRequestParams.get("question-type-" + i);
-			if (questionType.equals("Textfrage")) {
-				TextQuestion textQuestion = new TextQuestion();
-				textQuestion.setQuestionPosition(i);
-				String text = allRequestParams.get("question-" + i);
-				int maxLength = Integer.parseInt(allRequestParams.get("max-chars-" + i));
-				boolean onlyNumbers = false;
-				String onlyNumbersString = allRequestParams.get("numbers-only-" + i);
-				if (onlyNumbersString != null) {
-					onlyNumbers = true;
-				}
+                textQuestion.setType(QuestionType.TextQuestion);
+                textQuestion.setText(text);
+                textQuestion.setMaxLength(maxLength);
+                textQuestion.setOnlyNumbers(onlyNumbers);
+                questions.add(textQuestion);
 
-				textQuestion.setType(QuestionType.TextQuestion);
-				textQuestion.setText(text);
-				textQuestion.setMaxLength(maxLength);
-				textQuestion.setOnlyNumbers(onlyNumbers);
-				questions.add(textQuestion);
+            }
+            if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
+                SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
+                singleChoiceQuestion.setQuestionPosition(i);
+                String text = allRequestParams.get("question-" + i);
+                List<Choice> choices = new ArrayList<Choice>();
+                int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + i));
+                for (int j = 1; j <= choicesNumber; j++) {
+                    Choice choice = new Choice();
+                    choice.setText(allRequestParams.get("choice-text-" + i + "-" + j));
+                    choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + i + "-" + j)));
+                    choices.add(choice);
+                }
+                boolean noAnswer = false;
+                String noAnswerString = allRequestParams.get("no-answer-" + i);
+                if (noAnswerString != null) {
+                    noAnswer = true;
+                }
 
-			}
-			if (questionType.equals("Best First") || questionType.equals("Best In The Middle")) {
-				SingleChoiceQuestion singleChoiceQuestion = new SingleChoiceQuestion();
-				singleChoiceQuestion.setQuestionPosition(i);
-				String text = allRequestParams.get("question-" + i);
-				List<Choice> choices = new ArrayList<Choice>();
-				int choicesNumber = Integer.parseInt(allRequestParams.get("choices-number-" + i));
-				for (int j = 1; j <= choicesNumber; j++) {
-					Choice choice = new Choice();
-					choice.setText(allRequestParams.get("choice-text-" + i + "-" + j));
-					choice.setGrade(Short.parseShort(allRequestParams.get("choice-grade-" + i + "-" + j)));
-					choices.add(choice);
-				}
-				boolean noAnswer = false;
-				String noAnswerString = allRequestParams.get("no-answer-" + i);
-				if (noAnswerString != null) {
-					noAnswer = true;
-				}
+                if (noAnswer) {
+                    Choice noAnswerChoice = new Choice();
+                    noAnswerChoice.setText(allRequestParams.get("choice-text-" + i + "-" + 0));
+                    noAnswerChoice.setGrade((short) 0);
+                    choices.add(noAnswerChoice);
+                }
 
-				if (noAnswer) {
-					Choice noAnswerChoice = new Choice();
-					noAnswerChoice.setText(allRequestParams.get("choice-text-" + i + "-" + 0));
-					noAnswerChoice.setGrade((short) 0);
-					choices.add(noAnswerChoice);
-				}
+                singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+                singleChoiceQuestion.setText(text);
+                singleChoiceQuestion.setChoices(choices);
+                questionRevisionChoices.addAll(choices);
+                questions.add(singleChoiceQuestion);
+            }
+        }
 
-				singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
-				singleChoiceQuestion.setText(text);
-				singleChoiceQuestion.setChoices(choices);
-				questionRevisionChoices.addAll(choices);
-				questions.add(singleChoiceQuestion);
-			}
-		}
+        questionRevision.setChoices(questionRevisionChoices);
+        questionRevision.setQuestions(questions);
 
-		questionRevision.setChoices(questionRevisionChoices);
-		questionRevision.setQuestions(questions);
+        return questionRevision;
+    }
 
-		return questionRevision;
-	}
+    private void setupQuestionnaireModel(Model model, QuestionRevision questionnaire) {
+        // Unterscheiden zwischen Textfragen und Single-Choice-Fragen
+        List<TextQuestion> textQuestions = new ArrayList<TextQuestion>();
+        List<SingleChoiceQuestion> singleChoiceQuestionsTemp = new ArrayList<SingleChoiceQuestion>();
+        for (Question question : questionnaire.getQuestions()) {
+            if (question instanceof TextQuestion) {
+                textQuestions.add((TextQuestion) question);
+            } else if (question instanceof SingleChoiceQuestion) {
+                singleChoiceQuestionsTemp.add((SingleChoiceQuestion) question);
+            }
+        }
 
-	private void setupQuestionnaireModel(Model model, QuestionRevision questionnaire) {
-		// Unterscheiden zwischen Textfragen und Single-Choice-Fragen
-		List<TextQuestion> textQuestions = new ArrayList<TextQuestion>();
-		List<SingleChoiceQuestion> singleChoiceQuestionsTemp = new ArrayList<SingleChoiceQuestion>();
-		for (Question question : questionnaire.getQuestions()) {
-			if (question instanceof TextQuestion) {
-				textQuestions.add((TextQuestion) question);
-			} else if (question instanceof SingleChoiceQuestion) {
-				singleChoiceQuestionsTemp.add((SingleChoiceQuestion) question);
-			}
-		}
+        // Unterscheiden zwischen Best-First-Fragen und Best-In-The-Middle-Fragen
+        List<SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<SimpleEntry<String, SingleChoiceQuestion>>();
+        List<Choice> noAnswerChoices = new ArrayList<Choice>();
+        for (SingleChoiceQuestion question : singleChoiceQuestionsTemp) {
+            List<Choice> choicesTemp = question.getChoices();
+            Choice noAnswerChoice = null;
+            boolean containsNegativeGrade = false;
 
-		// Unterscheiden zwischen Best-First-Fragen und Best-In-The-Middle-Fragen
-		List<SimpleEntry<String, SingleChoiceQuestion>> singleChoiceQuestions = new ArrayList<SimpleEntry<String, SingleChoiceQuestion>>();
-		List<Choice> noAnswerChoices = new ArrayList<Choice>();
-		for (SingleChoiceQuestion question : singleChoiceQuestionsTemp) {
-			List<Choice> choicesTemp = question.getChoices();
-			Choice noAnswerChoice = null;
-			boolean containsNegativeGrade = false;
+            for (Choice choice : choicesTemp) {
+                if (choice.getGrade() < 0) {
+                    containsNegativeGrade = true;
+                }
+                if (choice.getGrade() == 0) {
+                    noAnswerChoice = choice;
+                }
+            }
 
-			for (Choice choice : choicesTemp) {
-				if (choice.getGrade() < 0) {
-					containsNegativeGrade = true;
-				}
-				if (choice.getGrade() == 0) {
-					noAnswerChoice = choice;
-				}
-			}
+            // "keine Angabe"-Choice aus der Liste aller Choices entfernen und einer separaten Liste hinzufügen
+            if (noAnswerChoice != null) {
+                choicesTemp.remove(noAnswerChoice);
+            }
+            noAnswerChoices.add(noAnswerChoice);
 
-			// "keine Angabe"-Choice aus der Liste aller Choices entfernen und einer separaten Liste hinzufügen
-			if (noAnswerChoice != null) {
-				choicesTemp.remove(noAnswerChoice);
-			}
-			noAnswerChoices.add(noAnswerChoice);
+            if (containsNegativeGrade) {
+                // Choices absteigend sortieren und Frage der Liste von Best-In-The-Middle-Fragen hinzufügen
+                choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
+                singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
+            } else {
+                // Choices aufsteigend sortieren und Frage der Liste von Best-First-Fragen hinzufügen
+                choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
+                singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
+            }
+        }
 
-			if (containsNegativeGrade) {
-				// Choices absteigend sortieren und Frage der Liste von Best-In-The-Middle-Fragen hinzufügen
-				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()) * -1);
-				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestInTheMiddle", question));
-			} else {
-				// Choices aufsteigend sortieren und Frage der Liste von Best-First-Fragen hinzufügen
-				choicesTemp.sort((Choice choice1, Choice choice2) -> Short.compare(choice1.getGrade(), choice2.getGrade()));
-				singleChoiceQuestions.add(new SimpleEntry<String, SingleChoiceQuestion>("BestFirst", question));
-			}
-		}
+        model.addAttribute("questionnaire", questionnaire);
+        model.addAttribute("textQuestions", textQuestions);
+        model.addAttribute("singleChoiceQuestions", singleChoiceQuestions);
+        model.addAttribute("noAnswerChoices", noAnswerChoices);
+    }
 
-		model.addAttribute("questionnaire", questionnaire);
-		model.addAttribute("textQuestions", textQuestions);
-		model.addAttribute("singleChoiceQuestions", singleChoiceQuestions);
-		model.addAttribute("noAnswerChoices", noAnswerChoices);
-	}
+    private float collumnAverageGrade(List<Evaluation> evaluationArray, int evaNumber)
+    {
+        // Berechnung der Durchschnittsnote für das Balkendiagramm
+        float gradeAverage = 0;
+        int studentsVoted = 0;
+        for (int j = 0; j < evaluationArray.get(evaNumber).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+        {
+            int currentId = evaluationArray.get(evaNumber).getQuestionRevision().getMcQuestions().get(j).getId();
+            if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
+                if (evaluationArray.get(evaNumber).getVotes().size() != 0) {
+                    for (int stVote = 0; stVote < evaluationArray.get(evaNumber).getVotes().size(); stVote++) {
+                        gradeAverage += evaluationArray.get(evaNumber).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade();
+                        if(evaluationArray.get(evaNumber).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade() == 0)
+                        {
+                            studentsVoted -= 1;//wenn "keine Angabe" gewählt wird, wird der Vote abgezogen
+                        }
+                    }
+                }
+                studentsVoted += evaluationArray.get(evaNumber).getVotes().size(); // Anzahl der Votes wird aufaddiert
+            }
+        }
+        return (gradeAverage / studentsVoted);
 
+    }
+
+    private float mainAverageGrade(List<Evaluation> evaluationArray, int evaluationLength) {
+        //Berechnung der Gesamtdurchschnittsnote
+        float subjectNoteDurchschnitt = 0;
+        int studentsVotetMainQuestions = 0;
+        for (int i = 0; i < evaluationLength; i++) // zählt evas durch
+        {
+            for (int j = 0; j < evaluationArray.get(i).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+            {
+                int currentId = evaluationArray.get(i).getQuestionRevision().getMcQuestions().get(j).getId();
+                if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
+                    if (evaluationArray.get(i).getVotes().size() != 0) {
+                        for (int stVote = 0; stVote < evaluationArray.get(i).getVotes().size(); stVote++) {
+                            subjectNoteDurchschnitt += evaluationArray.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade();
+                            if(evaluationArray.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade() == 0)
+                            {
+                                studentsVotetMainQuestions -= 1; //wenn "keine Angabe" gewählt wird, wird der Vote abgezogen
+                            }
+                        }
+                    }
+                    studentsVotetMainQuestions += evaluationArray.get(i).getVotes().size();// Anzahl der Votes wird aufaddiert
+                }
+            }
+        }
+        return (subjectNoteDurchschnitt / studentsVotetMainQuestions);
+    }
+
+    private List<Evaluation> dateSortEvaluation(List<Evaluation> evaluationArray, int evaluationLength)
+    {
+        // Sortieren der Evaluationen nach Datum
+        for (int i = 0; i < evaluationLength; i++) {
+            for (int j = 0; j < evaluationLength - 1; j++) {
+                if (evaluationArray.get(j).getDateOfEvaluation().compareTo(evaluationArray.get(j + 1).getDateOfEvaluation()) == -1) {
+
+                    Evaluation temp = evaluationArray.get(j);
+                    evaluationArray.set(j, evaluationArray.get(j + 1));
+                    evaluationArray.set(j + 1, temp);
+                }
+            }
+        }
+
+        return evaluationArray;
+    }
+    private float responseRate(List<Evaluation> evaluationArray, int evaluationLength)
+    {
+        //for schleife zur Berechnung der Ruecklaufquote
+        float studentsAllCount = 0;
+        float studentsVotetCount = 0;
+        for (int i = 0; i < evaluationLength; i++)
+        {
+            studentsAllCount += evaluationArray.get(i).getStudentsAll();
+            studentsVotetCount += evaluationArray.get(i).getStudentsVoted();
+        }
+        return (studentsVotetCount / studentsAllCount);
+    }
+    private List<Evaluation> allEvaluation(List<Evaluation> evaluationArray, int tutorCount)
+    {
+        //Sucht alle Evaluationen jedes Tutors und packt sie in eine Liste
+        int evaListElement = 0;
+
+        for (int i = 0; i < tutorCount; i++) {
+            List<Evaluation> evaluationsFromTutor = tutorService.getByFamilyName(tutorService.getAll().get(i).getFamilyName()).
+                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            if (evaluationsFromTutor.size() >= 1) {
+                for (int j = 0; j < evaluationsFromTutor.size(); j++) {
+                    evaluationArray.add(evaListElement, evaluationsFromTutor.get(j));
+                    evaListElement += 1;
+                }
+            }
+        }
+
+        return evaluationArray;
+    }
+    private List<Evaluation> singleTutorList(List<Evaluation> newEvaluationArray, List<Evaluation> oldEvaluationArray, int evaLength)
+    {
+        //Erstellen einer Liste bei der jeder Professor nur einmal vorkommt
+        int newListElementPos = 0;
+        List<Integer> tutorIDList = new ArrayList<Integer>();// Liste in der bereits vorhandene Professoren gespeichert werden
+        for (int i = 0; i < evaLength; i++) {
+            boolean tutorListed = false;
+            int tutorListLength = tutorIDList.size();
+            if (tutorListLength != 0) {
+                for (int j = 0; j < tutorListLength; j++)
+                {
+                    // Überprüfung ob die tutorID schon vorkommt
+                    if (oldEvaluationArray.get(i).getTutors().get(0).getId() == tutorIDList.get(j)) {
+                        tutorListed = true;
+                    }
+                }
+            }
+            if (tutorListed == false) //wenn tutorID nicht schon vorhanden ist, wird sie die Evaluation der neuen Liste hinzugefügt
+            {
+                newEvaluationArray.add(newListElementPos, oldEvaluationArray.get(i));
+                tutorIDList.add(newListElementPos, oldEvaluationArray.get(i).getTutors().get(0).getId());
+                newListElementPos += 1;
+
+            }
+        }
+        return newEvaluationArray;
+    }
+    private List<Evaluation> singleSubjectList(List<Evaluation> newEvaluationArray, List<Evaluation> oldEvaluationArray, int evaLength) {
+        //Erstellen einer Liste bei der jede Veranstaltung nur einmal vorkommt
+        int newListElementPos = 0;
+        List<Integer> subjectIDList = new ArrayList<Integer>();// liste in der bereits vorhandene Veranstaltungen gespeichert werden
+        for (int i = 0; i < evaLength; i++) {
+            boolean subjectListed = false;
+            int tutorListLength = subjectIDList.size();
+            if (tutorListLength != 0) {
+                for (int j = 0; j < tutorListLength; j++) {
+                    // Überprüfung ob die subjectID schon vorkommt
+                    if (oldEvaluationArray.get(i).getSubject().getId() == subjectIDList.get(j)) {
+                        subjectListed = true;
+                    }
+                }
+            }
+            if (subjectListed == false) //wenn subjectID nicht schon vorhanden ist, wird sie die Evaluation der neuen Liste hinzugefügt
+            {
+                newEvaluationArray.add(newListElementPos, oldEvaluationArray.get(i));
+                subjectIDList.add(newListElementPos, oldEvaluationArray.get(i).getSubject().getId());
+                newListElementPos += 1;
+            }
+        }
+        return newEvaluationArray;
+    }
+
+    private List<Evaluation> evaluationFilter(List<Evaluation> newEvaluationArray, List<Evaluation> oldEvaluationArray, int evaLength) {
+
+        //Herausfiltern von Evaluationen mit den FragenIDs 8 und 16 herausfiltert
+        int newListElementPos = 0;
+        for (int i = 0; i < evaLength; i++)// zählt Evaluationen durch
+        {
+            boolean questionAvailable = false;
+            for (int j = 0; j < oldEvaluationArray.get(i).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+            {
+                int currentId = oldEvaluationArray.get(i).getQuestionRevision().getMcQuestions().get(j).getId();
+                if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
+                    questionAvailable = true;
+                }
+            }
+            if (questionAvailable == true) {
+                newEvaluationArray.add(newListElementPos, oldEvaluationArray.get(i));
+                newListElementPos += 1;
+            }
+
+        }
+        return newEvaluationArray;
+    }
+
+    private List<Evaluation> subjectResponseAnswer(List<Evaluation> subjectArray, List<Evaluation> evaluationArray) {
+        //Berechnung der Rücklaufquoten für Veranstaltungen
+        for (int i = 0; i < subjectArray.size(); i++) {
+            int studentsSubjectCount = 0;
+            int studentsSubjectVoted = 0;
+            for (int j = 0; j < evaluationArray.size(); j++) {
+                if (evaluationArray.get(j).getSubject().getId() == subjectArray.get(i).getSubject().getId())//wenn ID übereinstimmt
+                {
+                    studentsSubjectCount += evaluationArray.get(j).getStudentsAll();
+                    studentsSubjectVoted += evaluationArray.get(j).getStudentsVoted();
+                }
+            }
+            subjectArray.get(i).setStudentsAll(studentsSubjectCount);
+            subjectArray.get(i).setStudentsVoted(studentsSubjectVoted);
+        }
+        return subjectArray;
+    }
+
+    private List<Evaluation> tutorIdList(List<Evaluation> newEvaluationArray, int tutorID)
+    {
+        // Erstellen einer Liste mit allen Evaluationen eines Tutors
+        int tutorCount = tutorService.getAll().size();// Anzahl aller möglichen Lehrenden
+        int evaListElement = 0;
+        for (int i = 0; i < tutorCount; i++) //durchläuft tutorIds
+        {
+            //Liste des jeweiligen Tutors
+            List<Evaluation> evaluationsFromTutor = tutorService.getByFamilyName(tutorService.getAll().get(i).getFamilyName()).
+                    get(0).getEvaluations().stream().filter(Evaluation::getClosed).collect(Collectors.toList());
+            if (evaluationsFromTutor.size() >= 1) {
+                for (int j = 0; j < evaluationsFromTutor.size(); j++) {
+                    if (evaluationsFromTutor.get(j).getTutors().get(0).getId() == tutorID) {
+                        newEvaluationArray.add(evaListElement, evaluationsFromTutor.get(j));
+                        evaListElement += 1;
+                    }
+                }
+            }
+        }
+        return newEvaluationArray;
+    }
+
+    private List<Evaluation> tutorSubjectIdList(List<Evaluation> newEvaluationArray, List<Evaluation> oldEvaluationArray,int tutorId, int subjectId)
+    {
+        //Filtert relevante Veranstaltungen aufgrund subjectId und tutorId
+        int newListElementPos = 0;
+        for (int i = 0; i < oldEvaluationArray.size(); i++) {
+            if (oldEvaluationArray.get(i).getSubject().getId() == subjectId && oldEvaluationArray.get(i).getTutors().get(0).getId() == tutorId) {
+                //in neue Liste hinzufügen
+                newEvaluationArray.add(newListElementPos, oldEvaluationArray.get(i));
+                newListElementPos += 1;
+            }
+        }
+        return newEvaluationArray;
+    }
+
+    private List<Float>averageGradeTutor(List<Float> averageGradeList) {
+        //Berechnung der Gesamtdurchschnittsnote
+        for(int h = 0; h < tutorService.getAll().size(); h++)
+        {
+            float subjectNoteDurchschnitt = 0;
+            int studentsVotetMainQuestions = 0;
+            List<Evaluation> singleTutorList = new ArrayList<Evaluation>();
+            tutorIdList(singleTutorList,h); //Herausfiltern des jeweiligen Tutors
+            if (singleTutorList.size() >= 1)
+            {
+                for (int i = 0; i < singleTutorList.size(); i++) // zählt alle evaluationen eines Professors durch
+                {
+                    for (int j = 0; j < singleTutorList.get(i).getQuestionRevision().getMcQuestions().size(); j++)// zählt vorhandene Fragen durch
+                    {
+                        int currentId = singleTutorList.get(i).getQuestionRevision().getMcQuestions().get(j).getId();
+                        if (currentId == 8 ||currentId == 16 ||currentId == 17||currentId == 27|| currentId == 32) {
+                            if (singleTutorList.get(i).getVotes().size() != 0) {
+                                for (int stVote = 0; stVote < singleTutorList.get(i).getVotes().size(); stVote++) {
+                                    subjectNoteDurchschnitt += singleTutorList.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade();
+                                    if(singleTutorList.get(i).getVotes().get(stVote).getMcAnswers().get(j).getChoice().getGrade() == 0)
+                                    {
+                                        studentsVotetMainQuestions -= 1; //wenn "keine Angabe" gewählt wird, wird der Vote abgezogen
+                                    }
+                                }
+                            }
+                            studentsVotetMainQuestions += singleTutorList.get(i).getVotes().size();// Anzahl der Votes wird aufaddiert
+                        }
+                    }
+                }
+            }
+
+            averageGradeList.add(Math.round((subjectNoteDurchschnitt / studentsVotetMainQuestions)* 100.0f)/100.0f);
+        }
+        return averageGradeList;
+    }
+
+    private float [][]createAverageGradeList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und Mittelwerten aller Fragen (y) zurück
+    {
+
+
+
+        int [] questionCount= new int[100];
+        for(int i = 0; i< evaluationArray.size() ; i++) //geht durch jeden vote in der Evaluation des Fachs und schreibt die Anzahl der Fragen an die entsprechende Stelle des questioncount Arrays
+        {
+            questionCount[i]= evaluationArray.get(i).getQuestionRevision().getMcQuestions().size();
+        }
+
+        float [][] averageGradeList = new float[evaluationArray.size()][100];
+        for (int i = 0; i < evaluationArray.size(); i++) // zählt evas durch
+        {
+            for(int j = 0; j < questionCount[i]; j++) //zählt anzahl der fragen der aktuellen eva durch
+            {
+                int studentsVotedQuestion = 0;
+                float Grade = 0;
+                if (evaluationArray.get(i).getVotes().size() != 0) {
+                    for (int v = 0; v < evaluationArray.get(i).getVotes().size(); v++) //zählt votes durch
+                    {
+                        if (evaluationArray.get(i).getVotes().get(v).getMcAnswers().get(j).getChoice().getGrade() != 0) //holt grade der aktuellen frage und eva und addiert grade und student++ wenn grade!=0
+                        {
+                            Grade += evaluationArray.get(i).getVotes().get(v).getMcAnswers().get(j).getChoice().getGrade();
+                            studentsVotedQuestion++;
+                        }
+                    }
+                }
+                averageGradeList[i][j] = (Math.round((Grade/studentsVotedQuestion) * 100.0f) / 100.0f);
+            }
+        }
+        return averageGradeList;
+    }
+
+    private Boolean [][][]createPictureCommentList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und booleans ob textfragen beantwortet wurden (y) zurück
+    {
+        int [] questionCount= new int[100];
+        for(int i = 0; i< evaluationArray.size() ; i++) //geht durch jeden vote in der Evaluation des Fachs und schreibt die Anzahl der Textfragen an die entsprechende Stelle des questioncount Arrays
+        {
+            questionCount[i]= evaluationArray.get(i).getQuestionRevision().getQuestions().size();
+        }
+
+        Boolean [][][] pictureCommentList = new Boolean[evaluationArray.size()][1000][100];
+        for (int i = 0; i < evaluationArray.size(); i++) // zählt evas durch
+        {
+            for(int j = 0; j < questionCount[i]; j++) //zählt Anzahl der Textfragen der aktuellen Evaluation durch
+            {
+                if (evaluationArray.get(i).getVotes().size() != 0) {
+                    for (int v = 0; v < evaluationArray.get(i).getVotes().size(); v++) //zählt votes durch und guckt ob eine zip mit der voteID, ergo ein Bild Existiert
+                    {
+                        pictureCommentList[i][v][j] = evaluationService.imageExists(evaluationArray.get(i).getUid(), v+1);
+                    }
+                }
+            }
+        }
+        return pictureCommentList;
+    }
 }
