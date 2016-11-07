@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head id="head">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>CampusApp Evaluation</title>
+
+	<!-- Minified jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+			integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+		  integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous" />
+
+	<!-- Main CSS -->
+	<link rel="stylesheet" href="/css/main.css" />
+
+	<!-- for toggle-function-->
+	<script>
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+	</script>
+	<!-- Countdown Clock JS -->
+	<script src="/js/backtalk.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+
+		// Load Charts and the corechart and barchart packages.
+		google.charts.load('current', {'packages':['corechart']});
+
+		// Draw the pie chart and bar chart when Charts is loaded.
+		google.charts.setOnLoadCallback(drawChart);
+
+		/*<![CDATA[*/
+
+		var oGradeSemOneValue = 		/*[[${oGradeSemOne}]]*/ '0.0';
+		var oGradeSemTwoValue = 		/*[[${oGradeSemTwo}]]*/ '0.0';
+		var oGradeSemThreeValue = 	/*[[${oGradeSemThree}]]*/ '0.0';
+		var oGradeSemFourValue = 	/*[[${oGradeSemFour}]]*/ '0.0';
+		var oGradeSemFiveValue = 	/*[[${oGradeSemFive}]]*/ '0.0';
+
+		var mainResponseValue = 		/*[[${mainResponse}]]*/ 'Ruecklaufquote';
+		var evaLimitCount = 		/*[[${gEvaCount}]]*/ 'evaluationsAnzahl';
+
+		var oGradeSemOneDateOfEva = 	/*[[${oGradeSemOneDate}]]*/ 'Datum der Evaluierung';
+		var oGradeSemTwoDateOfEva = 	/*[[${oGradeSemTwoDate}]]*/ 'Datum der Evaluierung';
+		var oGradeSemThreeDateOfEva = /*[[${oGradeSemThreeDate}]]*/ 'Datum der Evaluierung';
+		var oGradeSemFourDateOfEva = /*[[${oGradeSemFourDate}]]*/ 'Datum der Evaluierung';
+		var oGradeSemFiveDateOfEva = /*[[${oGradeSemFiveDate}]]*/ 'Datum der Evaluierung';
+
+		var oGradeSemOneName = /*[[${oGradeSemOneVName}]]*/ 'Name der Evaluierung';
+		var oGradeSemTwoName = /*[[${oGradeSemTwoVName}]]*/ 'Name der Evaluierung';
+		var oGradeSemThreeName = /*[[${oGradeSemThreeVName}]]*/ 'Name der Evaluierung';
+		var oGradeSemFourName = /*[[${oGradeSemFourVName}]]*/ 'Name der Evaluierung';
+		var oGradeSemFiveName = /*[[${oGradeSemFiveVName}]]*/ 'Name der Evaluierung';
+
+		/*]]>*/
+
+		function drawChart()
+		{
+			if(mainResponseValue != 0) {
+				var pieDataArchive2 = google.visualization.arrayToDataTable([
+					['Rücklaufquote', 'in Prozent'],
+					['Abgestimmte Studenten', mainResponseValue],
+					['Restliche Studenten', 1 - mainResponseValue]
+				]);
+
+				var pieOptionsArchive2 = {
+					title: 'Rücklaufquote',
+					enableInteractivity: false,
+					pieHole: 0.2,
+					pieSliceTextStyle: {
+						color: 'white',
+						bold: true
+					},
+					slices: {
+						0: { color: '#40FF00' },
+						1: { color: 'grey' }
+					}
+				};
+			}
+			var pieChartArchive2 = new google.visualization.PieChart(document.getElementById('donutchartArchive2'));
+			pieChartArchive2.draw(pieDataArchive2, pieOptionsArchive2);
+
+			if(evaLimitCount >= 2)
+			{
+				if(evaLimitCount == 2)
+				{
+					var columnDataArchive2 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+oGradeSemOneName		+"("+oGradeSemOneDateOfEva	+")"), oGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemTwoName		+"("+oGradeSemTwoDateOfEva	+")"), oGradeSemTwoValue, "#40FF00"]
+					]);
+				}
+				if(evaLimitCount == 3)
+				{
+					var columnDataArchive2 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+oGradeSemOneName		+"("+oGradeSemOneDateOfEva	+")"), oGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemTwoName		+"("+oGradeSemTwoDateOfEva	+")"), oGradeSemTwoValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemThreeName	+"("+oGradeSemThreeDateOfEva	+")"), oGradeSemThreeValue,  "#40FF00"]
+					]);
+				}
+
+				if(evaLimitCount == 4)
+				{
+					var columnDataArchive2 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+oGradeSemOneName		+"("+oGradeSemOneDateOfEva	+")"), oGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemTwoName		+"("+oGradeSemTwoDateOfEva	+")"), oGradeSemTwoValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemThreeName	+"("+oGradeSemThreeDateOfEva	+")"), oGradeSemThreeValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemFourName	+"("+oGradeSemFourDateOfEva	+")"), oGradeSemFourValue, "#40FF00"]
+					]);
+				}
+				if(evaLimitCount >= 5)
+				{
+					var columnDataArchive2 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+oGradeSemOneName		+"("+oGradeSemOneDateOfEva	+")"), oGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemTwoName		+"("+oGradeSemTwoDateOfEva	+")"), oGradeSemTwoValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemThreeName	+"("+oGradeSemThreeDateOfEva	+")"), oGradeSemThreeValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemFourName	+"("+oGradeSemFourDateOfEva	+")"), oGradeSemFourValue, "#40FF00"],
+						[("Evaluation von "+oGradeSemFiveName	+"("+oGradeSemFiveDateOfEva	+")"), oGradeSemFiveValue, "#40FF00"]
+					]);
+				}
+
+
+
+				var columnViewArchive2 = new google.visualization.DataView(columnDataArchive2);
+				columnViewArchive2.setColumns([0, 1,
+					{ calc: "stringify",
+						sourceColumn: 1,
+						type: "string",
+						role: "annotation" },
+					2]);
+
+				var columnOptionsArchive2 = {
+					title: "Vergleich bisheriger Evaluationen",
+					bar: {groupWidth: "95%"},
+					legend: { position: "none" },
+					hAxis:{
+						baselineColor: 'none',
+						gridlineColor: 'none'},
+					vAxis: {
+						baselineColor: 'none',
+						gridlineColor: '#fff',
+						ticks: [],
+						viewWindow: {
+							min: 1,
+							max: 6
+						}
+					},
+					annotations: {
+						textStyle: {
+							bold: true	}
+					}
+				};
+				var columnChartArchive2 = new google.visualization.ColumnChart(document.getElementById("columnchartArchive2"));
+				columnChartArchive2.draw(columnViewArchive2, columnOptionsArchive2);
+
+			}
+
+
+
+
+		}
+
+	</script>
+
+
+</head>
+
+<body>
+<script>document.write(ruecklauf)
+
+</script>
+</body>
+
+</html>

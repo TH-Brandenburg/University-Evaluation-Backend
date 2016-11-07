@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head id="head">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>CampusApp Evaluation</title>
+
+	<!-- Minified jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+			integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+		  integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous" />
+
+	<!-- Main CSS -->
+	<link rel="stylesheet" href="/css/main.css" />
+	<!-- for toggle-function-->
+	<script>
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+	</script>
+
+	<!-- Countdown Clock JS -->
+	<script src="/js/backtalk.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+
+		// Load Charts and the corechart and barchart packages.
+		google.charts.load('current', {'packages':['corechart']});
+
+		// Draw the pie chart and bar chart when Charts is loaded.
+		google.charts.setOnLoadCallback(drawChart);
+
+
+
+
+		/*<![CDATA[*/
+
+
+		var subjGradeSemOneValue = /*[[${subjectGradeOne}]]*/ '0.0';
+		var subjGradeSemTwoValue = /*[[${subjectGradeTwo}]]*/ '0.0';
+		var subjGradeSemThreeValue = /*[[${subjectGradeThree}]]*/ '0.0';
+		var subjGradeSemFourValue = /*[[${subjectGradeFour}]]*/ '0.0';
+		var subjGradeSemFiveValue = /*[[${subjectGradeFive}]]*/ '0.0';
+
+		var subjectResponseValue = /*[[${subjectResponse}]]*/ 'Ruecklaufquote';
+		var subjEvaLimitCount = /*[[${subjectEvaCount}]]*/ 'evaluationsAnzahl';
+
+		var subjGradeSemOneDateOfEva = /*[[${subjectGradeSemOneDate}]]*/ 'Datum der Evaluierung';
+		var subjGradeSemTwoDateOfEva = /*[[${subjectGradeSemTwoDate}]]*/ 'Datum der Evaluierung';
+		var subjGradeSemThreeDateOfEva = /*[[${subjectGradeSemThreeDate}]]*/ 'Datum der Evaluierung';
+		var subjGradeSemFourDateOfEva = /*[[${subjectGradeSemFourDate}]]*/ 'Datum der Evaluierung';
+		var subjGradeSemFiveDateOfEva = /*[[${subjectGradeSemFiveDate}]]*/ 'Datum der Evaluierung';
+
+		var subjGradeSemOneName = /*[[${subjectGradeSemOneVName}]]*/ 'Name der Evaluierung';
+		var subjGradeSemTwoName = /*[[${subjectGradeSemTwoVName}]]*/ 'Name der Evaluierung';
+		var subjGradeSemThreeName = /*[[${subjectGradeSemThreeVName}]]*/ 'Name der Evaluierung';
+		var subjGradeSemFourName = /*[[${subjectGradeSemFourVName}]]*/ 'Name der Evaluierung';
+		var subjGradeSemFiveName = /*[[${subjectGradeSemFiveVName}]]*/ 'Name der Evaluierung';
+		/*]]>*/
+
+		function drawChart()
+		{
+
+
+			var pieDataArchive3 = google.visualization.arrayToDataTable([
+				['Rücklaufquote', 'in Prozent'],
+				['Abgestimmte Studenten', subjectResponseValue],
+				['Restliche Studenten', 1 - subjectResponseValue]
+			]);
+			var pieOptionsArchive3 = {
+				title: 'Rücklaufquote',
+				enableInteractivity: false,
+				pieHole: 0.2,
+				pieSliceTextStyle: {
+					color: 'white',
+					bold: true
+				},
+				slices: {
+					0: { color: '#40FF00' },
+					1: { color: 'grey' }
+				}
+			};
+
+			var pieChartArchive3 = new google.visualization.PieChart(document.getElementById('donutchartArchive3'));
+			pieChartArchive3.draw(pieDataArchive3, pieOptionsArchive3);
+
+			if(subjEvaLimitCount >= 2)
+			{
+				if(subjEvaLimitCount == 2)
+				{
+					var columnDataArchive3 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+subjGradeSemOneName		+"("+subjGradeSemOneDateOfEva	+")"), subjGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemTwoName		+"("+subjGradeSemTwoDateOfEva	+")"), subjGradeSemTwoValue, "#40FF00"]
+					]);
+				}
+				if(subjEvaLimitCount == 3)
+				{
+					var columnDataArchive3 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+subjGradeSemOneName		+"("+subjGradeSemOneDateOfEva	+")"), subjGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemTwoName		+"("+subjGradeSemTwoDateOfEva	+")"), subjGradeSemTwoValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemThreeName	+"("+subjGradeSemThreeDateOfEva	+")"), subjGradeSemThreeValue, "#40FF00"]
+					]);
+				}
+
+				if(subjEvaLimitCount == 4)
+				{
+					var columnDataArchive3 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+subjGradeSemOneName		+"("+subjGradeSemOneDateOfEva	+")"), subjGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemTwoName		+"("+subjGradeSemTwoDateOfEva	+")"), subjGradeSemTwoValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemThreeName	+"("+subjGradeSemThreeDateOfEva	+")"), subjGradeSemThreeValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemFourName		+"("+subjGradeSemFourDateOfEva	+")"), subjGradeSemFourValue, "#40FF00"]
+					]);
+				}
+				if(subjEvaLimitCount >= 5)
+				{
+					var columnDataArchive3 = google.visualization.arrayToDataTable([
+						["Element", "Durchschnittsnote", { role: "style" } ],
+						[("Evaluation von "+subjGradeSemOneName		+"("+subjGradeSemOneDateOfEva	+")"), subjGradeSemOneValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemTwoName		+"("+subjGradeSemTwoDateOfEva	+")"), subjGradeSemTwoValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemThreeName	+"("+subjGradeSemThreeDateOfEva	+")"), subjGradeSemThreeValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemFourName		+"("+subjGradeSemFourDateOfEva	+")"), subjGradeSemFourValue, "#40FF00"],
+						[("Evaluation von "+subjGradeSemFiveName		+"("+subjGradeSemFiveDateOfEva	+")"), subjGradeSemFiveValue, "#40FF00"]
+					]);
+				}
+
+
+				var columnViewArchive3 = new google.visualization.DataView(columnDataArchive3);
+				columnViewArchive3.setColumns([0, 1,
+					{ calc: "stringify",
+						sourceColumn: 1,
+						type: "string",
+						role: "annotation" },
+					2]);
+
+				var columnOptionsArchive3 = {
+					title: "Vergleich bisheriger Evaluationen",
+					bar: {groupWidth: "95%"},
+					legend: { position: "none" },
+					hAxis:{
+						baselineColor: 'none',
+						gridlineColor: 'none'},
+					vAxis: {
+						baselineColor: 'none',
+						gridlineColor: '#fff',
+						ticks: [],
+						viewWindow: {
+							min: 1,
+							max: 6
+						}
+					},
+					annotations: {
+						textStyle: {
+							bold: true	}
+					}
+				};
+				var columnChartArchive3 = new google.visualization.ColumnChart(document.getElementById("columnchartArchive3"));
+				columnChartArchive3.draw(columnViewArchive3, columnOptionsArchive3);
+
+			}
+
+
+
+		}
+	</script>
+
+
+</head>
+
+<body>
+<script>document.write(ruecklauf)
+</script>
+</body>
+
+</html>

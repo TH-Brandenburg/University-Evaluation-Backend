@@ -195,8 +195,8 @@ public class ViewController extends WebMvcConfigurerAdapter {
             }
 
             model.addAttribute("evaluations", subjectList);
-            model.addAttribute("tutor", subjectList.get(0).getTutors().get(0).getFamilyName().toString());
             if (subjectList.isEmpty() == false) {
+                model.addAttribute("tutor", subjectList.get(0).getTutors().get(0).getFamilyName().toString());
                 model.addAttribute("tutorID", subjectList.get(0).getTutors().get(0).getId());
             }
 
