@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<!--head th:replace="stdTemplateArchive3 :: #head"-->
+<head th:replace="stdTemplate :: #head" >
+</head>
+<body>
+<!-- Navigation bar -->
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">THB Evaluation</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
+                <li><a href="#" th:href="@{/}">Dashboard</a></li>
+                <li class="active"><a href="#" th:href="@{/archive}"><span class="sr-only">(current)</span>Archiv</a></li>
+                <li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Content -->
+<div class="container">
+    <div class="row">
+        <div  th:unless="${#lists.isEmpty(evaluations)}" class="col-xs-12">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <td class="text-center" style="font-size:120px" data-toggle="tooltip"  data-placement="bottom" title="Durchschnittsnote" th:text="${ subjectNotenQ  }">Kein Notenschnitt vorhanden </td>
+                    <td class="text-center" style="font-size:20px"><div id="donutchartArchive3" style="width: 400px; height: 200px;"><div id="textReplace" style="padding : 60px;">Keine Rücklaufquote vorhanden</div></div></td>
+                    <td class="text-center" style="font-size:20px"><div id="columnchartArchive3" style="width: 400px; height: 200px;"><div id="textReplace2" style="padding : 60px;">Keine Vergleichsdaten vorhanden</div></div></td>
+                </tr>
+
+                </thead>
+            </table>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th width="28*">Archivierte Evaluation</th>
+                    <th width="23*">Beendet</th>
+                    <th width="20*">Abgestimmt</th>
+                    <th width="20*">Studentenanzahl</th>
+                    <th width="9*">Ergebnis</th>
+                </tr>
+                </thead>
+
+            </table>
+            <div th:each="evaluation, estat : ${evaluations}" class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <table>
+                                <thead>
+                                <th style="width: 34%" >
+                                <a th:text="${evaluation.subject.name}" data-toggle="collapse" th:attr = "data-target = ${'#' + evaluation.uid}">
+                                    Veranstaltung
+                                </a>
+                                </th>
+                            <th th:text="${#joda.shortDateTime(evaluation.dateOfEvaluation)}" style="width: 24%">
+                                Datum
+                            </th>
+                            <th th:text="${evaluation.studentsVoted}" style="width: 20%">
+                                k.A.
+                            </th>
+                            <th th:text="${evaluation.studentsAll}" style="width: 20%">
+                                k.A.
+                            </th>
+                            <th style="width: 9%">
+                                <a th:href="@{/resultfile(uid=${evaluation.uid})}" class="csv">
+                                    <span class="glyphicon glyphicon-save" aria-hidden="true">
+                                    </span>
+                                </a>
+                            </th>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div th:id="${evaluation.uid}" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <th style="width:40%">Frage</th>
+                                <th th:each="vote, stat : ${evaluation.votes}" th:text="${stat.count}" style="width:40px">TN</th>
+                                <th>MW</th>
+                                <tr th:each="j, jterstat : ${evaluation.votes[0].mcAnswers}">
+                                    <td th:text="${evaluation.votes.get(0).mcAnswers.get(jterstat.index).question.text}">frage</td>
+                                    <td th:each="i, iterstat : ${evaluation.votes}" th:text="${evaluation.votes.get(iterstat.index).mcAnswers.get(jterstat.index).choice.grade}">
+                                        grade
+                                    </td>
+                                    <td th:text="${averageGradeList[estat.index][jterstat.index]}">
+                                        MW
+                                    </td>
+                                </tr>
+                            </table>
+                            <div>
+                                <table th:each="a, aterstat : ${evaluation.votes[0].Answers}" class="table table-striped">
+                                    <th th:text="${evaluation.votes.get(0).answers.get(aterstat.index).question.text}">
+                                    </th>
+                                    <tr th:each="vote, stat : ${evaluation.votes}">
+                                        <td th:text="${stat.count + '. ' + evaluation.votes.get(stat.index).answers.get(aterstat.index).text}">
+                                            k.A.
+                                        </td>
+                                        <td th:if="${pictureCommentList[estat.index][stat.index][aterstat.index]}">
+                                            <a th:href="@{/imagefile(uid=${evaluation.uid}, voteID=${stat.count})}" class="csv">
+                                    <span class="glyphicon glyphicon-save" aria-hidden="true">
+                                    </span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(evaluations)}" class="info">Keine Evaluationen.</p>
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<div th:replace="stdTemplate :: #footer"></div>
+</body>
+</html>
