@@ -20,17 +20,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 
 @SpringBootApplication
 public class UniversityEvaluationBackendApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        ApplicationContext ctx = SpringApplication.run(UniversityEvaluationBackendApplication.class, args);
-        Environment env = ctx.getEnvironment();
-        System.setProperty("javax.net.ssl.trustStore", env.getProperty("ldap.trustStore"));
-        System.setProperty("javax.net.ssl.trustStorePassword", env.getProperty("ldap.trustStorePassword"));
+        SpringApplication.run(UniversityEvaluationBackendApplication.class, args);
     }
 
     @Override

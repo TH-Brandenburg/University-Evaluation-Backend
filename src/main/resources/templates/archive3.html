@@ -24,7 +24,9 @@
             <ul class="nav navbar-nav">
                 <li><a href="#" th:href="@{/new-evaluation}">Neue Evaluation</a></li>
                 <li><a href="#" th:href="@{/}">Dashboard</a></li>
+                <li><a th:href="@{/questionnaires}">Frageb&ouml;gen</a></li>
                 <li class="active"><a href="#" th:href="@{/archive}"><span class="sr-only">(current)</span>Archiv</a></li>
+                <li><a href="http://evaluation.th-brandenburg.de/mediawiki">Wiki</a></li>
                 <li><a href="#" th:href="@{/logout}" id="logout">Log Out</a></li>
             </ul>
         </div>
@@ -93,22 +95,22 @@
                                 <th style="width:40%">Frage</th>
                                 <th th:each="vote, stat : ${evaluation.votes}" th:text="${stat.count}" style="width:40px">TN</th>
                                 <th>MW</th>
-                                <tr th:each="j, jterstat : ${evaluation.votes[0].mcAnswers}">
-                                    <td th:text="${evaluation.votes.get(0).mcAnswers.get(jterstat.index).question.text}">frage</td>
-                                    <td th:each="i, iterstat : ${evaluation.votes}" th:text="${evaluation.votes.get(iterstat.index).mcAnswers.get(jterstat.index).choice.grade}">
+                                <tr th:each="j, jterstat : ${evaluation.votes[0].singleChoiceAnswers}">
+                                    <td th:text="${evaluation.votes.get(0).singleChoiceAnswers.get(jterstat.index).question.text}">frage</td>
+                                    <td th:each="i, iterstat : ${evaluation.votes}" th:text="${evaluation.votes.get(iterstat.index).singleChoiceAnswers.get(jterstat.index).choice.grade}">
                                         grade
                                     </td>
-                                    <td th:text="${averageGradeList[estat.index][jterstat.index]}">
+                                    <td th:text="${averageGradeList.get(evaluation.uid)}">
                                         MW
                                     </td>
                                 </tr>
                             </table>
                             <div>
-                                <table th:each="a, aterstat : ${evaluation.votes[0].Answers}" class="table table-striped">
-                                    <th th:text="${evaluation.votes.get(0).answers.get(aterstat.index).question.text}">
+                                <table th:each="a, aterstat : ${evaluation.votes[0].textAnswers}" class="table table-striped">
+                                    <th th:text="${evaluation.votes.get(0).textAnswers.get(aterstat.index).textQuestion.text}">
                                     </th>
                                     <tr th:each="vote, stat : ${evaluation.votes}">
-                                        <td th:text="${stat.count + '. ' + evaluation.votes.get(stat.index).answers.get(aterstat.index).text}">
+                                        <td th:text="${stat.count + '. ' + evaluation.votes.get(stat.index).textAnswers.get(aterstat.index).text}">
                                             k.A.
                                         </td>
                                         <td th:if="${pictureCommentList[estat.index][stat.index][aterstat.index]}">

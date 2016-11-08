@@ -16,6 +16,18 @@
 
 package de.thb.ue.backend.controller;
 
+import de.thb.ue.backend.exception.AggregatedAnswerException;
+import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
+import de.thb.ue.backend.exception.EvaluationException;
+import de.thb.ue.backend.exception.ParticipantException;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.service.interfaces.IEvaluationService;
+import de.thb.ue.backend.service.interfaces.IQuestionsService;
+import de.thb.ue.backend.service.interfaces.ISubjectService;
+import de.thb.ue.backend.service.interfaces.ITutorService;
+import de.thb.ue.backend.util.SemesterType;
+import de.thb.ue.dto.util.Department;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,16 +36,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,28 +52,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import de.thb.ue.dto.util.Department;
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.exception.EvaluationException;
-import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.SingleChoiceQuestion;
-import de.thb.ue.backend.model.TextQuestion;
-import de.thb.ue.backend.model.Tutor;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.QuestionType;
-import de.thb.ue.backend.util.SemesterType;
-import lombok.extern.slf4j.Slf4j;
+import static de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion;
+import static de.thb.ue.backend.util.QuestionType.TextQuestion;
 
 @Slf4j
 @org.springframework.stereotype.Controller
@@ -756,7 +746,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 						onlyNumbers = true;
 					}
 
-					textQuestion.setType(QuestionType.TextQuestion);
+					textQuestion.setType(TextQuestion);
 					textQuestion.setText(text);
 					textQuestion.setMaxLength(maxLength);
 					textQuestion.setOnlyNumbers(onlyNumbers);
@@ -789,7 +779,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 						choices.add(noAnswerChoice);
 					}
 
-					singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+					singleChoiceQuestion.setType(SingleChoiceQuestion);
 					singleChoiceQuestion.setText(text);
 					singleChoiceQuestion.setChoices(choices);
 					adhocQuestions.add(singleChoiceQuestion);
@@ -865,7 +855,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
                     onlyNumbers = true;
                 }
 
-                textQuestion.setType(QuestionType.TextQuestion);
+                textQuestion.setType(TextQuestion);
                 textQuestion.setText(text);
                 textQuestion.setMaxLength(maxLength);
                 textQuestion.setOnlyNumbers(onlyNumbers);
@@ -897,7 +887,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
                     choices.add(noAnswerChoice);
                 }
 
-                singleChoiceQuestion.setType(QuestionType.SingleChoiceQuestion);
+                singleChoiceQuestion.setType(SingleChoiceQuestion);
                 singleChoiceQuestion.setText(text);
                 singleChoiceQuestion.setChoices(choices);
                 questionRevisionChoices.addAll(choices);
@@ -1225,7 +1215,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         return averageGradeList;
     }
 
-    private float [][]createAverageGradeList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und Mittelwerten aller Fragen (y) zurück
+    private Map<String, Float> createAverageGradeList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und Mittelwerten aller Fragen (y) zurück
     {
 
 
@@ -1236,7 +1226,21 @@ public class ViewController extends WebMvcConfigurerAdapter {
             questionCount[i]= evaluationArray.get(i).getQuestionRevision().getQuestions().size();
         }
 
-        float [][] averageGradeList = new float[evaluationArray.size()][100];
+        Map<String, Float> averageGrade = new HashMap<>();
+        for (Evaluation eva : evaluationArray) {
+            for (Vote vote : eva.getVotes()) {
+                float grade = 0;
+                int studentsVoted = 0;
+                for (SingleChoiceAnswer scAnswer : vote.getSingleChoiceAnswers()) {
+                    if (scAnswer.getChoice().getGrade() != 0) {
+                        grade += scAnswer.getChoice().getGrade();
+                        studentsVoted++;
+                    }
+                }
+                averageGrade.put(eva.getUid(), (Math.round((grade/studentsVoted) * 100.0f) / 100.0f));
+            }
+        }
+        /*
         for (int i = 0; i < evaluationArray.size(); i++) // zählt evas durch
         {
             for(int j = 0; j < questionCount[i]; j++) //zählt anzahl der fragen der aktuellen eva durch
@@ -1246,17 +1250,24 @@ public class ViewController extends WebMvcConfigurerAdapter {
                 if (evaluationArray.get(i).getVotes().size() != 0) {
                     for (int v = 0; v < evaluationArray.get(i).getVotes().size(); v++) //zählt votes durch
                     {
-                        if (evaluationArray.get(i).getVotes().get(v).getSingleChoiceAnswers().get(j).getChoice().getGrade() != 0) //holt grade der aktuellen frage und eva und addiert grade und student++ wenn grade!=0
-                        {
-                            Grade += evaluationArray.get(i).getVotes().get(v).getSingleChoiceAnswers().get(j).getChoice().getGrade();
-                            studentsVotedQuestion++;
+                        //FIXME: Bug
+                        try {
+                            if (evaluationArray.get(i).getVotes().get(v).getSingleChoiceAnswers().get(j).getChoice().getGrade() != 0) //holt grade der aktuellen frage und eva und addiert grade und student++ wenn grade!=0
+                            {
+                                Grade += evaluationArray.get(i).getVotes().get(v).getSingleChoiceAnswers().get(j).getChoice().getGrade();
+                                studentsVotedQuestion++;
+                            }
+                        } catch (Exception e) {
+                            log.error(e.getMessage());
                         }
                     }
                 }
                 averageGradeList[i][j] = (Math.round((Grade/studentsVotedQuestion) * 100.0f) / 100.0f);
             }
         }
-        return averageGradeList;
+        */
+
+        return averageGrade;
     }
 
     private Boolean [][][]createPictureCommentList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und booleans ob textfragen beantwortet wurden (y) zurück
