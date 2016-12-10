@@ -26,10 +26,8 @@ import de.thb.ue.backend.exception.AggregatedAnswerException;
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.Vote;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.util.AggregateEvaluationHelper;
 import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
 
@@ -69,5 +67,11 @@ public interface IEvaluationService {
     File getImageFile(String evaluationUID, int voteID) throws EvaluationException, DBEntryDoesNotExistException;
 
     Boolean imageExists(String evaluationUID, int voteID);
+
+    AggregateEvaluationHelper findAvgGradeByEvaluationIdAndQuestionId(Evaluation evaluation, Question question);
+
+    AggregateEvaluationHelper getAvgForEvaluation(Evaluation evaluation);
+
+    double getAvgForTutor(Tutor tutor);
 
 }

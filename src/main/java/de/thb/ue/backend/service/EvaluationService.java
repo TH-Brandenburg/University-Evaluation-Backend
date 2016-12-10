@@ -28,7 +28,6 @@ import de.thb.ue.backend.repository.IEvaluation;
 import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.repository.ISCQuestion;
 import de.thb.ue.backend.repository.ITextQuestion;
-import de.thb.ue.backend.service.interfaces.*;
 import de.thb.ue.backend.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -48,10 +47,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import de.thb.ue.backend.exception.AggregatedAnswerException;
-import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.exception.EvaluationException;
-import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.Evaluation;
 import de.thb.ue.backend.model.Participant;
 import de.thb.ue.backend.model.Question;
@@ -59,8 +54,6 @@ import de.thb.ue.backend.model.QuestionRevision;
 import de.thb.ue.backend.model.Subject;
 import de.thb.ue.backend.model.Tutor;
 import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.repository.IEvaluation;
-import de.thb.ue.backend.repository.IQuestionRevision;
 import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
 import de.thb.ue.backend.service.interfaces.IEvaluationService;
 import de.thb.ue.backend.service.interfaces.IParticipantService;
@@ -70,7 +63,6 @@ import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
 import de.thb.ue.backend.util.QRCGeneration;
 import de.thb.ue.backend.util.SemesterType;
 import de.thb.ue.backend.util.ZipHelper;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -384,6 +376,21 @@ public class EvaluationService implements IEvaluationService {
             }
         }
         return exists;
+    }
+
+    @Override
+    public AggregateEvaluationHelper findAvgGradeByEvaluationIdAndQuestionId(Evaluation evaluation, Question question) {
+        return evaluationRepo.findAvgGradeByEvaluationIdAndQuestionId(evaluation.getId(), question.getId());
+    }
+
+    @Override
+    public AggregateEvaluationHelper getAvgForEvaluation(Evaluation evaluation) {
+        return evaluationRepo.getAvgForEvaluation(evaluation);
+    }
+
+    @Override
+    public double getAvgForTutor(Tutor tutor) {
+        return evaluationRepo.getAvgForTutor(tutor.getEvaluations());
     }
 
 }

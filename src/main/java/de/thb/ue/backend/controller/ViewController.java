@@ -21,10 +21,10 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IQuestionsService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
+import de.thb.ue.backend.service.interfaces.*;
+import de.thb.ue.backend.util.AggregateEvaluationHelper;
+import de.thb.ue.backend.util.EvalAnalysisHelper;
+import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
 import de.thb.ue.dto.util.Department;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +71,12 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	@Autowired
 	private IQuestionsService questionsService;
 
+    @Autowired
+    private IVoteService voteService;
+
+    @Autowired
+    private ISCAnswerService scAnswerService;
+
 	// @Autowired
 	// private PersonRepo personRepo;
 
@@ -114,11 +120,12 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
             return "archive";
         } else {
-            List<Evaluation> evaluations = tutorService.getByUsername(user.getUsername()).getEvaluations()
+            Tutor tutor = tutorService.getByUsername(user.getUsername());
+            List<Evaluation> evaluations = tutor.getEvaluations()
                     .stream().filter(Evaluation::getClosed).collect(Collectors.toList());
 
             // Berechnung der Durchschnittsnote eines Professors
-            float mainAverageGradeVariable = mainAverageGrade(evaluations, evaluations.size());
+            double mainAverageGradeVariable = evaluationService.getAvgForTutor(tutor);
             double mainAverageGradeRounded = Math.round(mainAverageGradeVariable * 100.0) / 100.0;
 
             //Berechnung der Rücklaufquote
@@ -403,6 +410,20 @@ public class ViewController extends WebMvcConfigurerAdapter {
         String subjectGradeFourName = "nicht vorhanden";
         String subjectGradeFiveName = "nicht vorhanden";
 
+        List<EvalAnalysisHelper> evalAnalysisHelpers = new ArrayList<>();
+        for (Evaluation evaluation : collumnEvaList) {
+            Map<Question, AggregateEvaluationHelper> map = new HashMap<>();
+            for (Question question : evaluation.getQuestionRevision().getQuestions()) {
+                if (question.getType() == QuestionType.SingleChoiceQuestion) {
+                    map.put(question, evaluationService.findAvgGradeByEvaluationIdAndQuestionId(evaluation, question));
+                }
+            }
+            evalAnalysisHelpers.add(new EvalAnalysisHelper(evaluation, map));
+        }
+
+        model.addAttribute("evalHelper", evalAnalysisHelpers);
+        model.addAttribute("test", evaluationService.getAvgForEvaluation(evaluations.get(0)));
+
         for (int i = 0; i < collumnEvaList.size(); i++) {
             if (i == 5) {
                 break;
@@ -620,16 +641,16 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		}
 	}
 
-	// @RequestMapping(value = "test")
-	// ResponseEntity<String> test() throws UnknownHostException {
-	//// LdapUserDetails user = (LdapUserDetails)
-	// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	//// Person person =personRepo.findPerson(user.getDn());
-	//// return new ResponseEntity<>("CN "+ Arrays.toString(person.getCn()) +"
-	// "+person.getSn(), HttpStatus.OK);
-	// return new ResponseEntity<>("Your current IP address : " +
-	// InetAddress.getLocalHost().getHostAddress(), HttpStatus.OK);
-	// }
+	 /*@RequestMapping(value = "/test", method = RequestMethod.GET)
+	 ResponseEntity test() {
+	    Tutor tutor = tutorService.getByUsername("bartz");
+         List<Evaluation> evaluations = tutor.getEvaluations();
+         List<SingleChoiceAnswer> singleChoiceAnswers = new ArrayList<>();
+         for (Vote vote : evaluations.get(1).getVotes()) {
+             singleChoiceAnswers.addAll(vote.getSingleChoiceAnswers());
+         }
+	 return new ResponseEntity<>(scAnswerService.computeAvgGrade(singleChoiceAnswers), HttpStatus.OK);
+	 }*/
 
 	@RequestMapping(value = "/qrcfile", method = RequestMethod.GET)
 	void getEvaluationExcelFile(@RequestParam String uid, HttpServletResponse response) throws DBEntryDoesNotExistException, IOException, EvaluationException {
