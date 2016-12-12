@@ -42,6 +42,7 @@ public class WebSecurityConfig {
     @Configuration
     public static class configureBrowser extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
+            http.requiresChannel().anyRequest().requiresSecure();
             http.authorizeRequests()
                     .antMatchers("/static/**").permitAll()
                     .anyRequest().fullyAuthenticated()
