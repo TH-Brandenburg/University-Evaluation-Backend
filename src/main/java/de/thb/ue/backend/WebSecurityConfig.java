@@ -18,6 +18,7 @@ package de.thb.ue.backend;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -57,6 +58,7 @@ public class WebSecurityConfig {
     }
 
     @Configuration
+    @Profile("!test")
     protected static class AuthenticationConfiguration extends
             GlobalAuthenticationConfigurerAdapter {
 
@@ -76,18 +78,19 @@ public class WebSecurityConfig {
         }
     }
 
-//    @Configuration
-//    protected static class AuthenticationConfiguration extends
-//            GlobalAuthenticationConfigurerAdapter {
-//
-//        @Override
-//        public void init(AuthenticationManagerBuilder auth) throws Exception {
-//            auth
-//                    .ldapAuthentication()
-//                    .userDnPatterns("uid={0},ou=people,ou=informatik")
-//                    .groupSearchBase("ou=tutor")
-//                    .contextSource().ldif("classpath:test-server.ldif");
-//        }
-//    }
+    @Configuration
+    @Profile("test")
+    protected static class AuthenticationTestConfiguration extends GlobalAuthenticationConfigurerAdapter {
+
+        @Override
+        public void init(AuthenticationManagerBuilder auth) throws Exception {
+            auth
+                    .ldapAuthentication()
+                    .userDnPatterns("uid={0},ou=people,ou=informatik")
+                    .groupSearchBase("ou=tutor")
+                    .contextSource().ldif("classpath:test-server.ldif");
+        }
+    }
+
 }
 
