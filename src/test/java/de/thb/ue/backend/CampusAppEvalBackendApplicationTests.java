@@ -133,7 +133,7 @@ public class CampusAppEvalBackendApplicationTests {
 
     @Test
     public void answerAggregationTest() throws Exception {
-        String evaluationUID = evaluationService.add(1, 100, "Socher", 6, SemesterType.SUMMER, "Demo Evaluation");
+        String evaluationUID = evaluationService.add(1, 100, "test", 6, SemesterType.SUMMER, "Demo Evaluation");
         Evaluation evaluation = evaluationService.getByUID(evaluationUID);
         List<String> voteTokens = participantService.getByEvaluation(evaluation).stream().map(Participant::getVoteToken).collect(Collectors.toList());
 
@@ -183,7 +183,7 @@ public class CampusAppEvalBackendApplicationTests {
     }
 
     private String startEvaluationAndGetVoteToken() throws Exception {
-        String evaluationUID = evaluationService.add(1, 10, "Socher", 6, SemesterType.SUMMER, "Demo Evaluation");
+        String evaluationUID = evaluationService.add(1, 10, "test", 6, SemesterType.SUMMER, "Demo Evaluation");
         Evaluation evaluation = evaluationService.getByUID(evaluationUID);
         return participantService.getByEvaluation(evaluation).get(0).getVoteToken();
     }

@@ -86,8 +86,8 @@ public class WebSecurityConfig {
         public void init(AuthenticationManagerBuilder auth) throws Exception {
             auth
                     .ldapAuthentication()
-                    .userDnPatterns("uid={0},ou=people,ou=informatik")
-                    .groupSearchBase("ou=tutor")
+                    .userSearchFilter("(uid={0})")
+                    .userDnPatterns("uid={0}")
                     .contextSource().ldif("classpath:test-server.ldif");
         }
     }
