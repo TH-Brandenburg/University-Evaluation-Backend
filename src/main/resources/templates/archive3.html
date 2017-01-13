@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
 <head th:replace="stdTemplateArchive3 :: #head">
 <!--head th:replace="stdTemplate :: #head" -->
 </head>
@@ -59,28 +59,28 @@
                 </thead>
 
             </table>
-            <div th:each="evalHelp, estat : ${evalHelper}" class="panel-group" id="accordion">
+            <div th:each="evalHelper, estat : ${averageGradeList}" class="panel-group" id="accordion">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <div class="panel-title">
                             <table>
                                 <thead>
                                 <th style="width: 34%" >
-                                <a th:text="${evalHelp.evaluation.subject.name}" data-toggle="collapse" th:attr = "data-target = ${'#' + evalHelp.evaluation.uid}">
+                                <a th:text="${evalHelper.evaluation.subject.name}" data-toggle="collapse" th:attr = "data-target = ${'#' + evalHelper.evaluation.uid}">
                                     Veranstaltung
                                 </a>
                                 </th>
-                            <th th:text="${#joda.shortDateTime(evalHelp.evaluation.dateOfEvaluation)}" style="width: 24%">
+                            <th th:text="${#joda.shortDateTime(evalHelper.evaluation.dateOfEvaluation)}" style="width: 24%">
                                 Datum
                             </th>
-                            <th th:text="${evalHelp.evaluation.studentsVoted}" style="width: 20%">
+                            <th th:text="${evalHelper.evaluation.studentsVoted}" style="width: 20%">
                                 k.A.
                             </th>
-                            <th th:text="${evalHelp.evaluation.studentsAll}" style="width: 20%">
+                            <th th:text="${evalHelper.evaluation.studentsAll}" style="width: 20%">
                                 k.A.
                             </th>
                             <th style="width: 9%">
-                                <a th:href="@{/resultfile(uid=${evalHelp.evaluation.uid})}" class="csv">
+                                <a th:href="@{/resultfile(uid=${evalHelper.evaluation.uid})}" class="csv">
                                     <span class="glyphicon glyphicon-save" aria-hidden="true">
                                     </span>
                                 </a>
@@ -89,32 +89,32 @@
                             </table>
                         </div>
                     </div>
-                    <div th:id="${evalHelp.evaluation.uid}" class="panel-collapse collapse">
+                    <div th:id="${evalHelper.evaluation.uid}" class="panel-collapse collapse">
                         <div class="panel-body">
                             <table class="table table-striped">
                                 <th style="width:40%">Frage</th>
-                                <th th:each="vote, stat : ${evalHelp.evaluation.votes}" th:text="${stat.count}" style="width:40px">TN</th>
-                                <th>MW</th>
-                                <tr th:each="j, jterstat : ${evalHelp.evaluation.votes[0].singleChoiceAnswers}">
-                                    <td th:text="${evalHelp.evaluation.votes.get(0).singleChoiceAnswers.get(jterstat.index).question.text}">frage</td>
-                                    <td th:each="i, iterstat : ${evalHelp.evaluation.votes}" th:text="${evalHelp.evaluation.votes.get(iterstat.index).singleChoiceAnswers.get(jterstat.index).choice.grade}">
-                                        grade
-                                    </td>
-                                    <td th:text="${averageGradeList.get(evalHelp.evaluation.uid)}">
-                                        MW
-                                    </td>
-                                </tr>
+                                    <th th:each="i, stat : ${#numbers.sequence( 1, evalHelper.evaluation.studentsVoted)}" th:text="${stat.count}" style="width:40px">TN</th>
+                                    <th>MW</th>
+                                    <tr th:each="item : ${evalHelper.questions}">
+                                        <td th:text="${item.key.text}">frage</td>
+                                        <td th:each="i, iterstat : ${item.value.grades}" th:text="${item.value.grades.get(iterstat.index)}">
+                                            grade
+                                        </td>
+                                        <td th:text="${item.value.mw}">
+                                            MW
+                                        </td>
+                                    </tr>
                             </table>
                             <div>
-                                <table th:each="a, aterstat : ${evalHelp.evaluation.votes[0].textAnswers}" class="table table-striped">
-                                    <th th:text="${evalHelp.evaluation.votes.get(0).textAnswers.get(aterstat.index).textQuestion.text}">
+                                <table th:each="a, aterstat : ${evalHelper.evaluation.votes[0].textAnswers}" class="table table-striped">
+                                    <th th:text="${evalHelper.evaluation.votes.get(0).textAnswers.get(aterstat.index).textQuestion.text}">
                                     </th>
-                                    <tr th:each="vote, stat : ${evalHelp.evaluation.votes}">
-                                        <td th:text="${stat.count + '. ' + evalHelp.evaluation.votes.get(stat.index).textAnswers.get(aterstat.index).text}">
+                                    <tr th:each="vote, stat : ${evalHelper.evaluation.votes}">
+                                        <td th:text="${stat.count + '. ' + evalHelper.evaluation.votes.get(stat.index).textAnswers.get(aterstat.index).text}">
                                             k.A.
                                         </td>
                                         <td th:if="${pictureCommentList[estat.index][stat.index][aterstat.index]}">
-                                            <a th:href="@{/imagefile(uid=${evalHelp.evaluation.uid}, voteID=${stat.count})}" class="csv">
+                                            <a th:href="@{/imagefile(uid=${evalHelper.evaluation.uid}, voteID=${stat.count})}" class="csv">
                                     <span class="glyphicon glyphicon-save" aria-hidden="true">
                                     </span>
                                             </a>
@@ -126,7 +126,7 @@
                     </div>
                 </div>
             </div>
-            <h3 th:text="${test}"></h3>
+            <!--h3 th:text="${test}"></h3-->
             <p th:if="${#lists.isEmpty(evaluations)}" class="info">Keine Evaluationen.</p>
         </div>
     </div>

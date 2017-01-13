@@ -17,6 +17,7 @@
 package de.thb.ue.backend.repository;
 
 import de.thb.ue.backend.model.Question;
+import de.thb.ue.backend.model.QuestionRevision;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -38,6 +39,9 @@ public interface ISCQuestion extends CrudRepository<Question, Serializable> {
 
     @Query("SELECT q FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
     Question findByText(@Param("text") String text);
+
+    @Query(value = "select * from question q where q.text = :text and q.id in (select * from single_choice_question) and q.id in (select qrs.questions_id from question_revision_questions qrs where qrs.question_revision_id = :qrId)", nativeQuery = true)
+    Question findByTextAndQuestionRevision(@Param("text") String text, @Param("qrId")int questionRevisionId);
 
     @Query("SELECT COUNT(q) FROM Question q WHERE q.text = :text and q.type = de.thb.ue.backend.util.QuestionType.SingleChoiceQuestion")
     long count(@Param("text") String text);

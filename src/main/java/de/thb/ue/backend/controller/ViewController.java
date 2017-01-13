@@ -21,11 +21,15 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.service.AggregatedMCAnswerService;
 import de.thb.ue.backend.service.interfaces.*;
 import de.thb.ue.backend.util.AggregateEvaluationHelper;
 import de.thb.ue.backend.util.EvalAnalysisHelper;
 import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
+import de.thb.ue.backend.util.eval_helper.EvalHelper;
+import de.thb.ue.backend.util.eval_helper.EvalQuestion;
+import de.thb.ue.backend.util.eval_helper.EvalScQuestion;
 import de.thb.ue.dto.util.Department;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -411,7 +415,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         String subjectGradeFiveName = "nicht vorhanden";
 
         List<EvalAnalysisHelper> evalAnalysisHelpers = new ArrayList<>();
-        for (Evaluation evaluation : collumnEvaList) {
+        for (Evaluation evaluation : relEvaList) {
             Map<Question, AggregateEvaluationHelper> map = new HashMap<>();
             for (Question question : evaluation.getQuestionRevision().getQuestions()) {
                 if (question.getType() == QuestionType.SingleChoiceQuestion) {
@@ -820,6 +824,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 	@ExceptionHandler(Exception.class)
 	public ModelAndView handleEvaluationException(HttpServletRequest req, Exception exception) {
 		log.error("Request: " + req.getRequestURL() + " raised " + exception);
+        exception.printStackTrace();
 		String message;
 
 		ModelAndView mav = new ModelAndView();
@@ -1236,19 +1241,49 @@ public class ViewController extends WebMvcConfigurerAdapter {
         return averageGradeList;
     }
 
-    private Map<String, Float> createAverageGradeList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und Mittelwerten aller Fragen (y) zurück
+    private Float avg(List<Short> grades) {
+        Float sum = 0f;
+        int students = 0;
+        if(!grades.isEmpty()) {
+            for (Short grade : grades) {
+                if (grade != 0) {
+                    sum += grade;
+                    students++;
+                }
+            }
+            if (students != 0)
+                return Math.round(100.0f * (sum / students)) / 100.0f;
+        }
+        return sum;
+    }
+
+    private List<EvalHelper> createAverageGradeList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und Mittelwerten aller Fragen (y) zurück
     {
-
-
-
-        int [] questionCount= new int[100];
+        /*int [] questionCount= new int[100];
         for(int i = 0; i< evaluationArray.size() ; i++) //geht durch jeden vote in der Evaluation des Fachs und schreibt die Anzahl der Fragen an die entsprechende Stelle des questioncount Arrays
         {
             questionCount[i]= evaluationArray.get(i).getQuestionRevision().getQuestions().size();
-        }
+        }*/
+        List<EvalHelper> evalHelperList = new ArrayList<>();
 
-        Map<String, Float> averageGrade = new HashMap<>();
+        //Map<String, Float> averageGrade = new HashMap<>();
         for (Evaluation eva : evaluationArray) {
+            HashMap<Question, EvalScQuestion> evalQuestions = new HashMap<>();
+            for (Vote vote : eva.getVotes()) {
+                for (SingleChoiceAnswer singleChoiceAnswer : vote.getSingleChoiceAnswers()) {
+                    EvalScQuestion evalQuestion;
+                    if (evalQuestions.containsKey(singleChoiceAnswer.getQuestion())) {
+                        evalQuestion = evalQuestions.get(singleChoiceAnswer.getQuestion());
+                    } else {
+                        evalQuestion = new EvalScQuestion();
+                    }
+                    evalQuestion.getGrades().add(singleChoiceAnswer.getChoice().getGrade());
+                    evalQuestion.setMw(avg(evalQuestion.getGrades()));
+                    evalQuestions.put(singleChoiceAnswer.getQuestion(), evalQuestion);
+                }
+            }
+            evalHelperList.add(new EvalHelper(eva, evalQuestions));
+/*
             for (Vote vote : eva.getVotes()) {
                 float grade = 0;
                 int studentsVoted = 0;
@@ -1259,7 +1294,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
                     }
                 }
                 averageGrade.put(eva.getUid(), (Math.round((grade/studentsVoted) * 100.0f) / 100.0f));
-            }
+            }*/
         }
         /*
         for (int i = 0; i < evaluationArray.size(); i++) // zählt evas durch
@@ -1288,7 +1323,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         }
         */
 
-        return averageGrade;
+        return evalHelperList;
     }
 
     private Boolean [][][]createPictureCommentList(List<Evaluation> evaluationArray) //gibt ein 2-Dimensionales Array mit allen Evaluationen (x) und booleans ob textfragen beantwortet wurden (y) zurück

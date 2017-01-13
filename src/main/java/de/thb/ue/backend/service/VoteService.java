@@ -59,6 +59,9 @@ public class VoteService implements IVoteService {
     @Autowired
     private StudyPathService studyPathService;
 
+    @Autowired
+    private EvaluationService evaluationService;
+
 
     @Override
     public Vote addAnswers(AnswersDTO answersDTO, String evaluationUID) throws EvaluationException, DBEntryDoesNotExistException, ValidationExeption {
@@ -68,6 +71,7 @@ public class VoteService implements IVoteService {
         StudyPath studyPath = null;
         //Add textAnswers
 
+        Evaluation evaluation = evaluationService.getByUID(evaluationUID);
 
         for (TextAnswerDTO answer : answersDTO.getTextAnswers()) {
             textAnswers.add(new TextAnswer((TextQuestion) questionRepo.findByText(answer.getQuestionText()).get(0), answer.getAnswerText()));
@@ -93,7 +97,7 @@ public class VoteService implements IVoteService {
             SingleChoiceAnswer singleChoiceAnswer;
 
             if (choiceDTO != null && multipleChoiceAnswerDTO.getQuestionText() != null && !multipleChoiceAnswerDTO.getQuestionText().isEmpty()) {
-                singleChoiceAnswer = new SingleChoiceAnswer((SingleChoiceQuestion) mcQuestionRepo.findByText(multipleChoiceAnswerDTO.getQuestionText()), choiceService.get(choiceDTO.getChoiceText(), choiceDTO.getGrade()));
+                singleChoiceAnswer = new SingleChoiceAnswer((SingleChoiceQuestion) mcQuestionRepo.findByTextAndQuestionRevision(multipleChoiceAnswerDTO.getQuestionText(), evaluation.getQuestionRevision().getId()), choiceService.get(choiceDTO.getChoiceText(), choiceDTO.getGrade()));
             } else {
                 throw new ValidationExeption(ValidationExeption.OBJECT_INVALID,
                         "Given MultipleChoiceAnswerDTO was invalid.");
