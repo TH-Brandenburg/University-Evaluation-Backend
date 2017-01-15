@@ -21,14 +21,9 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
-import de.thb.ue.backend.service.AggregatedMCAnswerService;
 import de.thb.ue.backend.service.interfaces.*;
-import de.thb.ue.backend.util.AggregateEvaluationHelper;
-import de.thb.ue.backend.util.EvalAnalysisHelper;
-import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
 import de.thb.ue.backend.util.eval_helper.EvalHelper;
-import de.thb.ue.backend.util.eval_helper.EvalQuestion;
 import de.thb.ue.backend.util.eval_helper.EvalScQuestion;
 import de.thb.ue.dto.util.Department;
 import lombok.extern.slf4j.Slf4j;
@@ -414,7 +409,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         String subjectGradeFourName = "nicht vorhanden";
         String subjectGradeFiveName = "nicht vorhanden";
 
-        List<EvalAnalysisHelper> evalAnalysisHelpers = new ArrayList<>();
+        /*List<EvalAnalysisHelper> evalAnalysisHelpers = new ArrayList<>();
         for (Evaluation evaluation : relEvaList) {
             Map<Question, AggregateEvaluationHelper> map = new HashMap<>();
             for (Question question : evaluation.getQuestionRevision().getQuestions()) {
@@ -423,10 +418,10 @@ public class ViewController extends WebMvcConfigurerAdapter {
                 }
             }
             evalAnalysisHelpers.add(new EvalAnalysisHelper(evaluation, map));
-        }
+        }*/
 
-        model.addAttribute("evalHelper", evalAnalysisHelpers);
-        model.addAttribute("test", evaluationService.getAvgForEvaluation(evaluations.get(0)));
+        //model.addAttribute("evalHelper", evalAnalysisHelpers);
+        //model.addAttribute("test", evaluationService.getAvgForEvaluation(evaluations.get(0)));
 
         for (int i = 0; i < collumnEvaList.size(); i++) {
             if (i == 5) {

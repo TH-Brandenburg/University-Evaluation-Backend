@@ -17,15 +17,11 @@
 package de.thb.ue.backend.util;
 
 import de.thb.ue.backend.model.*;
+import lombok.NonNull;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.joda.time.LocalDateTime;
 
@@ -35,9 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import de.thb.ue.backend.model.SingleChoiceAnswer;
-import lombok.NonNull;
 
 public class EvaluationExcelFileGenerator {
 
@@ -216,7 +209,7 @@ public class EvaluationExcelFileGenerator {
                         // the correct question for this cell
                         if (answer.getQuestion().getText().equals(mcQuestionTexts.get(k))) {
                             Choice choice = answer.getChoice();
-                            if (choice != null && choice.getGrade() > 0) {
+                            if (choice != null && choice.getGrade() != 0) {
                                 cell = colorizeCell(cell, wb, choice.getGrade());
                                 cell.setCellValue(answer.getChoice().getGrade());
                             } else {
