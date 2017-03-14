@@ -105,12 +105,13 @@
                                         </td>
                                     </tr>
                             </table>
-                            <div>
+                            <div th:unless="${#lists.isEmpty(evalHelper.evaluation.votes)}">
                                 <table th:each="a, aterstat : ${evalHelper.evaluation.votes[0].textAnswers}" class="table table-striped">
                                     <th th:text="${evalHelper.evaluation.votes.get(0).textAnswers.get(aterstat.index).textQuestion.text}">
                                     </th>
                                     <tr th:each="vote, stat : ${evalHelper.evaluation.votes}">
-                                        <td th:text="${stat.count + '. ' + evalHelper.evaluation.votes.get(stat.index).textAnswers.get(aterstat.index).text}">
+                                        <div th:unless="${#lists.isEmpty(vote.textAnswers)}">
+                                        <td th:text="${stat.count + '. ' + vote.textAnswers.get(aterstat.index).text}">
                                             k.A.
                                         </td>
                                         <td th:if="${pictureCommentList[estat.index][stat.index][aterstat.index]}">
@@ -119,6 +120,7 @@
                                     </span>
                                             </a>
                                         </td>
+                                        </div>
                                     </tr>
                                 </table>
                             </div>
