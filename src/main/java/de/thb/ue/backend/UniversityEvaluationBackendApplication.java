@@ -30,7 +30,7 @@ import org.springframework.util.SocketUtils;
 public class UniversityEvaluationBackendApplication extends SpringBootServletInitializer {
 
     // SSL-Config
-    /*@Bean
+    @Bean
     public EmbeddedServletContainerFactory servletContainer() {
         TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory();
         tomcat.addAdditionalTomcatConnectors(createStandardConnector());
@@ -41,7 +41,7 @@ public class UniversityEvaluationBackendApplication extends SpringBootServletIni
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         connector.setPort(8080);
         return connector;
-    }*/
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(UniversityEvaluationBackendApplication.class, args);

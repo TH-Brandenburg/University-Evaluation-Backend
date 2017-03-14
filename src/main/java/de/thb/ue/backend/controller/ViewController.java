@@ -414,7 +414,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
         String subjectGradeFourName = "nicht vorhanden";
         String subjectGradeFiveName = "nicht vorhanden";
 
-        List<EvalAnalysisHelper> evalAnalysisHelpers = new ArrayList<>();
+        /*List<EvalAnalysisHelper> evalAnalysisHelpers = new ArrayList<>();
         for (Evaluation evaluation : relEvaList) {
             Map<Question, AggregateEvaluationHelper> map = new HashMap<>();
             for (Question question : evaluation.getQuestionRevision().getQuestions()) {
@@ -427,6 +427,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 
         model.addAttribute("evalHelper", evalAnalysisHelpers);
         model.addAttribute("test", evaluationService.getAvgForEvaluation(evaluations.get(0)));
+        */
 
         for (int i = 0; i < collumnEvaList.size(); i++) {
             if (i == 5) {
