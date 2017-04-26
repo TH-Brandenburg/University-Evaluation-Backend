@@ -113,6 +113,6 @@ public class InitializationService implements IInitializationService {
         questions.addAll(singleChoiceQuestionsForRevision);
 
         questionRevisionRepo.save(new QuestionRevision(revisionName,
-                questions, choicesForRevision,textQuestionsFirst));
+                questions, choicesForRevision,textQuestionsFirst, false));
     }
 }

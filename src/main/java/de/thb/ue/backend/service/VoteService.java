@@ -72,7 +72,7 @@ public class VoteService implements IVoteService {
         //Add textAnswers
 
         Evaluation evaluation = evaluationService.getByUID(evaluationUID);
-
+        
         for (TextAnswerDTO answer : answersDTO.getTextAnswers()) {
             textAnswers.add(new TextAnswer((TextQuestion) questionRepo.findByText(answer.getQuestionText()).get(0), answer.getAnswerText()));
         }

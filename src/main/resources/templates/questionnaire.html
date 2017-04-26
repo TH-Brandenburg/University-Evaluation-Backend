@@ -2,6 +2,15 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="stdTemplate :: #head"></head>
 
+<script>
+	window.addEventListener("beforeunload", function() {
+		var ans = confirm("Deine Änderungen werden nicht gespeichert. Bist du sicher?");
+		if (ans) {
+			//TODO: add your code here
+		}
+	}, false);
+</script>
+
 <body>
 	<!-- Navigation bar -->
 	<nav class="navbar navbar-default">
@@ -223,6 +232,7 @@
 						<button id="new-question" class="btn btn-danger" type="button">Neue Frage</button>
 					</div>
 					<div class="pull-right">
+						<a href="/questionnaires"><button type="button" class="btn btn-danger">Abbrechen</button></a>
 						<button class="btn btn-danger" type="submit">Speichern</button>
 						<p>&nbsp;</p>
 					</div>

@@ -18,6 +18,7 @@ package de.thb.ue.backend.util;
 
 import de.thb.ue.backend.model.*;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -32,10 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+@Slf4j
 public class EvaluationExcelFileGenerator {
 
-//    @Value("${working-directory:}") //TODO
-    private String workingDirectoryPath = "media";
+    private File workingDirectory;
 
     // configure cell styles
     private CellStyle commonStyle = null;
@@ -65,7 +66,7 @@ public class EvaluationExcelFileGenerator {
     public EvaluationExcelFileGenerator(String evaluationUID, List<AggregatedSingleChoiceAnswer> aggregatedSingleChoiceAnswers,
                                         List<String> tutors, List<String> mcQuestionTexts, List<String> textualQuestionTexts,
                                         List<Vote> studentVotes, String subject, SemesterType semesterType,
-                                        LocalDateTime dateOfEvaluation, int numberStudentsAll, int numberStudentsVoted) {
+                                        LocalDateTime dateOfEvaluation, int numberStudentsAll, int numberStudentsVoted, File  workingDirectory) {
         this.evaluationUID = evaluationUID;
         this.aggregatedSingleChoiceAnswers = aggregatedSingleChoiceAnswers;
         this.tutors = tutors;
@@ -77,6 +78,7 @@ public class EvaluationExcelFileGenerator {
         this.dateOfEvaluation = dateOfEvaluation;
         this.numberStudentsAll = numberStudentsAll;
         this.numberStudentsVoted = numberStudentsVoted;
+        this.workingDirectory = workingDirectory;
     }
 
     public void generateExcelFile() {
@@ -84,11 +86,12 @@ public class EvaluationExcelFileGenerator {
         Row row;
         Cell cell;
         int yOffset = 1;
-        File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
-        if (!workingDirectory.exists()) {
-            workingDirectory.mkdir();
+        //File workingDirectory = new File((workingDirectoryPath.isEmpty() ? "" : (workingDirectoryPath + File.separatorChar)) + evaluationUID);
+        log.error(this.workingDirectory.getAbsolutePath());
+        if (!this.workingDirectory.exists()) {
+            this.workingDirectory.mkdir();
         }
-        File file = new File(workingDirectory,  "auswertung.xls");
+        File file = new File(this.workingDirectory,  "auswertung.xls");
 
         try {
             FileOutputStream out = new FileOutputStream(file);

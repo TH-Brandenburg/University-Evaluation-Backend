@@ -16,18 +16,16 @@
 
 package de.thb.ue.backend.model;
 
-import java.util.List;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -53,6 +51,9 @@ public class QuestionRevision extends BaseModel {
 
     @NotNull
     private Boolean textQuestionsFirst;
+
+    @NotNull
+    private Boolean deleted;
 
 
     @Override

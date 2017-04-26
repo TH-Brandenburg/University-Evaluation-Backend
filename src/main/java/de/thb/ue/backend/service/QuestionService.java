@@ -17,17 +17,8 @@
 package de.thb.ue.backend.service;
 
 import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.Choice;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.SingleChoiceQuestion;
-import de.thb.ue.backend.model.TextQuestion;
-import de.thb.ue.backend.repository.IChoice;
-import de.thb.ue.backend.repository.IEvaluation;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.repository.ISCQuestion;
-import de.thb.ue.backend.repository.ITextQuestion;
+import de.thb.ue.backend.model.*;
+import de.thb.ue.backend.repository.*;
 import de.thb.ue.backend.service.interfaces.IQuestionsService;
 import de.thb.ue.backend.util.DTOMapper;
 import de.thb.ue.backend.util.QuestionType;
@@ -156,7 +147,14 @@ public class QuestionService implements IQuestionsService {
     
     @Override
     public List<QuestionRevision> findAllQuestionRevisions() {
-    	return questionRevisionRepo.findAll();
+        List<QuestionRevision> questionRevisions = questionRevisionRepo.findAll();
+        List<QuestionRevision> returnList = new ArrayList<>();
+        for (QuestionRevision revision : questionRevisions) {
+            if (!revision.getDeleted()) {
+                returnList.add(revision);
+            }
+        }
+    	return returnList;
     }
     
     @Override
@@ -172,11 +170,16 @@ public class QuestionService implements IQuestionsService {
     @Override
     public void deleteQuestionRevisionById(int id) {
     	QuestionRevision questionRevision = questionRevisionRepo.findOne(id);
-    	questionRevisionRepo.delete(id);
+        questionRevision.setName(questionRevision.getName() + " (deleted)");
+        questionRevision.setDeleted(true);
+        questionRevisionRepo.save(questionRevision);
+
+        /*questionRevisionRepo.delete(id);
     	
     	List<Question> questions = questionRevision.getQuestions();
     	List<Choice> choices = questionRevision.getChoices();
     	deleteQuestionsAndChoices(choices, questions);
+    	*/
     }
     
     @Override

@@ -21,14 +21,9 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
-import de.thb.ue.backend.service.AggregatedMCAnswerService;
 import de.thb.ue.backend.service.interfaces.*;
-import de.thb.ue.backend.util.AggregateEvaluationHelper;
-import de.thb.ue.backend.util.EvalAnalysisHelper;
-import de.thb.ue.backend.util.QuestionType;
 import de.thb.ue.backend.util.SemesterType;
 import de.thb.ue.backend.util.eval_helper.EvalHelper;
-import de.thb.ue.backend.util.eval_helper.EvalQuestion;
 import de.thb.ue.backend.util.eval_helper.EvalScQuestion;
 import de.thb.ue.dto.util.Department;
 import lombok.extern.slf4j.Slf4j;
@@ -536,6 +531,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 				return "newQuestionnaire";
 			}
 		}
+		questionnaire.setDeleted(false);
 
 		int id = questionsService.saveQuestionRevision(questionnaire).getId();
 
@@ -569,6 +565,7 @@ public class ViewController extends WebMvcConfigurerAdapter {
 		boolean evaluationExistsForQuestionRevision = evaluationService.evaluationWithQuestionRevisionExists(Integer.parseInt(id));
 		if (evaluationExistsForQuestionRevision) {
 			QuestionRevision newQuestionnaire = new QuestionRevision();
+            newQuestionnaire.setDeleted(false);
 			newQuestionnaire = hydrateQuestionRevision(newQuestionnaire, allRequestParams);
 			String name = allRequestParams.get("name").trim();
 			List<String> revisionNames = questionsService.getRevisionNames();

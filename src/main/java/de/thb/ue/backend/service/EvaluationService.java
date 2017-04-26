@@ -23,11 +23,8 @@ import de.thb.ue.backend.exception.DBEntryDoesNotExistException;
 import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.model.*;
-import de.thb.ue.backend.repository.IChoice;
-import de.thb.ue.backend.repository.IEvaluation;
-import de.thb.ue.backend.repository.IQuestionRevision;
-import de.thb.ue.backend.repository.ISCQuestion;
-import de.thb.ue.backend.repository.ITextQuestion;
+import de.thb.ue.backend.repository.*;
+import de.thb.ue.backend.service.interfaces.*;
 import de.thb.ue.backend.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -46,23 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import de.thb.ue.backend.model.Evaluation;
-import de.thb.ue.backend.model.Participant;
-import de.thb.ue.backend.model.Question;
-import de.thb.ue.backend.model.QuestionRevision;
-import de.thb.ue.backend.model.Subject;
-import de.thb.ue.backend.model.Tutor;
-import de.thb.ue.backend.model.Vote;
-import de.thb.ue.backend.service.interfaces.IAggregatedMCAnswerService;
-import de.thb.ue.backend.service.interfaces.IEvaluationService;
-import de.thb.ue.backend.service.interfaces.IParticipantService;
-import de.thb.ue.backend.service.interfaces.ISubjectService;
-import de.thb.ue.backend.service.interfaces.ITutorService;
-import de.thb.ue.backend.util.EvaluationExcelFileGenerator;
-import de.thb.ue.backend.util.QRCGeneration;
-import de.thb.ue.backend.util.SemesterType;
-import de.thb.ue.backend.util.ZipHelper;
 
 @Slf4j
 @Component
@@ -215,13 +195,13 @@ public class EvaluationService implements IEvaluationService {
             if (votes != null && !votes.isEmpty()) {
                 aggregatedSingleChoiceAnswers = aggregatedMCAnswerService.aggregate(votes, evaluation.getQuestionRevision().getName());
 
-                List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getUsername()).collect(Collectors.toList());
+                List<String> tutors = evaluation.getTutors().stream().map(tutor -> tutor.getName() + " " + tutor.getFamilyName()).collect(Collectors.toList());
                 List<String> mcQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
                 List<String> textualQuestions = evaluation.getQuestionRevision().getQuestions().stream().map(Question::getText).collect(Collectors.toList());
                 new EvaluationExcelFileGenerator(evaluationUID, aggregatedSingleChoiceAnswers, tutors, mcQuestions,
                         textualQuestions, evaluation.getVotes(), evaluation.getSubject().getName(),
                         evaluation.getSemesterType(), evaluation.getDateOfEvaluation(), evaluation.getStudentsAll(),
-                        evaluation.getStudentsVoted()).generateExcelFile();
+                        evaluation.getStudentsVoted(), workingDirectory).generateExcelFile();
                 try {
                     File imageFolder = new File(workingDirectory, "images");
                     String[] images = imageFolder.list();

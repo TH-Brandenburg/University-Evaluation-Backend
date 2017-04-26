@@ -24,7 +24,6 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.SocketUtils;
 
 @SpringBootApplication
 public class UniversityEvaluationBackendApplication extends SpringBootServletInitializer {
@@ -36,6 +35,7 @@ public class UniversityEvaluationBackendApplication extends SpringBootServletIni
         tomcat.addAdditionalTomcatConnectors(createStandardConnector());
         return tomcat;
     }
+
 
     private Connector createStandardConnector() {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");

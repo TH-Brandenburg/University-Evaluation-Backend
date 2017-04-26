@@ -21,6 +21,7 @@ import de.thb.ue.backend.exception.EvaluationException;
 import de.thb.ue.backend.exception.ParticipantException;
 import de.thb.ue.backend.exception.ValidationExeption;
 import de.thb.ue.backend.model.Evaluation;
+import de.thb.ue.backend.model.Participant;
 import de.thb.ue.backend.model.Subject;
 import de.thb.ue.backend.model.Vote;
 import de.thb.ue.backend.service.TutorService;
@@ -41,6 +42,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @org.springframework.web.bind.annotation.RestController
@@ -88,6 +91,20 @@ public class RestController {
 //        return new ResponseEntity<>("Deletion is the answer!", HttpStatus.OK);
 //    }
 
+    @CrossOrigin
+    @RequestMapping(value = API_VERSION + "/token", method = RequestMethod.GET)
+    ResponseEntity<?> getVoteTokenForEvaluation(@RequestParam String uid) throws DBEntryDoesNotExistException, IOException, EvaluationException {
+        Evaluation evaluation = evaluationService.getByUID(uid);
+        List<String> voteToken = new ArrayList<>();
+        for (Participant participant : participantService.getByEvaluation(evaluation)) {
+            if (participant.getDeviceID().length() == 0) {
+                voteToken.add(participant.getVoteToken());
+            }
+        }
+        return new ResponseEntity<>(voteToken,HttpStatus.OK);
+    }
+
+    @CrossOrigin
     @RequestMapping(value = API_VERSION + "/questions", method = RequestMethod.POST)
     @ResponseBody
     ResponseEntity<?> getQuestions(@RequestBody RequestDTO requestDTO) throws DBEntryDoesNotExistException, EvaluationException, ParticipantException {
@@ -118,12 +135,16 @@ public class RestController {
         return new ResponseEntity<>(false, HttpStatus.OK);
     }*/
 
+    @CrossOrigin
     @RequestMapping(value = API_VERSION + "/answers", method = RequestMethod.POST)
     @ResponseBody
     ResponseEntity<ResponseDTO> addAnswers(@RequestParam("answers-dto") String answerDTOString, @RequestParam("images") MultipartFile images) throws DBEntryDoesNotExistException, EvaluationException, ParticipantException, IOException, ValidationExeption {
         AnswersDTO answersDTO = DTOMapper.stringToAnswersDTO(answerDTOString);
-        participantService.setVoted(answersDTO.getVoteToken(), answersDTO.getDeviceID());
         Evaluation evaluation = participantService.getEvaluation(answersDTO.getVoteToken());
+        if ((answersDTO.getMcAnswers().size() + answersDTO.getTextAnswers().size() != evaluation.getQuestionRevision().getQuestions().size())) {
+            return new ResponseEntity<>(new ResponseDTO("There are missing Answers", ErrorType.MALFORMED_REQUEST), HttpStatus.BAD_REQUEST);
+        }
+        participantService.setVoted(answersDTO.getVoteToken(), answersDTO.getDeviceID());
         Vote vote = voteService.addAnswers(answersDTO, evaluation.getUid());
         evaluationService.addVote(vote, evaluation.getUid());
         if(!images.isEmpty()){
